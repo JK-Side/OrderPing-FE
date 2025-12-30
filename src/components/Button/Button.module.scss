@@ -1,0 +1,124 @@
+@use '@/styles/colors' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:focus-visible {
+    outline-offset: 2px;
+  }
+}
+
+/* =========================
+    Sizes
+========================= */
+.sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.md {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+.lg {
+  height: 48px;
+  padding: 0 20px;
+  font-size: 16px;
+}
+
+/* =========================
+    Variants
+========================= */
+.primary {
+  background: $primary-50;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $primary-60;
+  }
+
+  &:active:not(:disabled) {
+    background: $primary-70;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $primary-20;
+  }
+
+  &:disabled {
+    background: $gray-20;
+    color: $gray-40;
+  }
+}
+
+.ghost {
+  background: $white;
+  color: $primary-50;
+  border: 1px solid $primary-50;
+
+  &:hover:not(:disabled) {
+    background: $primary-10;
+  }
+
+  &:active:not(:disabled) {
+    background: $primary-20;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $primary-20;
+  }
+
+  &:disabled {
+    background: $white;
+    border-color: $gray-20;
+    color: $gray-40;
+  }
+}
+
+.danger {
+  background: $red-50;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $red-60;
+  }
+
+  &:active:not(:disabled) {
+    background: $red-70;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $red-20;
+  }
+
+  &:disabled {
+    background: $gray-20;
+    color: $gray-40;
+  }
+}
+
+/* =========================
+    Utils
+========================= */
+.fullWidth {
+  width: 100%;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
