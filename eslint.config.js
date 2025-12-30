@@ -84,6 +84,8 @@ export default defineConfig([
       'import/default': 'off',
       'import/namespace': 'off',
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'import/no-named-as-default': 'off',
+      'import/no-named-as-default-member': 'off',
     },
   },
   prettier,
