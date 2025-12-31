@@ -1,0 +1,109 @@
+@use '@/styles/colors' as *;
+
+/* =========================
+    Wrapper
+========================= */
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* =========================
+    Label
+========================= */
+.label {
+  font-size: 14px;
+  font-weight: 600; // semibold
+  color: $gray-80;
+}
+
+.required {
+  margin-left: 2px;
+  color: $red-50;
+}
+
+/* =========================
+    Input Base
+========================= */
+.input,
+.textarea,
+.select {
+  width: 100%;
+  padding: 10px 12px;
+
+  background: $grayscale-10;
+  border: none;
+  border-radius: 4px;
+
+  font-size: 14px;
+  color: $black;
+
+  &::placeholder {
+    color: $grayscale-50;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary-20;
+    background: $white;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background: $gray-20;
+    color: $gray-40;
+  }
+}
+
+/* =========================
+    Textarea
+========================= */
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* =========================
+    Message
+========================= */
+.info-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.message {
+  font-size: 12px;
+
+  &.error {
+    color: $red-50;
+  }
+
+  &.warning {
+    color: $yellow-50;
+  }
+
+  &.success {
+    color: $green-50;
+  }
+
+  &.info {
+    color: $primary-50;
+  }
+}
+
+/* =========================
+    Image Input
+========================= */
+.image {
+  height: 120px;
+  border-radius: 4px;
+  border: 2px dashed $gray-30;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: $gray-50;
+  cursor: pointer;
+}
