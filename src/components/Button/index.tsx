@@ -12,6 +12,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
 }
 
+/* ----------------------------------------------
+  사용법
+
+  <Button>확인</Button>
+  <Button variant="ghost">확인</Button>
+
+---------------------------------------------- */
+
 export default function Button({
   variant = 'primary',
   size = 'md',
