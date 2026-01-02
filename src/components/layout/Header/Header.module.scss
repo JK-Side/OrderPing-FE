@@ -1,0 +1,16 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+}
+.logo {
+  text-decoration: none;
+}
+.nav {
+  display: flex;
+  gap: 12px;
+}
+.navItem {
+  text-decoration: none;
+}
