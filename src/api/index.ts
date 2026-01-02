@@ -1,4 +1,4 @@
-import { getCookie } from '@/utils/ts/cookie';
+import { AUTH_TOKEN_KEY } from '@/constants/auth';
 
 const BASE_URL = import.meta.env.VITE_API_PATH;
 
@@ -72,7 +72,7 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
     throw new Error('HTTP method가 설정되지 않았습니다.');
   }
 
-  const token = getCookie('AUTH_TOKEN_KEY');
+  const token = localStorage.getItem(AUTH_TOKEN_KEY);
 
   let url = joinUrl(BASE_URL, endPoint);
   if (params && Object.keys(params).length > 0) {

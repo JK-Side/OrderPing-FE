@@ -1,6 +1,5 @@
-import { getAuthHeader } from '@/utils/ts/auth';
 import { apiClient } from '..';
-import { LogoutRequest, InfoResponse } from './entity';
+import { LogoutRequest, UserInfoResponse } from './entity';
 
 export const postLogout = async (refreshToken: string) => {
   return await apiClient.post<LogoutRequest>('/api/auth/logout', {
@@ -9,7 +8,5 @@ export const postLogout = async (refreshToken: string) => {
 };
 
 export const getUserInfo = async () => {
-  return await apiClient.get<InfoResponse>('/api/main', {
-    headers: getAuthHeader(),
-  });
+  return await apiClient.get<UserInfoResponse>('/api/main');
 };

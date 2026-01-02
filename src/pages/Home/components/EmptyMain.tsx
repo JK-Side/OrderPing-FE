@@ -1,14 +1,15 @@
 import PlusIcon from '@/assets/icons/plus.svg?react';
+import { useUserInfo } from '@/utils/hooks/useUserInfo';
 import styles from './EmptyMain.module.scss';
 
 export default function EmptyMain() {
-  const userName = 'User';
+  const { data: userInfo } = useUserInfo();
 
   return (
     <section className={styles.emptyMain}>
       <div className={styles.greeting}>
         <h2 className={styles.title}>
-          <span className={styles.highlight}>{userName}</span> 님 안녕하세요.
+          <span className={styles.highlight}>{userInfo?.userName}</span> 님 안녕하세요.
         </h2>
         <p className={styles.subtitle}>주점을 클릭해 운영을 시작해 보세요!</p>
       </div>

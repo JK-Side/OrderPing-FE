@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY } from '@/constants/auth';
 
 export default function OAuthCallback() {
   const navigate = useNavigate();
@@ -12,8 +13,8 @@ export default function OAuthCallback() {
 
     if (!accessToken || !refreshToken) return;
 
-    localStorage.setItem('AUTH_TOKEN_KEY', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
 
     navigate('/', { replace: true });
   }, [navigate]);
