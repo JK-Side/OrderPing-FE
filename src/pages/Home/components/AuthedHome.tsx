@@ -3,7 +3,7 @@ import EmptyMain from './EmptyMain';
 import ReadyMain from './ReadyMain';
 
 export default function AuthedHome() {
-  const [hasShop] = useState(false);
+  const [hasShop] = useState(true);
 
   return <>{hasShop ? <ReadyMain /> : <EmptyMain />}</>;
 }
