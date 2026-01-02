@@ -3,7 +3,7 @@ import OrderPingLogo from '@/assets/logo/ORDERPING_LOGO_TEXT.png';
 import styles from './Header.module.scss';
 
 export default function Header() {
-  const isLogin = false; // 후에 로그인 확인 훅(ex. useAuth())으로 교체
+  const isLogin = true; // 후에 로그인 확인 훅(ex. useAuth())으로 교체
 
   return (
     <header className={styles.header}>
