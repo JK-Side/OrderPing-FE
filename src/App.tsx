@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import AppLayout from '@/components/layout';
 import Home from '@/pages/Home';
+import OAuthCallback from '@/pages/OAuthCallback';
 import './App.css';
 
 function App() {
@@ -10,6 +11,8 @@ function App() {
         <Route path="/" element={<Home />} />
         {/* <Route path="/login" element={<Login  />} /> */}
       </Route>
+
+      <Route path="/callback" element={<OAuthCallback />} />
     </Routes>
   );
 }

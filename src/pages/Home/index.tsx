@@ -1,9 +1,8 @@
-import { useState } from 'react';
 import AuthedHome from './components/AuthedHome';
 import GuestHome from './components/GuestHome';
 
 export default function Home() {
-  const [isLogin] = useState(true);
+  const isLoggedIn = !!localStorage.getItem('AUTH_TOKEN_KEY');
 
-  return <>{isLogin ? <AuthedHome /> : <GuestHome />}</>;
+  return <>{isLoggedIn ? <AuthedHome /> : <GuestHome />}</>;
 }
