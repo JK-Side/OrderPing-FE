@@ -1,0 +1,23 @@
+@use '@/styles/colors' as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 60px 80px 0px;
+}
+.logo {
+  text-decoration: none;
+}
+.nav {
+  display: flex;
+  gap: 40px;
+}
+.navItem {
+  text-decoration: none;
+  color: $black;
+
+  &:hover {
+    color: $primary-50;
+  }
+}

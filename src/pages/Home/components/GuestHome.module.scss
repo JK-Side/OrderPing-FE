@@ -1,0 +1,83 @@
+@use '@/styles/colors' as *;
+
+.guestHome {
+  padding: 60px 80px 120px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 48px;
+}
+
+.copy {
+  width: 100%;
+}
+
+.title {
+  margin: 0 0 20px;
+  font-size: 32px;
+  font-weight: 700;
+  color: $gray-90;
+}
+
+.accent {
+  color: $primary-50;
+}
+
+.descriptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.description {
+  color: $gray-60;
+  margin: 0;
+}
+
+.description:last-child {
+  margin-bottom: 0;
+}
+
+.lockPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+}
+
+.lockBox {
+  width: 250px;
+  height: 250px;
+  border: 2px dashed $gray-20;
+  border-radius: 16px;
+  background-color: $gray-10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lockText {
+  margin: 0;
+  font-size: 18px;
+  color: $gray-80;
+}
+
+@media (max-width: 900px) {
+  .guestHome {
+    padding: 56px 24px 80px;
+  }
+
+  .hero {
+    flex-direction: column;
+    gap: 100px;
+  }
+
+  .lockPanel {
+    width: 100%;
+    padding-top: 0;
+  }
+}
