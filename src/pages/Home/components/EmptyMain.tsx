@@ -20,7 +20,7 @@ export default function EmptyMain() {
       <button
         type="button"
         className={styles.panel}
-        onClick={() => navigate('/shop/create')}
+        onClick={() => navigate('/store/create')}
       >
         <div className={styles.createBox}>
           <PlusIcon width={32} height={32} fill="#8e8e93" />

@@ -1,6 +1,6 @@
 @use '@/styles/colors' as *;
 
-.shopCreate {
+.storeCreate {
   --page-padding-top: 60px;
   --page-padding-x: 80px;
   --page-padding-bottom: 120px;
@@ -149,7 +149,7 @@
 }
 
 @media (max-width: 900px) {
-  .shopCreate {
+  .storeCreate {
     --page-padding-top: 56px;
     --page-padding-x: 24px;
     --page-padding-bottom: 80px;
