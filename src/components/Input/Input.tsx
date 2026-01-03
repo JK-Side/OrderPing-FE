@@ -31,5 +31,3 @@ export function InputRoot({ label, message, messageState, required, children }: 
     </div>
   );
 }
-
-/* 이제 에러문구 아이콘을 넣으세요. 피그마에서 내보내기부터 해야됩니다. */
