@@ -1,18 +1,25 @@
-import { FieldErrors, UseFormRegister } from 'react-hook-form';
+import { Controller, FieldErrors, type Control, type UseFormRegister } from 'react-hook-form';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import QrIcon from '@/assets/icons/qr-code.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
+import { useBanks } from '@/pages/StoreCreate/hooks/useBanks';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
 import styles from './AccoutInfo.module.scss';
 
 interface AccoutInfoProps {
   register: UseFormRegister<StoreCreateForm>;
+  control: Control<StoreCreateForm>;
   errors: FieldErrors<StoreCreateForm>;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
 }
 
-export default function AccoutInfo({ register, errors, onSubmit }: AccoutInfoProps) {
+export default function AccoutInfo({ register, control, errors, onSubmit }: AccoutInfoProps) {
+  const { data: banks, isLoading } = useBanks();
+  console.log(banks);
+
+  const bankOptions = banks?.map((b) => ({ value: b.code, label: b.name })) ?? [];
+
   return (
     <>
       <header className={styles.header}>
@@ -24,29 +31,22 @@ export default function AccoutInfo({ register, errors, onSubmit }: AccoutInfoPro
         <h2 className={styles.sectionTitle}>정산 계좌 정보</h2>
 
         <div className={styles.fields}>
-          <Input
-            label="은행명"
-            required
-            message={errors.bankCode?.message}
-            messageState={errors.bankCode ? 'error' : undefined}
-          >
-            <Input.Select
-              defaultValue=""
-              {...register('bankCode', {
-                required: '은행명을 선택해 주세요.',
-              })}
-            >
-              <option value="" disabled>
-                은행명을 선택해 주세요.
-              </option>
-              <option value="KB">국민은행</option>
-              <option value="SHINHAN">신한은행</option>
-              <option value="WOORI">우리은행</option>
-              <option value="NH">NH농협</option>
-              <option value="KAKAO">카카오뱅크</option>
-              <option value="TOSS">토스뱅크</option>
-            </Input.Select>
-          </Input>
+          <Controller
+            name="bankCode"
+            control={control}
+            rules={{ required: '은행명을 선택해 주세요.' }}
+            render={({ field }) => (
+              <Input.InputSelect
+                name={field.name}
+                value={field.value ?? ''}
+                onValueChange={field.onChange}
+                options={bankOptions}
+                placeholder="은행명을 선택해 주세요."
+                disabled={isLoading}
+                required
+              />
+            )}
+          />
 
           <Input
             label="예금주"

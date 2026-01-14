@@ -58,7 +58,7 @@
 }
 
 /* =========================
-    Select
+    InputSelect
 ========================= */
 .selectWrapper {
   position: relative;
@@ -82,6 +82,66 @@
 
 .selectWrapperOpen::after {
   transform: translateY(-50%) rotate(180deg);
+}
+
+.selectTrigger {
+  width: 100%;
+  padding: 10px 12px;
+  background: $grayscale-10;
+  border: none;
+  border-radius: 4px;
+  color: $black;
+  text-align: left;
+  &:focus-visible {
+    outline: 1px solid $primary-50;
+    background: $background;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background: $gray-20;
+    color: $gray-40;
+  }
+
+  &[data-placeholder] {
+    color: $grayscale-50;
+  }
+}
+
+.selectContent {
+  background: $grayscale-10;
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  width: var(--radix-select-trigger-width);
+  min-width: var(--radix-select-trigger-width);
+  z-index: 20;
+}
+
+.selectViewport {
+  padding: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.selectItem {
+  padding: 8px 10px;
+  border-radius: 4px;
+  font-size: 14px;
+  color: $black;
+  cursor: pointer;
+  user-select: none;
+
+  &[data-highlighted] {
+    background: $background;
+    outline: none;
+    color: $primary-50;
+  }
+
+  &[data-disabled] {
+    color: $gray-40;
+    cursor: not-allowed;
+  }
 }
 
 .select {

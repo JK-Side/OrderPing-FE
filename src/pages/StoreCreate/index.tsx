@@ -17,6 +17,7 @@ export default function StoreCreate() {
   const step = isStepParamValid ? stepParam : STEP_MIN;
   const {
     register,
+    control,
     handleSubmit,
     getValues,
     formState: { errors },
@@ -84,7 +85,12 @@ export default function StoreCreate() {
         {step === 1 ? (
           <StoreInfo register={register} errors={errors} onSubmit={handleSubmit(handleStoreInfoSubmit)} />
         ) : (
-          <AccoutInfo register={register} errors={errors} onSubmit={handleSubmit(handleAccountInfoSubmit)} />
+          <AccoutInfo
+            register={register}
+            control={control}
+            errors={errors}
+            onSubmit={handleSubmit(handleAccountInfoSubmit)}
+          />
         )}
       </div>
     </section>
