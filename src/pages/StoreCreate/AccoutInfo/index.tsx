@@ -1,4 +1,5 @@
-import { Controller, FieldErrors, type Control, type UseFormRegister } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { Controller, FieldErrors, type Control, type UseFormRegister, useWatch } from 'react-hook-form';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import QrIcon from '@/assets/icons/qr-code.svg?react';
 import Button from '@/components/Button';
@@ -19,6 +20,23 @@ export default function AccoutInfo({ register, control, errors, onSubmit }: Acco
   console.log(banks);
 
   const bankOptions = banks?.map((b) => ({ value: b.code, label: b.name })) ?? [];
+  const qrCodeImage = useWatch({ control, name: 'qrCodeImage' });
+  const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const file = qrCodeImage?.[0];
+    if (!file) {
+      setQrPreviewUrl(null);
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setQrPreviewUrl(previewUrl);
+
+    return () => {
+      URL.revokeObjectURL(previewUrl);
+    };
+  }, [qrCodeImage]);
 
   return (
     <>
@@ -88,8 +106,14 @@ export default function AccoutInfo({ register, control, errors, onSubmit }: Acco
             <h3 className={styles.qrTitle}>토스 QR 코드 등록</h3>
             <input id="qrCodeImage" type="file" accept="image/*" hidden {...register('qrCodeImage')} />
             <label className={styles.qrUpload} htmlFor="qrCodeImage">
-              <QrIcon className={styles.qrIcon} aria-hidden="true" />
-              <span>클릭하여 QR코드 삽입</span>
+              {qrPreviewUrl ? (
+                <img className={styles.qrPreview} src={qrPreviewUrl} alt="QR preview" />
+              ) : (
+                <>
+                  <QrIcon className={styles.qrIcon} aria-hidden="true" />
+                  <span>클릭하여 QR코드 삽입</span>
+                </>
+              )}
             </label>
             <button type="button" className={styles.qrHelp}>
               <InfoIcon className={styles.qrHelpIcon} aria-hidden="true" />

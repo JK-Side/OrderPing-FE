@@ -82,6 +82,14 @@
   cursor: pointer;
 }
 
+.qrPreview {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
 .qrIcon {
   width: 24px;
   height: 24px;
