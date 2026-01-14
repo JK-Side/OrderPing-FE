@@ -1,8 +1,3 @@
-export interface BankCodeResponse {
-  code: string,
-  name: string,
-}
-
 export interface PresignedUrlRequest {
   directory: string,
   fileName: string,
