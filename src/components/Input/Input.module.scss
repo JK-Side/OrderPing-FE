@@ -58,6 +58,42 @@
 }
 
 /* =========================
+    Select
+========================= */
+.selectWrapper {
+  position: relative;
+}
+
+.selectWrapper::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  background-image: url('@/assets/icons/arrow-down.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+  transform: translateY(-50%);
+  transition: transform 0.2s ease;
+  pointer-events: none;
+}
+
+.selectWrapperOpen::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.select {
+  appearance: none;
+  padding-right: 36px;
+
+  &::-ms-expand {
+    display: none;
+  }
+}
+
+/* =========================
     Textarea
 ========================= */
 .textarea {

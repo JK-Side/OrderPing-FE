@@ -44,7 +44,7 @@ export default function StoreInfo({ register, errors, onSubmit }: StoreInfoProps
             messageState={errors.storeDescription ? 'error' : undefined}
           >
             <Input.TextArea
-              placeholder={`주점 설명을 입력해 주세요.\n예시) 포인터 당장 삭제해. 날 잡초하는 건 우리 컵 청춘 주점 뿐이다.`}
+              placeholder={`주점 설명을 입력해 주세요.\n예시) 포인터 당장 삭제해. 널 참조하는 건 우리 컴공 주점 뿐이다.`}
               {...register('storeDescription', {
                 required: '주점 설명을 입력해 주세요.',
               })}

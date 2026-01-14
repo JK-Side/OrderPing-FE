@@ -1,28 +1,55 @@
 import clsx from 'clsx';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useSearchParams } from 'react-router-dom';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
 import AccoutInfo from './AccoutInfo';
 import styles from './StoreCreate.module.scss';
 import StoreInfo from './StoreInfo';
 
+const STEP_MIN = 1;
+const STEP_MAX = 3;
+
 export default function StoreCreate() {
-  const [step, setStep] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const stepParam = Number(searchParams.get('step'));
+  const isStepParamValid = Number.isInteger(stepParam) && stepParam >= STEP_MIN && stepParam <= STEP_MAX;
+  const step = isStepParamValid ? stepParam : STEP_MIN;
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm<StoreCreateForm>({
     mode: 'onBlur',
   });
 
+  const updateStep = useCallback(
+    (nextStep: number, options?: { replace?: boolean }) => {
+      const nextParams = new URLSearchParams(searchParams);
+      nextParams.set('step', String(nextStep));
+      setSearchParams(nextParams, options);
+    },
+    [searchParams, setSearchParams],
+  );
+
+  useEffect(() => {
+    if (!isStepParamValid) {
+      updateStep(STEP_MIN, { replace: true });
+    }
+  }, [isStepParamValid, updateStep]);
+
   const handleStoreInfoSubmit = useCallback<SubmitHandler<StoreCreateForm>>(() => {
-    setStep(2);
-  }, []);
+    updateStep(2);
+  }, [updateStep]);
 
   const handleAccountInfoSubmit = useCallback<SubmitHandler<StoreCreateForm>>(() => {
-    setStep(3);
-  }, []);
+    updateStep(3);
+  }, [updateStep]);
+
+  useEffect(() => {
+    console.log('step', step, getValues());
+  }, [step, getValues]);
 
   return (
     <section className={styles.storeCreate}>
