@@ -1,0 +1,45 @@
+@use '@/styles/colors' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 120px;
+  gap: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: $gray-90;
+  line-height: 1.4;
+}
+
+.storeName {
+  color: $primary-50;
+  margin-right: 6px;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: $gray-60;
+}
+
+.homeButton {
+  margin-top: 28px;
+  width: 160px;
+}
+
+@media (max-width: 900px) {
+  .container {
+    padding-top: 80px;
+  }
+
+  .homeButton {
+    width: 100%;
+    max-width: 240px;
+  }
+}

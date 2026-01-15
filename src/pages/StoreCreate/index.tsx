@@ -2,8 +2,11 @@ import clsx from 'clsx';
 import { useCallback, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
+import { postPresignedUrl } from '@/api/store';
+import { useCreateStore } from '@/pages/StoreCreate/hooks/useCreateStore';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
 import AccoutInfo from './AccoutInfo';
+import StoreCreateComplete from './Complete';
 import styles from './StoreCreate.module.scss';
 import StoreInfo from './StoreInfo';
 
@@ -24,6 +27,32 @@ export default function StoreCreate() {
   } = useForm<StoreCreateForm>({
     mode: 'onBlur',
   });
+  const { mutateAsync: createStore } = useCreateStore();
+
+  const uploadStoreImage = useCallback(async (storeImage?: FileList) => {
+    if (!storeImage?.length) {
+      return '';
+    }
+
+    const file = storeImage[0];
+    const { presignedUrl, imageUrl } = await postPresignedUrl({
+      directory: 'stores',
+      fileName: file.name,
+    });
+    const uploadResponse = await fetch(presignedUrl, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type || 'application/octet-stream',
+      },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload store image.');
+    }
+
+    return imageUrl;
+  }, []);
 
   const updateStep = useCallback(
     (nextStep: number, options?: { replace?: boolean }) => {
@@ -44,13 +73,30 @@ export default function StoreCreate() {
     updateStep(2);
   }, [updateStep]);
 
-  const handleAccountInfoSubmit = useCallback<SubmitHandler<StoreCreateForm>>(() => {
-    updateStep(3);
-  }, [updateStep]);
+  const handleAccountInfoSubmit = useCallback<SubmitHandler<StoreCreateForm>>(
+    async (data) => {
+      try {
+        const imageUrl = await uploadStoreImage(data.storeImage);
+        await createStore({
+          name: data.storeName,
+          description: data.storeDescription,
+          imageUrl,
+          bankCode: data.bankCode ?? '',
+          accountHolder: data.accountHolder ?? '',
+          accountNumber: data.accountNumber ?? '',
+        });
+        updateStep(3);
+      } catch (error) {
+        console.error('Failed to create store', error);
+      }
+    },
+    [createStore, updateStep, uploadStoreImage],
+  );
 
-  useEffect(() => {
-    console.log('step', step, getValues());
-  }, [step, getValues]);
+  // 단계별 확인 콘솔
+  // useEffect(() => {
+  //   console.log('step', step, getValues());
+  // }, [step, getValues]);
 
   return (
     <section className={styles.storeCreate}>
@@ -82,9 +128,8 @@ export default function StoreCreate() {
       </div>
 
       <div className={styles.content}>
-        {step === 1 ? (
-          <StoreInfo register={register} errors={errors} onSubmit={handleSubmit(handleStoreInfoSubmit)} />
-        ) : (
+        {step === 1 && <StoreInfo register={register} errors={errors} onSubmit={handleSubmit(handleStoreInfoSubmit)} />}
+        {step === 2 && (
           <AccoutInfo
             register={register}
             control={control}
@@ -92,6 +137,7 @@ export default function StoreCreate() {
             onSubmit={handleSubmit(handleAccountInfoSubmit)}
           />
         )}
+        {step === 3 && <StoreCreateComplete storeName={getValues('storeName')} />}
       </div>
     </section>
   );
