@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Controller, FieldErrors, type Control, type UseFormRegister, useWatch } from 'react-hook-form';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import QrIcon from '@/assets/icons/qr-code.svg?react';
@@ -17,26 +17,27 @@ interface AccoutInfoProps {
 
 export default function AccoutInfo({ register, control, errors, onSubmit }: AccoutInfoProps) {
   const { data: banks, isLoading } = useBanks();
-  console.log(banks);
 
   const bankOptions = banks?.map((b) => ({ value: b.code, label: b.name })) ?? [];
   const qrCodeImage = useWatch({ control, name: 'qrCodeImage' });
-  const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(null);
-
-  useEffect(() => {
+  const qrPreviewUrl = useMemo(() => {
     const file = qrCodeImage?.[0];
     if (!file) {
-      setQrPreviewUrl(null);
+      return null;
+    }
+
+    return URL.createObjectURL(file);
+  }, [qrCodeImage]);
+
+  useEffect(() => {
+    if (!qrPreviewUrl) {
       return;
     }
 
-    const previewUrl = URL.createObjectURL(file);
-    setQrPreviewUrl(previewUrl);
-
     return () => {
-      URL.revokeObjectURL(previewUrl);
+      URL.revokeObjectURL(qrPreviewUrl);
     };
-  }, [qrCodeImage]);
+  }, [qrPreviewUrl]);
 
   return (
     <>
