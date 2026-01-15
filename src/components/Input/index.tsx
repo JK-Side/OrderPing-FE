@@ -1,6 +1,6 @@
 import { Image } from './Image';
 import { InputRoot } from './Input';
-import { Select } from './Select';
+import InputSelect from './InputSelect';
 import { Text } from './Text';
 import { TextArea } from './TextArea';
 
@@ -20,6 +20,6 @@ import { TextArea } from './TextArea';
 export const Input = Object.assign(InputRoot, {
   Text,
   TextArea,
-  Select,
+  InputSelect,
   Image,
 });

@@ -1,0 +1,87 @@
+@use '@/styles/colors' as *;
+
+.header {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mainTitle {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  color: $gray-90;
+}
+
+.mainSubtitle {
+  margin: 0;
+  font-size: 14px;
+  color: $gray-60;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: $gray-90;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.imageField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: $gray-80;
+}
+
+.imageUpload {
+  height: 180px;
+  border-radius: 8px;
+  border: 2px dashed $gray-20;
+  background: $grayscale-10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: $gray-50;
+  cursor: pointer;
+}
+
+.uploadIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.uploadIcon path {
+  fill: $gray-40;
+}
+
+.nextButton {
+  width: 100%;
+  align-self: center;
+  margin-top: 30px;
+}
+
+@media (max-width: 900px) {
+  .nextButton {
+    width: 100%;
+  }
+}

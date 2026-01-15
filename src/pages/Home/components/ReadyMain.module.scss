@@ -42,7 +42,7 @@
   align-items: center;
 }
 
-.shopCard {
+.storeCard {
   padding: 30px 45px;
   border-radius: 16px;
   background-color: $white;
@@ -53,18 +53,18 @@
   gap: 30px;
 }
 
-.shopTitle {
+.storeTitle {
   margin: 0;
   font-size: 22px;
   font-weight: 600;
   color: $gray-90;
 }
 
-.shopName {
+.storeName {
   color: $primary-50;
 }
 
-.shopImageWrap {
+.storeImageWrap {
   width: 250px;
   height: 250px;
   display: flex;
@@ -72,14 +72,14 @@
   justify-content: center;
 }
 
-.shopImage {
+.storeImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
   border-radius: 12px;
 }
 
-.shopButton {
+.storeButton {
   min-width: 120px;
 }
 

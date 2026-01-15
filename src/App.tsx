@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import AppLayout from '@/components/layout';
 import Home from '@/pages/Home';
 import OAuthCallback from '@/pages/OAuthCallback';
+import StoreCreate from '@/pages/StoreCreate';
 import './App.css';
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/store/create" element={<StoreCreate />} />
         {/* <Route path="/login" element={<Login  />} /> */}
       </Route>
 

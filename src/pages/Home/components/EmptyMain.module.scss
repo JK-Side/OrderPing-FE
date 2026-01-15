@@ -31,10 +31,20 @@
 
 .panel {
   margin-top: 120px;
+  padding: 0;
+  border: none;
+  background: transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  cursor: pointer;
+}
+
+.panel:focus-visible {
+  outline: 3px solid $primary-20;
+  outline-offset: 6px;
+  border-radius: 18px;
 }
 
 .createBox {

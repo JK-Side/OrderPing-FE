@@ -1,0 +1,93 @@
+@use '@/styles/colors' as *;
+
+.storeCreate {
+  --page-padding-top: 60px;
+  --page-padding-x: 80px;
+  --page-padding-bottom: 120px;
+  padding: var(--page-padding-top) var(--page-padding-x) var(--page-padding-bottom);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+}
+
+.stepper {
+  position: absolute;
+  left: var(--page-padding-x);
+  top: var(--page-padding-top);
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  min-width: 180px;
+}
+
+.stepper::before {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 30px;
+  bottom: 30px;
+  width: 2px;
+  background: $gray-20;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.stepCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: $gray-20;
+  color: $gray-60;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.stepLabel {
+  font-weight: 600;
+  color: $gray-60;
+}
+
+.stepItemActive .stepCircle {
+  background: $primary-50;
+  color: $white;
+}
+
+.stepItemActive .stepLabel {
+  color: $primary-50;
+}
+
+.content {
+  width: 100%;
+  max-width: 560px;
+}
+
+@media (max-width: 900px) {
+  .storeCreate {
+    --page-padding-top: 56px;
+    --page-padding-x: 24px;
+    --page-padding-bottom: 80px;
+    flex-direction: column;
+    gap: 40px;
+    justify-content: flex-start;
+  }
+
+  .stepper {
+    min-width: auto;
+    position: relative;
+    left: auto;
+    top: auto;
+  }
+
+  .content {
+    max-width: 100%;
+  }
+}

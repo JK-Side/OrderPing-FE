@@ -2,7 +2,7 @@ export interface LogoutRequest {
   refreshToken: string;
 }
 
-export interface InfoResponse {
+export interface UserInfoResponse {
   userName: string;
   stores: Store[];
 }
