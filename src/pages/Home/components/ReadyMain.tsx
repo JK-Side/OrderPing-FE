@@ -4,19 +4,29 @@ import AlternativeImg from '@/assets/img/basic-img.png';
 import Button from '@/components/Button';
 import styles from './ReadyMain.module.scss';
 
-export default function ReadyMain() {
-  const userName = 'User';
-  const storeName = '주점명';
-  const storeImageUrl = '';
+type StoreInfo = {
+  id: number;
+  name: string;
+  imageUrl: string;
+};
+
+interface ReadyMainProps {
+  userName?: string;
+  store?: StoreInfo;
+}
+
+export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) {
+  const storeName = store?.name ?? '주점';
+  const storeImageUrl = store?.imageUrl ?? '';
   const storeImage = storeImageUrl || AlternativeImg;
 
   return (
     <section className={styles.readyMain}>
       <div className={styles.greeting}>
         <h2 className={styles.title}>
-          <span className={styles.highlight}>{userName}</span> 님 안녕하세요.
+          <span className={styles.highlight}>{userName}</span> 님, 안녕하세요!
         </h2>
-        <p className={styles.subtitle}>주점을 클릭해 운영을 시작해 보세요!</p>
+        <p className={styles.subtitle}>주점 운영을 시작해볼까요?</p>
       </div>
 
       <div className={styles.panel}>
@@ -29,7 +39,7 @@ export default function ReadyMain() {
               <img className={styles.storeImage} src={storeImage} alt={`${storeName} 주점`} />
             </div>
             <Button className={styles.storeButton} size="md">
-              주점 운영
+              주점 시작
             </Button>
           </div>
 
@@ -45,13 +55,11 @@ export default function ReadyMain() {
           <div className={styles.guideItems}>
             <div className={styles.guideItem}>
               <div className={styles.guideHeading}>주점 설정</div>
-              <div className={styles.guideText}>
-                주점명, 메뉴 추가, 재고 관리 등 주점 기본 설정을 할 수 있어요!
-              </div>
+              <div className={styles.guideText}>주점 정보를 등록하고 운영 설정을 확인할 수 있어요.</div>
             </div>
             <div className={styles.guideItem}>
-              <div className={styles.guideHeading}>주점 운영</div>
-              <div className={styles.guideText}>축제 당일, 주점 운영을 진행할 수 있어요!</div>
+              <div className={styles.guideHeading}>주점 시작</div>
+              <div className={styles.guideText}>주문을 받고 판매를 시작해보세요.</div>
             </div>
           </div>
         </aside>
