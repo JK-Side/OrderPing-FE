@@ -1,2 +1,0 @@
-export const AUTH_TOKEN_KEY = 'AUTH_TOKEN_KEY';
-export const REFRESH_TOKEN_KEY = 'REFRESH_TOKEN_KEY';

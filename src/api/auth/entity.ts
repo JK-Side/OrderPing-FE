@@ -12,3 +12,12 @@ interface Store {
   name: string;
   imageUrl: string;
 }
+
+export interface RefreshRequest {
+  refreshToken: string;
+}
+
+export interface RefreshResponse {
+  accessToken: string;
+  refreshToken?: string;
+}

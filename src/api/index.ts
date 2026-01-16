@@ -1,4 +1,6 @@
-import { AUTH_TOKEN_KEY } from '@/constants/auth';
+import { RefreshResponse } from '@/api/auth/entity';
+import { useAuthStore } from '@/stores/auth';
+import { redirectToLogin } from '@/utils/ts/auth';
 
 const BASE_URL = import.meta.env.VITE_API_PATH;
 
@@ -13,7 +15,11 @@ interface FetchOptions<P extends object = Record<string, QueryParamValue>> exten
   headers?: Record<string, string>;
   body?: unknown;
   params?: P;
+  skipAuth?: boolean;
+  skipRefresh?: boolean;
 }
+
+let refreshPromise: Promise<string | null> | null = null;
 
 export const apiClient = {
   get: <T = unknown, P extends object = Record<string, QueryParamValue>>(
@@ -66,13 +72,15 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
   options: FetchOptions<P> = {},
   timeout: number = 10000,
 ): Promise<T> {
-  const { headers, body, method, params, ...restOptions } = options;
+  const { headers, body, method, params, skipAuth, skipRefresh, ...restOptions } = options;
 
   if (!method) {
     throw new Error('HTTP method가 설정되지 않았습니다.');
   }
 
-  const token = localStorage.getItem(AUTH_TOKEN_KEY);
+  const token = !skipAuth
+    ? useAuthStore.getState().accessToken
+    : null;
 
   let url = joinUrl(BASE_URL, endPoint);
   if (params && Object.keys(params).length > 0) {
@@ -94,6 +102,7 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
       },
       method,
       signal: abortController.signal,
+      credentials: restOptions.credentials ?? 'include',
       ...restOptions,
     };
 
@@ -105,6 +114,13 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
     }
 
     const response = await fetch(url, fetchOptions);
+
+    if (response.status === 401 && !skipAuth && !skipRefresh) {
+      const refreshedToken = await refreshAccessToken();
+      if (refreshedToken) {
+        return sendRequest<T, P>(endPoint, { ...options, skipRefresh: true }, timeout);
+      }
+    }
 
     if (!response.ok) {
       const errorMessage = await parseResponseText(response);
@@ -122,10 +138,60 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
     if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('요청 시간이 초과되었습니다.');
     }
+    if (error instanceof TypeError && !skipAuth && !skipRefresh) {
+      const { accessToken, refreshToken } = useAuthStore.getState();
+      if (accessToken || refreshToken) {
+        useAuthStore.getState().clearAccessToken();
+        useAuthStore.getState().clearRefreshToken();
+        redirectToLogin();
+      }
+    }
     throw error;
   } finally {
     clearTimeout(timeoutId);
   }
+}
+
+async function refreshAccessToken() {
+  if (refreshPromise) return refreshPromise;
+
+  const refreshToken = useAuthStore.getState().refreshToken;
+  if (!refreshToken) {
+    useAuthStore.getState().clearAccessToken();
+    useAuthStore.getState().clearRefreshToken();
+    redirectToLogin();
+    return null;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const response = await sendRequest<RefreshResponse>('/api/auth/refresh', {
+        method: 'POST',
+        skipAuth: true,
+        skipRefresh: true,
+        body: { refreshToken },
+      });
+
+      if (!response?.accessToken) {
+        throw new Error('Missing access token in refresh response.');
+      }
+
+      useAuthStore.getState().setAccessToken(response.accessToken);
+      if (response.refreshToken) {
+        useAuthStore.getState().setRefreshToken(response.refreshToken);
+      }
+      return response.accessToken;
+    } catch {
+      useAuthStore.getState().clearAccessToken();
+      useAuthStore.getState().clearRefreshToken();
+      redirectToLogin();
+      return null;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
 }
 
 async function parseResponse<T = unknown>(response: Response): Promise<T> {

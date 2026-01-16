@@ -1,21 +1,19 @@
 import { Link } from 'react-router-dom';
 import { postLogout } from '@/api/auth';
 import OrderPingLogo from '@/assets/logo/ORDERPING_LOGO_TEXT.png';
-import { AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY } from '@/constants/auth';
+import { useAuth } from '@/utils/hooks/useAuth';
 import styles from './Header.module.scss';
 
 const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;
 
 export default function Header() {
-  const isLoggedIn = Boolean(localStorage.getItem(AUTH_TOKEN_KEY));
+  const { isLoggedIn, refreshToken, clearAccessToken, clearRefreshToken } = useAuth();
 
   const handleKakaoLogin = () => {
     window.location.href = `${BASE_URL}`;
   };
 
   const handleLogout = async () => {
-    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-
     try {
       if (refreshToken) {
         await postLogout(refreshToken);
@@ -23,8 +21,8 @@ export default function Header() {
     } catch (e) {
       console.error('logout error', e);
     } finally {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      clearAccessToken();
+      clearRefreshToken();
 
       window.location.href = '/';
     }
