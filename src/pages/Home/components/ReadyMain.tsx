@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import SettingIcon from '@/assets/icons/setting-1.svg?react';
 import AlternativeImg from '@/assets/img/basic-img.png';
 import Button from '@/components/Button';
@@ -16,6 +16,7 @@ interface ReadyMainProps {
 }
 
 export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) {
+  const navigate = useNavigate();
   const storeName = store?.name ?? '주점';
   const storeImageUrl = store?.imageUrl ?? '';
   const storeImage = storeImageUrl || AlternativeImg;
@@ -38,7 +39,11 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
             <div className={styles.storeImageWrap}>
               <img className={styles.storeImage} src={storeImage} alt={`${storeName} 주점`} />
             </div>
-            <Button className={styles.storeButton} size="md">
+            <Button
+              className={styles.storeButton}
+              size="md"
+              onClick={() => navigate(`/store/operate/${store!.id}`)}
+            >
               주점 시작
             </Button>
           </div>
