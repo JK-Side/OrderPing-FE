@@ -1,10 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
-import SettingDetailIcon from '@/assets/icons/setting-2.svg?react';
 import WarningIcon from '@/assets/icons/warning-circle.svg?react';
 import AlternativeImg from '@/assets/img/basic-img.png';
 import Button from '@/components/Button';
 import MenuList from '@/pages/StoreOperate/components/MenuList';
+import StoreSettingsModal from '@/pages/StoreOperate/components/StoreSettingsModal';
 import { useMenusByCategory } from '@/pages/StoreOperate/hooks/useMenus';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import styles from './StoreOperate.module.scss';
@@ -52,10 +52,14 @@ export default function StoreOperate() {
               <AddMenuIcon className={styles.actionIcon} aria-hidden="true" />
               메뉴 추가
             </Button>
-            <Button className={styles.actionButton} size="md" variant="ghost">
-              <SettingDetailIcon className={styles.actionIcon} aria-hidden="true" />
-              주점 설정
-            </Button>
+            {storeId ? (
+              <StoreSettingsModal
+                storeId={storeId}
+                storeName={storeName}
+                storeDescription={storeDescription}
+                storeImageUrl={storeImage}
+              />
+            ) : null}
           </div>
         </div>
 
