@@ -18,8 +18,6 @@ interface FetchOptions<P extends object = Record<string, QueryParamValue>> exten
   skipRefresh?: boolean;
 }
 
-/* refresh 토큰으로 accessToken이 잘 갱신되는지 확인을 해야함 -> 곽에게 물어봐야될듯? */
-
 let refreshPromise: Promise<string | null> | null = null;
 
 export const apiClient = {
