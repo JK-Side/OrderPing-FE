@@ -24,5 +24,5 @@
 
 ## ✔️ Please check if the PR fulfills these requirements
 
-- [ ] It's submitted to the correct branch, not the `develop` branch unconditionally?
-- [ ] There are no warning message when you run `yarn lint`
+- [ ] The base branch is set to `main`.
+- [ ] There are no warning message when you run `npm run lint`
