@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useForm, type SubmitHandler } from 'react-hook-form';
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { postPresignedUrl } from '@/api/store';
 import PlusIcon from '@/assets/icons/plus.svg?react';
@@ -7,6 +7,7 @@ import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { useCreateMenu } from '@/pages/MenuCreate/hooks/useCreateMenu';
 import type { MenuCreateForm } from '@/pages/MenuCreate/types';
+import { MESSAGES, REGEX } from '@/static/validation';
 import styles from './MenuCreate.module.scss';
 
 const CATEGORY_MAIN = 1;
@@ -24,7 +25,7 @@ export default function MenuCreate() {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<MenuCreateForm>({
     mode: 'onBlur',
@@ -33,11 +34,9 @@ export default function MenuCreate() {
     },
   });
 
-  const categoryId = watch('categoryId');
-  const menuImage = watch('menuImage');
-  const numberPatternMessage = '숫자만 입력해 주세요.';
-  const isPriceFormatError = errors.price?.message === numberPatternMessage;
-  const isStockFormatError = errors.stock?.message === numberPatternMessage;
+  const categoryId = useWatch({ control, name: 'categoryId' });
+  const isPriceFormatError = errors.price?.message === MESSAGES.MENU.NUMBER_ONLY;
+  const isStockFormatError = errors.stock?.message === MESSAGES.MENU.NUMBER_ONLY;
   const priceMessageState = isPriceFormatError ? 'warning' : errors.price ? 'error' : undefined;
   const stockMessageState = isStockFormatError ? 'warning' : errors.stock ? 'error' : undefined;
 
@@ -50,19 +49,12 @@ export default function MenuCreate() {
   };
 
   useEffect(() => {
-    if (!menuImage?.length) {
-      setPreviewUrl(null);
-      return;
-    }
-
-    const file = menuImage[0];
-    const nextUrl = URL.createObjectURL(file);
-    setPreviewUrl(nextUrl);
-
     return () => {
-      URL.revokeObjectURL(nextUrl);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
-  }, [menuImage]);
+  }, [previewUrl]);
 
   const uploadMenuImage = useCallback(async (menuImage?: FileList) => {
     if (!menuImage?.length) {
@@ -135,7 +127,22 @@ export default function MenuCreate() {
             <div className={styles.photoLabel}>메뉴 사진</div>
             <p className={styles.photoHelp}>메뉴 사진이 없으면 기본 사진으로 대체됩니다.</p>
             <label className={styles.photoUpload}>
-              <input type="file" accept="image/*" hidden {...register('menuImage')} />
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                {...register('menuImage', {
+                  onChange: (event) => {
+                    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+                    setPreviewUrl((previous) => {
+                      if (previous) {
+                        URL.revokeObjectURL(previous);
+                      }
+                      return file ? URL.createObjectURL(file) : null;
+                    });
+                  },
+                })}
+              />
               {previewUrl ? (
                 <img className={styles.photoPreview} src={previewUrl} alt="메뉴 이미지 미리보기" />
               ) : (
@@ -166,10 +173,10 @@ export default function MenuCreate() {
                   inputMode="numeric"
                   placeholder="내용을 입력해 주세요."
                   {...register('price', {
-                    required: '메뉴 가격을 입력해 주세요.',
+                    required: MESSAGES.MENU.PRICE_REQUIRED,
                     pattern: {
-                      value: /^\d+$/,
-                      message: numberPatternMessage,
+                      value: REGEX.NUMBER_ONLY,
+                      message: MESSAGES.MENU.NUMBER_ONLY,
                     },
                   })}
                 />
@@ -180,10 +187,10 @@ export default function MenuCreate() {
                   inputMode="numeric"
                   placeholder="수량을 입력해 주세요."
                   {...register('stock', {
-                    required: '재고 수량을 입력해 주세요.',
+                    required: MESSAGES.MENU.STOCK_REQUIRED,
                     pattern: {
-                      value: /^\d+$/,
-                      message: numberPatternMessage,
+                      value: REGEX.NUMBER_ONLY,
+                      message: MESSAGES.MENU.NUMBER_ONLY,
                     },
                   })}
                 />
