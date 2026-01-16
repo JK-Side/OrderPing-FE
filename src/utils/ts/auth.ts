@@ -1,5 +1,6 @@
-import { getCookie } from './cookie';
+import { useAuthStore } from '@/stores/auth';
 
-export const getAuthHeader = () => ({
-  Authorization: `Bearer ${getCookie('AUTH_TOKEN_KEY')}`,
-});
+export const getAuthHeader = () => {
+  const token = useAuthStore.getState().accessToken;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};

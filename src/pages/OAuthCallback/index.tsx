@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY } from '@/constants/auth';
+import { useAuthStore } from '@/stores/auth';
 
 export default function OAuthCallback() {
   const navigate = useNavigate();
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const setRefreshToken = useAuthStore((state) => state.setRefreshToken);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -13,11 +15,11 @@ export default function OAuthCallback() {
 
     if (!accessToken || !refreshToken) return;
 
-    localStorage.setItem(AUTH_TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    setAccessToken(accessToken);
+    setRefreshToken(refreshToken);
 
     navigate('/', { replace: true });
-  }, [navigate]);
+  }, [navigate, setAccessToken, setRefreshToken]);
 
   return <div>로그인 처리 중...</div>;
 }
