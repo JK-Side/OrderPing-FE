@@ -29,6 +29,12 @@ export interface CreatedStoreResponse {
   createdAt: string;
 }
 
+export interface UpdateStoreRequest {
+  name: string;
+  description: string;
+  imageUrl: string;
+}
+
 export interface StoreDetailResponse {
   id: number;
   userId: number;

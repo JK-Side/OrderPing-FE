@@ -5,6 +5,7 @@ import {
   CreatedStoreRequest,
   CreatedStoreResponse,
   StoreDetailResponse,
+  UpdateStoreRequest,
 } from './entity';
 
 export const postPresignedUrl = async (body: PresignedUrlRequest) => {
@@ -21,4 +22,10 @@ export const postCreatedStore = async (body: CreatedStoreRequest) => {
 
 export const getStoreById = async (id: number) => {
   return await apiClient.get<StoreDetailResponse>(`/api/stores/${id}`);
+};
+
+export const putStoreById = async (id: number, body: UpdateStoreRequest) => {
+  return await apiClient.put<StoreDetailResponse>(`/api/stores/${id}`, {
+    body,
+  });
 };
