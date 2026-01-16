@@ -1,10 +1,16 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import SettingDetailIcon from '@/assets/icons/setting-2.svg?react';
+import WarningIcon from '@/assets/icons/warning-circle.svg?react';
 import AlternativeImg from '@/assets/img/basic-img.png';
 import Button from '@/components/Button';
+import MenuList from '@/pages/StoreOperate/components/MenuList';
+import { useMenusByCategory } from '@/pages/StoreOperate/hooks/useMenus';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import styles from './StoreOperate.module.scss';
+
+const CATEGORY_MAIN = 1;
+const CATEGORY_SIDE = 2;
 
 export default function StoreOperate() {
   const navigate = useNavigate();
@@ -16,6 +22,11 @@ export default function StoreOperate() {
   const storeImageUrl = storeDetail?.imageUrl ?? '';
   const storeImage = storeImageUrl || AlternativeImg;
   const storeDescription = storeDetail?.description ?? '주점 소개를 입력해 주세요.';
+  const { data: mainMenus = [], isError: isMainMenuError } = useMenusByCategory(storeId, CATEGORY_MAIN);
+  const { data: sideMenus = [], isError: isSideMenuError } = useMenusByCategory(storeId, CATEGORY_SIDE);
+  const menuItems = [...mainMenus, ...sideMenus];
+  const hasMenus = menuItems.length > 0;
+  const hasMenuError = isMainMenuError || isSideMenuError;
 
   return (
     <section className={styles.storeOperate}>
@@ -48,10 +59,19 @@ export default function StoreOperate() {
           </div>
         </div>
 
-        <div className={styles.emptyState}>
-          <AddMenuIcon className={styles.emptyIcon} aria-hidden="true" />
-          <p className={styles.emptyText}>메뉴를 추가해 보세요!</p>
-        </div>
+        {hasMenuError ? (
+          <div className={styles.emptyState}>
+            <WarningIcon className={styles.errorIcon} aria-hidden="true" />
+            <p className={styles.errorText}>메뉴를 불러오지 못했어요.</p>
+          </div>
+        ) : hasMenus ? (
+          <MenuList menus={menuItems} />
+        ) : (
+          <div className={styles.emptyState}>
+            <AddMenuIcon className={styles.emptyIcon} aria-hidden="true" />
+            <p className={styles.emptyText}>메뉴를 추가해 보세요!</p>
+          </div>
+        )}
       </div>
     </section>
   );

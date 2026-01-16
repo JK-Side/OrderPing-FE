@@ -32,15 +32,14 @@ export default function MenuCreate() {
       categoryId: CATEGORY_MAIN,
     },
   });
+
   const categoryId = watch('categoryId');
   const menuImage = watch('menuImage');
   const numberPatternMessage = '숫자만 입력해 주세요.';
   const isPriceFormatError = errors.price?.message === numberPatternMessage;
   const isStockFormatError = errors.stock?.message === numberPatternMessage;
-  const priceMessageState =
-    isPriceFormatError ? 'warning' : errors.price ? 'error' : undefined;
-  const stockMessageState =
-    isStockFormatError ? 'warning' : errors.stock ? 'error' : undefined;
+  const priceMessageState = isPriceFormatError ? 'warning' : errors.price ? 'error' : undefined;
+  const stockMessageState = isStockFormatError ? 'warning' : errors.stock ? 'error' : undefined;
 
   const handleCancel = () => {
     if (id) {
@@ -146,7 +145,12 @@ export default function MenuCreate() {
           </div>
 
           <div className={styles.fields}>
-            <Input label="메뉴명" required message={errors.name?.message} messageState={errors.name ? 'error' : undefined}>
+            <Input
+              label="메뉴명"
+              required
+              message={errors.name?.message}
+              messageState={errors.name ? 'error' : undefined}
+            >
               <Input.Text
                 placeholder="내용을 입력해 주세요."
                 {...register('name', {
@@ -156,12 +160,7 @@ export default function MenuCreate() {
             </Input>
 
             <div className={styles.row}>
-              <Input
-                label="메뉴 가격"
-                required
-                message={errors.price?.message}
-                messageState={priceMessageState}
-              >
+              <Input label="메뉴 가격" required message={errors.price?.message} messageState={priceMessageState}>
                 <Input.Text
                   type="text"
                   inputMode="numeric"

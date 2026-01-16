@@ -119,6 +119,23 @@
   color: $gray-70;
 }
 
+.errorIcon {
+  width: 48px;
+  height: 48px;
+  color: $primary-50;
+}
+
+.errorIcon path {
+  fill: currentColor;
+}
+
+.errorText {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $gray-70;
+}
+
 @media (max-width: 900px) {
   .storeOperate {
     padding: 56px 24px 80px;
