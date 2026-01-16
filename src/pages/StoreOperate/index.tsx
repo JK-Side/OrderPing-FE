@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import SettingDetailIcon from '@/assets/icons/setting-2.svg?react';
 import AlternativeImg from '@/assets/img/basic-img.png';
@@ -7,6 +7,7 @@ import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import styles from './StoreOperate.module.scss';
 
 export default function StoreOperate() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
   const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
@@ -32,7 +33,11 @@ export default function StoreOperate() {
             </div>
           </div>
           <div className={styles.summaryActions}>
-            <Button className={styles.actionButton} size="md">
+            <Button
+              className={styles.actionButton}
+              size="md"
+              onClick={() => id && navigate(`/store/${id}/menu/create`)}
+            >
               <AddMenuIcon className={styles.actionIcon} aria-hidden="true" />
               메뉴 추가
             </Button>
