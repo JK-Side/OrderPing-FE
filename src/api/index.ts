@@ -1,5 +1,6 @@
 import { RefreshResponse } from '@/api/auth/entity';
 import { useAuthStore } from '@/stores/auth';
+import { redirectToLogin } from '@/utils/ts/auth';
 
 const BASE_URL = import.meta.env.VITE_API_PATH;
 
@@ -137,6 +138,14 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
     if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('요청 시간이 초과되었습니다.');
     }
+    if (error instanceof TypeError && !skipAuth && !skipRefresh) {
+      const { accessToken, refreshToken } = useAuthStore.getState();
+      if (accessToken || refreshToken) {
+        useAuthStore.getState().clearAccessToken();
+        useAuthStore.getState().clearRefreshToken();
+        redirectToLogin();
+      }
+    }
     throw error;
   } finally {
     clearTimeout(timeoutId);
@@ -150,9 +159,7 @@ async function refreshAccessToken() {
   if (!refreshToken) {
     useAuthStore.getState().clearAccessToken();
     useAuthStore.getState().clearRefreshToken();
-    if (typeof window !== 'undefined') {
-      window.location.href = '/';
-    }
+    redirectToLogin();
     return null;
   }
 
@@ -177,9 +184,7 @@ async function refreshAccessToken() {
     } catch {
       useAuthStore.getState().clearAccessToken();
       useAuthStore.getState().clearRefreshToken();
-      if (typeof window !== 'undefined') {
-        window.location.href = '/';
-      }
+      redirectToLogin();
       return null;
     } finally {
       refreshPromise = null;

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { postRefresh } from '@/api/auth';
 import { useAuthStore } from '@/stores/auth';
+import { redirectToLogin } from '@/utils/ts/auth';
 
 let hasInitialized = false;
 let initPromise: Promise<void> | null = null;
@@ -35,11 +36,13 @@ export const useAuthInit = () => {
         } else {
           clearAccessToken();
           clearRefreshToken();
+          redirectToLogin();
         }
       } catch {
         if (!useAuthStore.getState().accessToken) {
           clearAccessToken();
           clearRefreshToken();
+          redirectToLogin();
         }
       } finally {
         initPromise = null;
