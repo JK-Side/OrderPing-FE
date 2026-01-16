@@ -1,0 +1,205 @@
+@use '@/styles/colors' as *;
+
+.menuCreate {
+  padding: 60px 80px 120px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: $gray-90;
+}
+
+.divider {
+  margin-top: 16px;
+  height: 1px;
+  background-color: $gray-20;
+}
+
+.form {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0 20px;
+}
+
+.formBody {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 48px;
+}
+
+.photoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.photoLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: $gray-80;
+}
+
+.photoHelp {
+  margin: 0;
+  font-size: 13px;
+  color: $gray-50;
+}
+
+.photoUpload {
+  margin-top: 16px;
+  width: 240px;
+  height: 240px;
+  border-radius: 16px;
+  border: 2px dashed $gray-30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $gray-40;
+  background-color: $grayscale-10;
+  overflow: hidden;
+}
+
+.photoIcon {
+  width: 32px;
+  height: 32px;
+}
+
+.photoIcon path {
+  fill: currentColor;
+}
+
+.photoPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.category {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.categoryLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: $gray-80;
+}
+
+.required {
+  color: $red-50;
+}
+
+.categoryButtons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.categoryButton {
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 8px;
+  border: 1px solid $primary-50;
+  background-color: $white;
+  color: $primary-50;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 24px;
+
+  &:focus-visible {
+    outline: 2px solid $primary-20;
+    outline-offset: 2px;
+  }
+}
+
+.categoryButtonActive {
+  background-color: $primary-50;
+  color: $white;
+}
+
+.categoryError {
+  font-size: 12px;
+  color: $red-50;
+}
+
+.actions {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.submitError {
+  margin: 12px 0 0;
+  text-align: center;
+  font-size: 12px;
+  color: $red-50;
+}
+
+.cancelButton.cancelButton {
+  background-color: $gray-80;
+  border-color: $gray-80;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background-color: $gray-70;
+    border-color: $gray-70;
+  }
+}
+
+.submitButton.submitButton {
+  min-width: 120px;
+}
+
+@media (max-width: 900px) {
+  .menuCreate {
+    padding: 56px 24px 80px;
+  }
+
+  .form {
+    gap: 32px;
+  }
+
+  .formBody {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .photoUpload {
+    width: 100%;
+    max-width: 320px;
+    height: 200px;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+}

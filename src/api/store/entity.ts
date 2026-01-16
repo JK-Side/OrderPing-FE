@@ -28,3 +28,13 @@ export interface CreatedStoreResponse {
   imageUrl: string;
   createdAt: string;
 }
+
+export interface StoreDetailResponse {
+  id: number;
+  userId: number;
+  name: string;
+  description: string;
+  isOpen: boolean;
+  imageUrl: string;
+  createdAt: string;
+}
