@@ -34,11 +34,25 @@ export default function MenuCreate() {
     },
   });
 
+  const menuName = useWatch({ control, name: 'name' });
+  const menuPrice = useWatch({ control, name: 'price' });
+  const menuStock = useWatch({ control, name: 'stock' });
   const categoryId = useWatch({ control, name: 'categoryId' });
+
   const isPriceFormatError = errors.price?.message === MESSAGES.MENU.NUMBER_ONLY;
   const isStockFormatError = errors.stock?.message === MESSAGES.MENU.NUMBER_ONLY;
+
   const priceMessageState = isPriceFormatError ? 'warning' : errors.price ? 'error' : undefined;
   const stockMessageState = isStockFormatError ? 'warning' : errors.stock ? 'error' : undefined;
+
+  const isPriceValid = typeof menuPrice === 'string' && REGEX.NUMBER_ONLY.test(menuPrice);
+  const isStockValid = typeof menuStock === 'string' && REGEX.NUMBER_ONLY.test(menuStock);
+
+  const isNameValid = typeof menuName === 'string' && menuName.trim().length > 0;
+  const isCategoryValid = typeof categoryId === 'number' && categoryId > 0;
+  const hasErrors = Object.keys(errors).length > 0;
+
+  const canSubmit = !!storeId && isNameValid && isPriceValid && isStockValid && isCategoryValid && !hasErrors;
 
   const handleCancel = () => {
     if (id) {
@@ -256,7 +270,7 @@ export default function MenuCreate() {
           <Button type="button" variant="ghost" className={styles.cancelButton} onClick={handleCancel}>
             취소
           </Button>
-          <Button type="submit" size="md" className={styles.submitButton} disabled={!storeId || isSubmitting}>
+          <Button type="submit" size="md" className={styles.submitButton} disabled={!canSubmit || isSubmitting}>
             메뉴 추가
           </Button>
         </div>
