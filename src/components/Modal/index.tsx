@@ -1,6 +1,6 @@
-﻿import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
+﻿import * as Dialog from '@radix-ui/react-dialog';
 import clsx from 'clsx';
-import * as Dialog from '@radix-ui/react-dialog';
+import { forwardRef, type HTMLAttributes, type ReactNode } from 'react';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import styles from './Modal.module.scss';
 
@@ -11,16 +11,14 @@ interface ModalContentProps extends Dialog.DialogContentProps {
   className?: string;
 }
 
-export const ModalContent = forwardRef<HTMLDivElement, ModalContentProps>(
-  ({ className, children, ...props }, ref) => (
-    <Dialog.Portal>
-      <Dialog.Overlay className={styles.overlay} />
-      <Dialog.Content ref={ref} className={clsx(styles.content, className)} {...props}>
-        {children}
-      </Dialog.Content>
-    </Dialog.Portal>
-  ),
-);
+export const ModalContent = forwardRef<HTMLDivElement, ModalContentProps>(({ className, children, ...props }, ref) => (
+  <Dialog.Portal>
+    <Dialog.Overlay className={styles.overlay} />
+    <Dialog.Content ref={ref} className={clsx(styles.content, className)} {...props}>
+      {children}
+    </Dialog.Content>
+  </Dialog.Portal>
+));
 ModalContent.displayName = 'ModalContent';
 
 interface ModalHeaderProps {
@@ -45,11 +43,9 @@ interface ModalTitleProps extends Dialog.DialogTitleProps {
   className?: string;
 }
 
-export const ModalTitle = forwardRef<HTMLHeadingElement, ModalTitleProps>(
-  ({ className, ...props }, ref) => (
-    <Dialog.Title ref={ref} className={clsx(styles.title, className)} {...props} />
-  ),
-);
+export const ModalTitle = forwardRef<HTMLHeadingElement, ModalTitleProps>(({ className, ...props }, ref) => (
+  <Dialog.Title ref={ref} className={clsx(styles.title, className)} {...props} />
+));
 ModalTitle.displayName = 'ModalTitle';
 
 interface ModalSectionProps extends HTMLAttributes<HTMLDivElement> {
@@ -63,4 +59,3 @@ export function ModalBody({ className, ...props }: ModalSectionProps) {
 export function ModalFooter({ className, ...props }: ModalSectionProps) {
   return <div className={clsx(styles.footer, className)} {...props} />;
 }
-
