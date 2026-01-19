@@ -113,14 +113,14 @@ export default function MenuCreate() {
           stock: Number(data.stock),
         });
         toast({
-          message: '\uBA54\uB274 \uCD94\uAC00\uAC00 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
+          message: '메뉴 추가가 완료되었습니다.',
           variant: 'info',
         });
         navigate(`/store/operate/${storeId}`);
       } catch (error) {
         const status = (error as { status?: number })?.status;
         toast({
-          message: '\uBA54\uB274 \uCD94\uAC00\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.',
+          message: '메뉴 추가에 실패했습니다.',
           variant: 'error',
         });
 

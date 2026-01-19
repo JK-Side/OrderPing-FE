@@ -114,14 +114,14 @@ export default function StoreSettingsModal({
       });
       await queryClient.invalidateQueries({ queryKey: ['store', storeId] });
       toast({
-        message: '\uC8FC\uC810 \uC815\uBCF4 \uC218\uC815\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4',
+        message: '주점 정보 수정이 완료되었습니다.',
         variant: 'info',
       });
       setOpen(false);
     } catch (error) {
       const status = (error as { status?: number })?.status;
       toast({
-        message: '\uC8FC\uC810 \uC815\uBCF4 \uC218\uC815\uC744 \uC2E4\uD328\uD558\uC600\uC2B5\uB2C8\uB2E4.',
+        message: '주점 정보 수정을 실패하였습니다.',
         variant: 'error',
       });
 
