@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import AppLayout from '@/components/layout';
 import Home from '@/pages/Home';
 import MenuCreate from '@/pages/MenuCreate';
+import MenuEdit from '@/pages/MenuEdit';
 import OAuthCallback from '@/pages/OAuthCallback';
 import StoreCreate from '@/pages/StoreCreate';
 import StoreOperate from '@/pages/StoreOperate';
@@ -18,6 +19,7 @@ function App() {
         <Route path="/store/create" element={<StoreCreate />} />
         <Route path="/store/operate/:id" element={<StoreOperate />} />
         <Route path="/store/:id/menu/create" element={<MenuCreate />} />
+        <Route path="/store/:id/menu/:menuId/edit" element={<MenuEdit />} />
       </Route>
 
       <Route path="/callback" element={<OAuthCallback />} />

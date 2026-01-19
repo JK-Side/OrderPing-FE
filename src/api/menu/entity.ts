@@ -37,3 +37,16 @@ export interface MenuResponse {
 }
 
 export type MenuListResponse = MenuResponse[];
+
+export interface UpdateMenuRequest {
+  categoryId: number;
+  name: string;
+  price: number;
+  description: string;
+  imageUrl: string;
+  initialStock: number;
+  stock: number;
+  isSoldOut: boolean;
+}
+
+export type UpdateMenuResponse = MenuResponse;
