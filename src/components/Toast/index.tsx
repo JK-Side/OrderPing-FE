@@ -87,9 +87,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const value = useMemo(() => ({ toast, dismiss }), [toast, dismiss]);
 
   useEffect(() => {
+    const timeouts = removeTimeouts.current;
     return () => {
-      removeTimeouts.current.forEach((timeout) => clearTimeout(timeout));
-      removeTimeouts.current.clear();
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.clear();
     };
   }, []);
 
@@ -114,16 +115,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               data-paused={toastItem.paused ? 'true' : 'false'}
               onPause={() => {
                 setToasts((prev) =>
-                  prev.map((toast) =>
-                    toast.id === toastItem.id ? { ...toast, paused: true } : toast,
-                  ),
+                  prev.map((toast) => (toast.id === toastItem.id ? { ...toast, paused: true } : toast)),
                 );
               }}
               onResume={() => {
                 setToasts((prev) =>
-                  prev.map((toast) =>
-                    toast.id === toastItem.id ? { ...toast, paused: false } : toast,
-                  ),
+                  prev.map((toast) => (toast.id === toastItem.id ? { ...toast, paused: false } : toast)),
                 );
               }}
               onOpenChange={(open) => {
