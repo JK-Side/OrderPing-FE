@@ -7,6 +7,7 @@ import UploadIcon from '@/assets/icons/upload.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, ModalTrigger } from '@/components/Modal';
+import { useToast } from '@/components/Toast/useToast';
 import { useUpdateStore } from '@/pages/StoreOperate/hooks/useUpdateStore';
 import styles from './StoreSettingsModal.module.scss';
 
@@ -30,6 +31,7 @@ export default function StoreSettingsModal({
 }: StoreSettingsModalProps) {
   const queryClient = useQueryClient();
   const { mutateAsync: updateStore } = useUpdateStore();
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -111,9 +113,18 @@ export default function StoreSettingsModal({
         },
       });
       await queryClient.invalidateQueries({ queryKey: ['store', storeId] });
+      toast({
+        message: '\uC8FC\uC810 \uC815\uBCF4 \uC218\uC815\uC774 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4',
+        variant: 'info',
+      });
       setOpen(false);
     } catch (error) {
       const status = (error as { status?: number })?.status;
+      toast({
+        message: '\uC8FC\uC810 \uC815\uBCF4 \uC218\uC815\uC744 \uC2E4\uD328\uD558\uC600\uC2B5\uB2C8\uB2E4.',
+        variant: 'error',
+      });
+
       if (status === 401) {
         setSubmitError('인증이 필요합니다.');
       } else if (status === 403) {
