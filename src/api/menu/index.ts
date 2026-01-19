@@ -1,5 +1,12 @@
 import { apiClient } from '..';
-import { CreateMenuRequest, CreateMenuResponse, MenuListResponse } from './entity';
+import {
+  CreateMenuRequest,
+  CreateMenuResponse,
+  MenuListResponse,
+  MenuResponse,
+  UpdateMenuRequest,
+  UpdateMenuResponse,
+} from './entity';
 
 export const postCreatedMenu = async (body: CreateMenuRequest) => {
   return await apiClient.post<CreateMenuResponse>('/api/menus', {
@@ -19,4 +26,14 @@ export const getMenusByCategory = async (storeId: number, categoryId: number) =>
     }
     throw error;
   }
+};
+
+export const getMenuById = async (id: number) => {
+  return await apiClient.get<MenuResponse>(`/api/menus/${id}`);
+};
+
+export const putMenuById = async (id: number, body: UpdateMenuRequest) => {
+  return await apiClient.put<UpdateMenuResponse>(`/api/menus/${id}`, {
+    body,
+  });
 };
