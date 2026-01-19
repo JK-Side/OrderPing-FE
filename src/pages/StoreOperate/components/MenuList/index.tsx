@@ -24,8 +24,10 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
                 <SettingIcon className={styles.menuActionIcon} aria-hidden="true" />
               </button>
             </div>
-            <div className={styles.menuName}>{menu.name}</div>
-            <div className={styles.menuPrice}>{formatPrice(menu.price)}</div>
+            <div className={styles.menuInfo}>
+              <div className={styles.menuName}>{menu.name}</div>
+              <div className={styles.menuPrice}>{formatPrice(menu.price)}</div>
+            </div>
           </article>
         ))}
       </div>
