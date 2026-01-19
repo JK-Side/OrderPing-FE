@@ -42,13 +42,17 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
             <Button
               className={styles.storeButton}
               size="md"
-              onClick={() => navigate(`/store/operate/${store!.id}`)}
+              onClick={() => navigate(`/store/${store!.id}/start`)}
             >
               주점 시작
             </Button>
           </div>
 
-          <Link to="/store/settings" className={styles.settingsLink}>
+          <Link
+            to={`/store/operate/${store!.id}`}
+            className={styles.settingsLink}
+            onClick={() => navigate(`/store/operate/${store!.id}`)}
+          >
             <SettingIcon />
             <span className={styles.settingsText}>주점 설정</span>
           </Link>
