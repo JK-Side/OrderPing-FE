@@ -5,6 +5,7 @@ import { postPresignedUrl } from '@/api/store';
 import PlusIcon from '@/assets/icons/plus.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
+import { useToast } from '@/components/Toast/useToast';
 import { useCreateMenu } from '@/pages/MenuCreate/hooks/useCreateMenu';
 import type { MenuCreateForm } from '@/pages/MenuCreate/types';
 import { MESSAGES, REGEX } from '@/static/validation';
@@ -21,6 +22,7 @@ export default function MenuCreate() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { mutateAsync: createMenu } = useCreateMenu();
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -110,9 +112,18 @@ export default function MenuCreate() {
           imageUrl,
           stock: Number(data.stock),
         });
+        toast({
+          message: '\uBA54\uB274 \uCD94\uAC00\uAC00 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.',
+          variant: 'info',
+        });
         navigate(`/store/operate/${storeId}`);
       } catch (error) {
         const status = (error as { status?: number })?.status;
+        toast({
+          message: '\uBA54\uB274 \uCD94\uAC00\uC5D0 \uC2E4\uD328\uD588\uC2B5\uB2C8\uB2E4.',
+          variant: 'error',
+        });
+
         if (status === 400) {
           setSubmitError('잘못된 요청입니다.');
         } else if (status === 401) {
@@ -125,7 +136,7 @@ export default function MenuCreate() {
         console.error('Failed to create menu', error);
       }
     },
-    [createMenu, navigate, storeId, uploadMenuImage],
+    [createMenu, navigate, storeId, toast, uploadMenuImage],
   );
 
   return (
