@@ -5,6 +5,7 @@ import { postPresignedUrl } from '@/api/store';
 import PlusIcon from '@/assets/icons/plus.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
+import { useToast } from '@/components/Toast/useToast';
 import { useCreateMenu } from '@/pages/MenuCreate/hooks/useCreateMenu';
 import type { MenuCreateForm } from '@/pages/MenuCreate/types';
 import { MESSAGES, REGEX } from '@/static/validation';
@@ -21,6 +22,7 @@ export default function MenuCreate() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { mutateAsync: createMenu } = useCreateMenu();
+  const { toast } = useToast();
   const {
     register,
     handleSubmit,
@@ -110,9 +112,18 @@ export default function MenuCreate() {
           imageUrl,
           stock: Number(data.stock),
         });
+        toast({
+          message: '메뉴 추가가 완료되었습니다.',
+          variant: 'info',
+        });
         navigate(`/store/operate/${storeId}`);
       } catch (error) {
         const status = (error as { status?: number })?.status;
+        toast({
+          message: '메뉴 추가에 실패했습니다.',
+          variant: 'error',
+        });
+
         if (status === 400) {
           setSubmitError('잘못된 요청입니다.');
         } else if (status === 401) {
@@ -125,7 +136,7 @@ export default function MenuCreate() {
         console.error('Failed to create menu', error);
       }
     },
-    [createMenu, navigate, storeId, uploadMenuImage],
+    [createMenu, navigate, storeId, toast, uploadMenuImage],
   );
 
   return (
