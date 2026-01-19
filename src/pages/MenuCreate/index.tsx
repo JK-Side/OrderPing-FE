@@ -18,9 +18,7 @@ export default function MenuCreate() {
   const navigate = useNavigate();
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
-  const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const storeId = Number.isFinite(parsedId) ? parsedId : undefined;  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { mutateAsync: createMenu } = useCreateMenu();
   const { toast } = useToast();
   const {
@@ -99,9 +97,7 @@ export default function MenuCreate() {
 
   const handleSubmitMenu = useCallback<SubmitHandler<MenuCreateForm>>(
     async (data) => {
-      if (!storeId) return;
-      setSubmitError(null);
-      try {
+      if (!storeId) return;      try {
         const imageUrl = await uploadMenuImage(data.menuImage);
         await createMenu({
           storeId,
@@ -118,21 +114,10 @@ export default function MenuCreate() {
         });
         navigate(`/store/operate/${storeId}`);
       } catch (error) {
-        const status = (error as { status?: number })?.status;
         toast({
           message: '메뉴 추가에 실패했습니다.',
           variant: 'error',
         });
-
-        if (status === 400) {
-          setSubmitError('잘못된 요청입니다.');
-        } else if (status === 401) {
-          setSubmitError('인증이 필요합니다.');
-        } else if (status === 403) {
-          setSubmitError('본인 매장이 아닙니다.');
-        } else {
-          setSubmitError('메뉴 생성에 실패했습니다.');
-        }
         console.error('Failed to create menu', error);
       }
     },
@@ -284,9 +269,7 @@ export default function MenuCreate() {
           <Button type="submit" size="md" className={styles.submitButton} disabled={!canSubmit || isSubmitting}>
             메뉴 추가
           </Button>
-        </div>
-        {submitError && <p className={styles.submitError}>{submitError}</p>}
-      </form>
+        </div>      </form>
     </section>
   );
 }

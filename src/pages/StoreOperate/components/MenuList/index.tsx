@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import type { MenuResponse } from '@/api/menu/entity';
 import SettingIcon from '@/assets/icons/setting-3.svg?react';
 import styles from './MenuList.module.scss';
@@ -12,6 +13,8 @@ const CATEGORY_SIDE = 2;
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
 function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] }) {
+  const navigate = useNavigate();
+
   return (
     <section className={styles.section}>
       <h3 className={styles.sectionTitle}>{title}</h3>
@@ -20,7 +23,7 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
           <article key={menu.id} className={styles.menuCard}>
             <div className={styles.menuImageWrap}>
               <img className={styles.menuImage} src={menu.imageUrl} alt={menu.name} />
-              <button type="button" className={styles.menuAction} aria-label={`${menu.name} 설정`}>
+              <button type="button" className={styles.menuAction} aria-label={`${menu.name} 설정`} onClick={() => navigate(`/store/${menu.storeId}/menu/${menu.id}/edit`)}>
                 <SettingIcon className={styles.menuActionIcon} aria-hidden="true" />
               </button>
             </div>
