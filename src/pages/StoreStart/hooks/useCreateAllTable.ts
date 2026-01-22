@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query';
-import { postCreatedTable } from '@/api/table';
-import type { CreateTableRequest, TableResponse } from '@/api/table/entity';
+import { postCreatedAllTable } from '@/api/table';
+import type { AllTableListResponse, CreateAllTableRequest } from '@/api/table/entity';
 
-export const useCreateTable = () => {
-  return useMutation<TableResponse, Error, CreateTableRequest>({
-    mutationFn: postCreatedTable,
+export const useCreateAllTable = () => {
+  return useMutation<AllTableListResponse, Error, CreateAllTableRequest>({
+    mutationFn: postCreatedAllTable,
   });
 };
