@@ -4,10 +4,7 @@ import type { AllTableListResponse, CreateAllTableRequest, CreateTableRequest, T
 // GET  /api/tables  매장별 테이블 목록
 export const getTablesByStore = async (storeId: number, status?: TableStatus) => {
   return await apiClient.get<TableListResponse>('/api/tables', {
-    params: {
-      storeId,
-      status,
-    },
+    params: status ? { storeId, status } : { storeId },
   });
 };
 

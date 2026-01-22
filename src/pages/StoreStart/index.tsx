@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import type { TableResponse, TableStatus } from '@/api/table/entity';
+import type { TableResponse } from '@/api/table/entity';
 import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
@@ -42,11 +41,14 @@ const parseStoredLayout = (value: string | null) => {
 export default function StoreStart() {
   const navigate = useNavigate();
 
-  const [tableLayout, setTableLayout] = useState<{ columns: number; rows: number } | null>(null);
-
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
   const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
+
+  const tableLayout =
+    storeId && typeof window !== 'undefined'
+      ? parseStoredLayout(localStorage.getItem(getLayoutStorageKey(storeId)))
+      : null;
 
   const { data: storeDetail } = useStoreById(storeId);
   const { data: tables = [] } = useTablesByStore(storeId);
@@ -67,24 +69,10 @@ export default function StoreStart() {
       }
     : undefined;
 
-  useEffect(() => {
-    if (!storeId || typeof window === 'undefined') {
-      setTableLayout(null);
-      return;
-    }
-    const stored = parseStoredLayout(localStorage.getItem(getLayoutStorageKey(storeId)));
-    setTableLayout(stored);
-  }, [storeId]);
-
-  useEffect(() => {
+  const handleLayoutSave = (layout: { columns: number; rows: number }) => {
     if (!storeId || typeof window === 'undefined') return;
-    const key = getLayoutStorageKey(storeId);
-    if (tableLayout && tableLayout.columns > 0 && tableLayout.rows > 0) {
-      localStorage.setItem(key, JSON.stringify(tableLayout));
-    } else {
-      localStorage.removeItem(key);
-    }
-  }, [storeId, tableLayout]);
+    localStorage.setItem(getLayoutStorageKey(storeId), JSON.stringify(layout));
+  };
 
   return (
     <section className={styles.storeStart}>
@@ -126,7 +114,7 @@ export default function StoreStart() {
             <div className={styles.actionButtons}>
               <TableCreateModal
                 storeId={storeId}
-                onCreated={(_, layout) => setTableLayout(layout)}
+                onCreated={(_, layout) => handleLayoutSave(layout)}
                 name={tableButtonLabel}
               />
               <Button className={styles.clearButton} size="md" disabled>
