@@ -55,7 +55,7 @@ export default function StoreStart() {
   const useGridLayout = !!tableLayout && tableLayout.columns > 0 && tableLayout.rows > 0;
   const tableGridStyle = useGridLayout
     ? {
-        gridTemplateColumns: `repeat(${tableLayout.columns}, 300px)`,
+        gridTemplateColumns: `repeat(${tableLayout.columns}, minmax(220px, 300px))`,
         gridTemplateRows: `repeat(${tableLayout.rows}, 222px)`,
       }
     : undefined;
