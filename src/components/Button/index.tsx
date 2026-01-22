@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from 'react';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import clsx from 'clsx';
 
 import styles from './Button.module.scss';
@@ -10,6 +10,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   fullWidth?: boolean;
+  isLoading?: boolean;
+  loadingText?: ReactNode;
 }
 
 /* ----------------------------------------------
@@ -25,27 +27,39 @@ export default function Button({
   size = 'md',
   fullWidth = false,
   disabled = false,
+  isLoading = false,
+  loadingText,
   className,
   children,
   ...props
 }: ButtonProps) {
+  const isButtonDisabled = disabled || isLoading;
+
   return (
     <button
       type="button"
-      disabled={disabled}
+      disabled={isButtonDisabled}
+      aria-busy={isLoading || undefined}
       className={clsx(
         styles.button,
         styles[variant],
         styles[size],
         {
           [styles.fullWidth]: fullWidth,
-          [styles.disabled]: disabled,
+          [styles.disabled]: isButtonDisabled,
         },
         className,
       )}
       {...props}
     >
-      {children}
+      {isLoading ? (
+        <span className={styles.loadingContent}>
+          <span className={styles.spinner} aria-hidden="true" />
+          {loadingText ?? children}
+        </span>
+      ) : (
+        children
+      )}
     </button>
   );
 }
