@@ -139,10 +139,9 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
       throw new Error('요청 시간이 초과되었습니다.');
     }
     if (error instanceof TypeError && !skipAuth && !skipRefresh) {
-      const { accessToken, refreshToken } = useAuthStore.getState();
-      if (accessToken || refreshToken) {
+      const { accessToken } = useAuthStore.getState();
+      if (accessToken) {
         useAuthStore.getState().clearAccessToken();
-        useAuthStore.getState().clearRefreshToken();
         redirectToLogin();
       }
     }
@@ -155,21 +154,12 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
 async function refreshAccessToken() {
   if (refreshPromise) return refreshPromise;
 
-  const refreshToken = useAuthStore.getState().refreshToken;
-  if (!refreshToken) {
-    useAuthStore.getState().clearAccessToken();
-    useAuthStore.getState().clearRefreshToken();
-    redirectToLogin();
-    return null;
-  }
-
   refreshPromise = (async () => {
     try {
       const response = await sendRequest<RefreshResponse>('/api/auth/refresh', {
         method: 'POST',
         skipAuth: true,
         skipRefresh: true,
-        body: { refreshToken },
       });
 
       if (!response?.accessToken) {
@@ -177,13 +167,9 @@ async function refreshAccessToken() {
       }
 
       useAuthStore.getState().setAccessToken(response.accessToken);
-      if (response.refreshToken) {
-        useAuthStore.getState().setRefreshToken(response.refreshToken);
-      }
       return response.accessToken;
     } catch {
       useAuthStore.getState().clearAccessToken();
-      useAuthStore.getState().clearRefreshToken();
       redirectToLogin();
       return null;
     } finally {
