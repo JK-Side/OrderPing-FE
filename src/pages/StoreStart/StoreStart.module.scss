@@ -81,6 +81,52 @@
   min-width: 120px;
 }
 
+.actionButtons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.orderPreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+.orderPreviewGrid {
+  display: grid;
+  gap: 30px;
+  grid-auto-flow: row;
+  justify-content: flex-start;
+}
+
+.emptyState {
+  width: 100%;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  color: $primary-50;
+}
+
+.emptyIcon path {
+  fill: currentColor;
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $gray-70;
+}
+
 @media (max-width: 900px) {
   .storeStart {
     padding: 56px 24px 80px;
@@ -99,7 +145,15 @@
     align-items: flex-start;
   }
 
+  .actionButtons {
+    flex-wrap: wrap;
+  }
+
   .noticeText {
     white-space: normal;
+  }
+
+  .emptyState {
+    min-height: 240px;
   }
 }
