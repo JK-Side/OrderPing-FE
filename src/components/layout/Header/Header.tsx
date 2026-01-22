@@ -10,6 +10,10 @@ export default function Header() {
   const { pathname } = useLocation();
   const { isLoggedIn, clearAccessToken } = useAuth();
   const isStoreStartPage = /^\/store\/[^/]+\/start/.test(pathname);
+  const storeIdMatch = pathname.match(/^\/store\/([^/]+)\/start/);
+  const storeId = storeIdMatch?.[1];
+  const menuManagePath = storeId ? `/store/operate/${storeId}` : '/';
+  const tableManagePath = storeId ? `/store/${storeId}/start` : '/';
 
   const handleKakaoLogin = () => {
     window.location.href = `${BASE_URL}`;
@@ -36,8 +40,13 @@ export default function Header() {
       <nav className={styles.nav}>
         {isStoreStartPage ? (
           <>
+            <Link to={menuManagePath} className={styles.navItem}>
+              메뉴 관리
+            </Link>
             <span className={styles.navItem}>주문 조회</span>
-            <span className={`${styles.navItem} ${styles.navItemActive}`}>테이블 관리</span>
+            <Link to={tableManagePath} className={`${styles.navItem} ${styles.navItemActive}`}>
+              테이블 관리
+            </Link>
             <span className={styles.navItem}>주문 통계</span>
           </>
         ) : isLoggedIn ? (
