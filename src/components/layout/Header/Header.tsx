@@ -8,7 +8,7 @@ const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;
 
 export default function Header() {
   const { pathname } = useLocation();
-  const { isLoggedIn, refreshToken, clearAccessToken, clearRefreshToken } = useAuth();
+  const { isLoggedIn, clearAccessToken } = useAuth();
   const isStoreStartPage = /^\/store\/[^/]+\/start/.test(pathname);
 
   const handleKakaoLogin = () => {
@@ -17,14 +17,11 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      if (refreshToken) {
-        await postLogout(refreshToken);
-      }
+      await postLogout();
     } catch (e) {
       console.error('logout error', e);
     } finally {
       clearAccessToken();
-      clearRefreshToken();
 
       window.location.href = '/';
     }
