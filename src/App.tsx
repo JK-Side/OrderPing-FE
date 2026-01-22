@@ -6,6 +6,7 @@ import MenuEdit from '@/pages/MenuEdit';
 import OAuthCallback from '@/pages/OAuthCallback';
 import StoreCreate from '@/pages/StoreCreate';
 import StoreOperate from '@/pages/StoreOperate';
+import StoreStart from '@/pages/StoreStart';
 import { useAuthInit } from '@/utils/hooks/useAuthInit';
 import './App.css';
 
@@ -20,6 +21,7 @@ function App() {
         <Route path="/store/operate/:id" element={<StoreOperate />} />
         <Route path="/store/:id/menu/create" element={<MenuCreate />} />
         <Route path="/store/:id/menu/:menuId/edit" element={<MenuEdit />} />
+        <Route path="/store/:id/start" element={<StoreStart />} />
       </Route>
 
       <Route path="/callback" element={<OAuthCallback />} />

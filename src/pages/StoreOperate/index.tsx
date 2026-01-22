@@ -3,6 +3,8 @@ import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import WarningIcon from '@/assets/icons/warning-circle.svg?react';
 import AlternativeImg from '@/assets/img/basic-img.png';
 import Button from '@/components/Button';
+import StoreSummaryCard from '@/components/StoreSummaryCard';
+import summaryStyles from '@/components/StoreSummaryCard/StoreSummaryCard.module.scss';
 import MenuList from '@/pages/StoreOperate/components/MenuList';
 import StoreSettingsModal from '@/pages/StoreOperate/components/StoreSettingsModal';
 import { useMenusByCategory } from '@/pages/StoreOperate/hooks/useMenus';
@@ -31,37 +33,31 @@ export default function StoreOperate() {
   return (
     <section className={styles.storeOperate}>
       <div className={styles.panel}>
-        <div className={styles.summaryCard}>
-          <div className={styles.summaryInfo}>
-            <div className={styles.summaryImageWrap}>
-              <img className={styles.summaryImage} src={storeImage} alt={`${storeName} 주점`} />
-            </div>
-            <div className={styles.summaryText}>
-              <div className={styles.summaryTitle}>
-                <span className={styles.storeName}>{storeName}</span> 주점
-              </div>
-              <p className={styles.summaryDescription}>{storeDescription}</p>
-            </div>
-          </div>
-          <div className={styles.summaryActions}>
-            <Button
-              className={styles.actionButton}
-              size="md"
-              onClick={() => id && navigate(`/store/${id}/menu/create`)}
-            >
-              <AddMenuIcon className={styles.actionIcon} aria-hidden="true" />
-              메뉴 추가
-            </Button>
-            {storeId ? (
-              <StoreSettingsModal
-                storeId={storeId}
-                storeName={storeName}
-                storeDescription={storeDescription}
-                storeImageUrl={storeImage}
-              />
-            ) : null}
-          </div>
-        </div>
+        <StoreSummaryCard
+          storeName={storeName}
+          storeDescription={storeDescription}
+          imageUrl={storeImageUrl}
+          actions={
+            <>
+              <Button
+                className={summaryStyles.actionButton}
+                size="md"
+                onClick={() => id && navigate(`/store/${id}/menu/create`)}
+              >
+                <AddMenuIcon className={summaryStyles.actionIcon} aria-hidden="true" />
+                메뉴 추가
+              </Button>
+              {storeId ? (
+                <StoreSettingsModal
+                  storeId={storeId}
+                  storeName={storeName}
+                  storeDescription={storeDescription}
+                  storeImageUrl={storeImage}
+                />
+              ) : null}
+            </>
+          }
+        />
 
         {hasMenuError ? (
           <div className={styles.emptyState}>

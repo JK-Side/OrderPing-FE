@@ -5,21 +5,18 @@ import { useAuthStore } from '@/stores/auth';
 export default function OAuthCallback() {
   const navigate = useNavigate();
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
-  const setRefreshToken = useAuthStore((state) => state.setRefreshToken);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
     const accessToken = params.get('accessToken');
-    const refreshToken = params.get('refreshToken');
 
-    if (!accessToken || !refreshToken) return;
+    if (!accessToken) return;
 
     setAccessToken(accessToken);
-    setRefreshToken(refreshToken);
 
     navigate('/', { replace: true });
-  }, [navigate, setAccessToken, setRefreshToken]);
+  }, [navigate, setAccessToken]);
 
   return <div>로그인 처리 중...</div>;
 }

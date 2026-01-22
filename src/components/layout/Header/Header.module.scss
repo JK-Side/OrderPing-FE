@@ -16,8 +16,15 @@
 .navItem {
   text-decoration: none;
   color: $black;
+  cursor: pointer;
+  font-size: 16px;
 
   &:hover {
     color: $primary-50;
   }
+}
+
+.navItemActive {
+  color: $primary-50;
+  font-weight: 600;
 }

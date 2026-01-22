@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { postLogout } from '@/api/auth';
 import OrderPingLogo from '@/assets/logo/ORDERPING_LOGO_TEXT.png';
 import { useAuth } from '@/utils/hooks/useAuth';
@@ -7,7 +7,9 @@ import styles from './Header.module.scss';
 const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;
 
 export default function Header() {
-  const { isLoggedIn, refreshToken, clearAccessToken, clearRefreshToken } = useAuth();
+  const { pathname } = useLocation();
+  const { isLoggedIn, clearAccessToken } = useAuth();
+  const isStoreStartPage = /^\/store\/[^/]+\/start/.test(pathname);
 
   const handleKakaoLogin = () => {
     window.location.href = `${BASE_URL}`;
@@ -15,14 +17,11 @@ export default function Header() {
 
   const handleLogout = async () => {
     try {
-      if (refreshToken) {
-        await postLogout(refreshToken);
-      }
+      await postLogout();
     } catch (e) {
       console.error('logout error', e);
     } finally {
       clearAccessToken();
-      clearRefreshToken();
 
       window.location.href = '/';
     }
@@ -35,7 +34,13 @@ export default function Header() {
       </Link>
 
       <nav className={styles.nav}>
-        {isLoggedIn ? (
+        {isStoreStartPage ? (
+          <>
+            <span className={styles.navItem}>주문 조회</span>
+            <span className={`${styles.navItem} ${styles.navItemActive}`}>테이블 관리</span>
+            <span className={styles.navItem}>주문 통계</span>
+          </>
+        ) : isLoggedIn ? (
           <>
             <Link to="/mypage" className={styles.navItem}>
               마이페이지
