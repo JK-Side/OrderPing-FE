@@ -14,6 +14,7 @@ import styles from './TableCreateModal.module.scss';
 interface TableCreateModalProps {
   storeId?: number;
   onCreated?: (tables: AllTableListResponse, layout: { columns: number; rows: number }) => void;
+  name: string;
 }
 
 interface TableCreateForm {
@@ -22,11 +23,12 @@ interface TableCreateForm {
   tableRows: string;
 }
 
-export default function TableCreateModal({ storeId, onCreated }: TableCreateModalProps) {
+export default function TableCreateModal({ storeId, onCreated, name }: TableCreateModalProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { mutateAsync: createAllTables, isPending } = useCreateAllTable();
+
   const {
     register,
     reset,
@@ -103,7 +105,7 @@ export default function TableCreateModal({ storeId, onCreated }: TableCreateModa
       <ModalTrigger asChild>
         <Button className={styles.triggerButton} size="md" disabled={!storeId}>
           <AddTableIcon className={styles.triggerIcon} aria-hidden="true" />
-          테이블 추가
+          {name}
         </Button>
       </ModalTrigger>
       <ModalContent>
@@ -173,13 +175,7 @@ export default function TableCreateModal({ storeId, onCreated }: TableCreateModa
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button
-              type="submit"
-              size="lg"
-              fullWidth
-              disabled={!isValid || isSubmitting}
-              isLoading={isPending}
-            >
+            <Button type="submit" size="lg" fullWidth disabled={!isValid || isSubmitting} isLoading={isPending}>
               테이블 생성
             </Button>
           </ModalFooter>

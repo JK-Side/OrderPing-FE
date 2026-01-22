@@ -26,10 +26,10 @@ const parseStoredLayout = (value: string | null) => {
   try {
     const parsed = JSON.parse(value) as { columns?: number; rows?: number };
     if (
-      typeof parsed?.columns === 'number'
-      && typeof parsed?.rows === 'number'
-      && parsed.columns > 0
-      && parsed.rows > 0
+      typeof parsed?.columns === 'number' &&
+      typeof parsed?.rows === 'number' &&
+      parsed.columns > 0 &&
+      parsed.rows > 0
     ) {
       return { columns: parsed.columns, rows: parsed.rows };
     }
@@ -41,17 +41,24 @@ const parseStoredLayout = (value: string | null) => {
 
 export default function StoreStart() {
   const navigate = useNavigate();
+
+  const [tableLayout, setTableLayout] = useState<{ columns: number; rows: number } | null>(null);
+
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
   const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
+
   const { data: storeDetail } = useStoreById(storeId);
+  const { data: tables = [] } = useTablesByStore(storeId);
+
   const storeName = storeDetail?.name ?? '주점';
   const storeImageUrl = storeDetail?.imageUrl ?? '';
   const storeImage = storeImageUrl || AlternativeImg;
   const storeDescription = storeDetail?.description ?? '';
-  const { data: tables = [] } = useTablesByStore(storeId);
+
   const hasTables = tables.length > 0;
-  const [tableLayout, setTableLayout] = useState<{ columns: number; rows: number } | null>(null);
+  const tableButtonLabel = hasTables ? '테이블 수정' : '테이블 추가';
+
   const useGridLayout = !!tableLayout && tableLayout.columns > 0 && tableLayout.rows > 0;
   const tableGridStyle = useGridLayout
     ? {
@@ -117,7 +124,11 @@ export default function StoreStart() {
               </button>
             </div>
             <div className={styles.actionButtons}>
-              <TableCreateModal storeId={storeId} onCreated={(_, layout) => setTableLayout(layout)} />
+              <TableCreateModal
+                storeId={storeId}
+                onCreated={(_, layout) => setTableLayout(layout)}
+                name={tableButtonLabel}
+              />
               <Button className={styles.clearButton} size="md" disabled>
                 테이블 비우기
               </Button>
