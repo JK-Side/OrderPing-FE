@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { TableResponse } from '@/api/table/entity';
 import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
@@ -59,7 +60,9 @@ export default function StoreStart() {
   const storeDescription = storeDetail?.description ?? '';
 
   const hasTables = tables.length > 0;
+  const hasActiveOrders = tables.some((table: TableResponse) => table.status === 'OCCUPIED');
   const tableButtonLabel = hasTables ? '테이블 수정' : '테이블 추가';
+  const [isNoticeVisible, setIsNoticeVisible] = useState(true);
 
   const useGridLayout = !!tableLayout && tableLayout.columns > 0 && tableLayout.rows > 0;
   const tableGridStyle = useGridLayout
@@ -104,17 +107,25 @@ export default function StoreStart() {
             }
           />
           <div className={styles.sidePanel}>
-            <div className={styles.noticeCard}>
-              <InfoIcon className={styles.noticeIcon} aria-hidden="true" />
-              <p className={styles.noticeText}>테이블의 체크박스를 누르고 테이블을 비워보세요!</p>
-              <button type="button" className={styles.noticeClose} aria-label="안내 닫기">
-                <CloseIcon className={styles.noticeCloseIcon} aria-hidden="true" />
-              </button>
-            </div>
+            {isNoticeVisible ? (
+              <div className={styles.noticeCard}>
+                <InfoIcon className={styles.noticeIcon} aria-hidden="true" />
+                <p className={styles.noticeText}>테이블의 체크박스를 누르고 테이블을 비워보세요!</p>
+                <button
+                  type="button"
+                  className={styles.noticeClose}
+                  aria-label="안내 닫기"
+                  onClick={() => setIsNoticeVisible(false)}
+                >
+                  <CloseIcon className={styles.noticeCloseIcon} aria-hidden="true" />
+                </button>
+              </div>
+            ) : null}
             <div className={styles.actionButtons}>
               <TableCreateModal
                 storeId={storeId}
                 onCreated={(_, layout) => handleLayoutSave(layout)}
+                hasActiveOrders={hasActiveOrders}
                 name={tableButtonLabel}
               />
               <Button className={styles.clearButton} size="md" disabled>

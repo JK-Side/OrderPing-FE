@@ -1,7 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, type ChangeEvent } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import { postPresignedUrl } from '@/api/store';
 import SettingDetailIcon from '@/assets/icons/setting-2.svg?react';
 import UploadIcon from '@/assets/icons/upload.svg?react';
 import Button from '@/components/Button';
@@ -9,6 +8,7 @@ import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, ModalTrigger } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import { useUpdateStore } from '@/pages/StoreOperate/hooks/useUpdateStore';
+import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
 import styles from './StoreSettingsModal.module.scss';
 
 interface StoreSettingsModalProps {
@@ -36,6 +36,7 @@ export default function StoreSettingsModal({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { upload } = usePresignedUploader();
   const {
     register,
     reset,
@@ -81,23 +82,12 @@ export default function StoreSettingsModal({
       return storeImageUrl;
     }
 
-    const { presignedUrl, imageUrl } = await postPresignedUrl({
+    return await upload({
       directory: 'stores',
       fileName: file.name,
+      file,
+      errorMessage: 'Failed to upload store image.',
     });
-    const uploadResponse = await fetch(presignedUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': file.type || 'application/octet-stream',
-      },
-      body: file,
-    });
-
-    if (!uploadResponse.ok) {
-      throw new Error('Failed to upload store image.');
-    }
-
-    return imageUrl;
   };
 
   const handleSubmitStore: SubmitHandler<StoreSettingsForm> = async (data) => {

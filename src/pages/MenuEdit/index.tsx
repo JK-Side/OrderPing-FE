@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
-import { postPresignedUrl } from '@/api/store';
 import PlusIcon from '@/assets/icons/plus.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -9,6 +8,7 @@ import { useToast } from '@/components/Toast/useToast';
 import { useMenuById } from '@/pages/MenuEdit/hooks/useMenuById';
 import { useUpdateMenu } from '@/pages/MenuEdit/hooks/useUpdateMenu';
 import { MESSAGES, REGEX } from '@/static/validation';
+import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
 import styles from './MenuEdit.module.scss';
 
 const CATEGORY_MAIN = 1;
@@ -34,6 +34,7 @@ export default function MenuEdit() {
   const { data: menuDetail, isError: isMenuError } = useMenuById(resolvedMenuId);
   const { mutateAsync: updateMenu } = useUpdateMenu();
   const { toast } = useToast();
+  const { upload } = usePresignedUploader();
   const {
     register,
     handleSubmit,
@@ -109,25 +110,14 @@ export default function MenuEdit() {
       }
 
       const file = menuImage[0];
-      const { presignedUrl, imageUrl } = await postPresignedUrl({
+      return await upload({
         directory: 'menus',
         fileName: file.name,
+        file,
+        errorMessage: 'Failed to upload menu image.',
       });
-      const uploadResponse = await fetch(presignedUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': file.type || 'application/octet-stream',
-        },
-        body: file,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error('Failed to upload menu image.');
-      }
-
-      return imageUrl;
     },
-    [menuDetail?.imageUrl],
+    [menuDetail?.imageUrl, upload],
   );
 
   const handleSubmitMenu = useCallback<SubmitHandler<MenuEditForm>>(

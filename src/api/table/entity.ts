@@ -22,6 +22,15 @@ export interface CreateAllTableRequest {
   count: number;
 }
 
+export interface UpdateTableQrImagePayload {
+  tableId: number;
+  qrImage: string;
+}
+
+export interface UpdateTableQrImagesRequest {
+  updates: UpdateTableQrImagePayload[];
+}
+
 interface CreateAllTableResponse {
   id: number;
   storeId: number;

@@ -2,9 +2,9 @@ import clsx from 'clsx';
 import { useCallback, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
-import { postPresignedUrl } from '@/api/store';
 import { useCreateStore } from '@/pages/StoreCreate/hooks/useCreateStore';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
+import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
 import AccoutInfo from './AccoutInfo';
 import StoreCreateComplete from './Complete';
 import styles from './StoreCreate.module.scss';
@@ -28,6 +28,7 @@ export default function StoreCreate() {
     mode: 'onBlur',
   });
   const { mutateAsync: createStore } = useCreateStore();
+  const { upload } = usePresignedUploader();
 
   const uploadStoreImage = useCallback(async (storeImage?: FileList) => {
     if (!storeImage?.length) {
@@ -35,24 +36,13 @@ export default function StoreCreate() {
     }
 
     const file = storeImage[0];
-    const { presignedUrl, imageUrl } = await postPresignedUrl({
+    return await upload({
       directory: 'stores',
       fileName: file.name,
+      file,
+      errorMessage: 'Failed to upload store image.',
     });
-    const uploadResponse = await fetch(presignedUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': file.type || 'application/octet-stream',
-      },
-      body: file,
-    });
-
-    if (!uploadResponse.ok) {
-      throw new Error('Failed to upload store image.');
-    }
-
-    return imageUrl;
-  }, []);
+  }, [upload]);
 
   const updateStep = useCallback(
     (nextStep: number, options?: { replace?: boolean }) => {

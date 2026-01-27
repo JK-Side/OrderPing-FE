@@ -1,5 +1,13 @@
 import { apiClient } from '..';
-import type { AllTableListResponse, CreateAllTableRequest, CreateTableRequest, TableListResponse, TableResponse, TableStatus } from './entity';
+import type {
+  AllTableListResponse,
+  CreateAllTableRequest,
+  CreateTableRequest,
+  TableListResponse,
+  TableResponse,
+  TableStatus,
+  UpdateTableQrImagesRequest,
+} from './entity';
 
 // GET  /api/tables  매장별 테이블 목록
 export const getTablesByStore = async (storeId: number, status?: TableStatus) => {
@@ -19,6 +27,13 @@ export const postCreatedTable = async (body: CreateTableRequest) => {
 // POST  /api/tables/bulk 테이블 일괄 생성
 export const postCreatedAllTable = async (body: CreateAllTableRequest) => {
   return await apiClient.post<AllTableListResponse>('/api/tables/bulk', {
+    body,
+  });
+};
+
+// PATCH /api/tables/bulk/{storeId} 테이블 QR 이미지 일괄 업데이트
+export const patchTableQrImages = async (storeId: number, body: UpdateTableQrImagesRequest) => {
+  return await apiClient.patch<void>(`/api/tables/bulk/${storeId}`, {
     body,
   });
 };
