@@ -41,7 +41,6 @@ export default function OrderLookupCard({
   couponAmount,
   onDetailClick,
   onAccept,
-  onReject,
   className,
   ...rest
 }: OrderLookupCardProps) {
@@ -76,16 +75,10 @@ export default function OrderLookupCard({
       </div>
 
       <div className={styles.actions}>
-        <Button
-          type="button"
-          variant="danger"
-          size="sm"
-          className={`${styles.actionButton} ${styles.rejectButton}`}
-          onClick={onReject}
-        >
+        <button className={styles.rejectButton}>
           <CloseIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
           거절
-        </Button>
+        </button>
         <Button type="button" size="sm" className={styles.actionButton} onClick={onAccept}>
           <CheckIcon className={styles.actionIcon} aria-hidden="true" />
           수락
