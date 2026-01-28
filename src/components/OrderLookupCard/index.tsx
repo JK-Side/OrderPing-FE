@@ -78,7 +78,7 @@ export default function OrderLookupCard({
       <div className={styles.actions}>
         <Button
           type="button"
-          variant="ghost"
+          variant="danger"
           size="sm"
           className={`${styles.actionButton} ${styles.rejectButton}`}
           onClick={onReject}

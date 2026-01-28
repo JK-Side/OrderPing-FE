@@ -103,7 +103,7 @@
   border: none;
 
   &:hover {
-    background-color: $gray-40;
+    color: $white;
   }
 }
 
@@ -121,4 +121,8 @@
   width: 17px;
   height: 17px;
   color: $grayscale-80;
+
+  &:hover {
+    color: $white;
+  }
 }
