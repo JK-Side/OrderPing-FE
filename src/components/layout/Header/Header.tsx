@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+﻿import { Link, useLocation } from 'react-router-dom';
 import { postLogout } from '@/api/auth';
 import OrderPingLogo from '@/assets/logo/ORDERPING_LOGO_TEXT.png';
 import { useAuth } from '@/utils/hooks/useAuth';
@@ -9,10 +9,13 @@ const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;
 export default function Header() {
   const { pathname } = useLocation();
   const { isLoggedIn, clearAccessToken } = useAuth();
+  const isStoreContextPage = /^\/store\/[^/]+\/(start|orders)/.test(pathname);
   const isStoreStartPage = /^\/store\/[^/]+\/start/.test(pathname);
-  const storeIdMatch = pathname.match(/^\/store\/([^/]+)\/start/);
+  const isStoreOrdersPage = /^\/store\/[^/]+\/orders/.test(pathname);
+  const storeIdMatch = pathname.match(/^\/store\/([^/]+)\/(start|orders)/);
   const storeId = storeIdMatch?.[1];
   const menuManagePath = storeId ? `/store/operate/${storeId}` : '/';
+  const orderManagePath = storeId ? `/store/${storeId}/orders` : '/';
   const tableManagePath = storeId ? `/store/${storeId}/start` : '/';
 
   const handleKakaoLogin = () => {
@@ -38,13 +41,21 @@ export default function Header() {
       </Link>
 
       <nav className={styles.nav}>
-        {isStoreStartPage ? (
+        {isStoreContextPage ? (
           <>
             <Link to={menuManagePath} className={styles.navItem}>
               메뉴 관리
             </Link>
-            <span className={styles.navItem}>주문 조회</span>
-            <Link to={tableManagePath} className={`${styles.navItem} ${styles.navItemActive}`}>
+            <Link
+              to={orderManagePath}
+              className={`${styles.navItem} ${isStoreOrdersPage ? styles.navItemActive : ''}`}
+            >
+              주문 조회
+            </Link>
+            <Link
+              to={tableManagePath}
+              className={`${styles.navItem} ${isStoreStartPage ? styles.navItemActive : ''}`}
+            >
               테이블 관리
             </Link>
             <span className={styles.navItem}>주문 통계</span>
