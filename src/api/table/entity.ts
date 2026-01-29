@@ -11,7 +11,7 @@ export interface TableResponse {
   tableNum: number;
   status: TableStatus;
   qrToken: string;
-  qrUrl: string;
+  qrUrl: string | null;
   qrImageUrl: string;
 }
 
@@ -41,7 +41,7 @@ interface CreateAllTableResponse {
   tableNum: number;
   status: TableStatus;
   qrToken: string;
-  qrUrl: string;
+  qrUrl: string | null;
   qrImageUrl: string;
 }
 

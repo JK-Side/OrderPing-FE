@@ -24,6 +24,12 @@ const createQrSvgMarkup = (value: string) => {
   )}`;
 };
 
+const createQrValue = (storeId: number, tableNum: number) => {
+  const url = new URL(`/customer/store/${storeId}`, window.location.origin);
+  url.searchParams.set('tableId', String(tableNum));
+  return url.toString();
+};
+
 const createQrFileName = (storeId: number, tableId: number) => {
   const uuid =
     typeof crypto !== 'undefined' && 'randomUUID' in crypto
@@ -110,10 +116,8 @@ export default function TableCreateModal({
 
       const response = await Promise.all(
         tables.map(async (table) => {
-          if (!table.qrUrl) {
-            throw new Error('Missing QR URL.');
-          }
-          const svgMarkup = createQrSvgMarkup(table.qrUrl);
+          const qrValue = createQrValue(table.storeId, table.tableNum);
+          const svgMarkup = createQrSvgMarkup(qrValue);
           const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml' });
           const imageUrl = await upload({
             directory: QR_S3_DIRECTORY,
@@ -134,7 +138,7 @@ export default function TableCreateModal({
       await updateTableQrImages({
         updates: response.map((table) => ({
           tableId: table.id,
-          qrImage: table.qrImageUrl,
+          qrImageUrl: table.qrImageUrl,
         })),
       });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
