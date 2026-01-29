@@ -24,11 +24,15 @@ export interface CreateAllTableRequest {
 
 export interface UpdateTableQrImagePayload {
   tableId: number;
-  qrImage: string;
+  qrImageUrl: string;
 }
 
 export interface UpdateTableQrImagesRequest {
   updates: UpdateTableQrImagePayload[];
+}
+
+export interface UpdateTableQrImageRequest {
+  qrImageUrl: string;
 }
 
 interface CreateAllTableResponse {

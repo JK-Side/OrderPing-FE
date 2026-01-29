@@ -6,6 +6,7 @@ import type {
   TableListResponse,
   TableResponse,
   TableStatus,
+  UpdateTableQrImageRequest,
   UpdateTableQrImagesRequest,
 } from './entity';
 
@@ -33,7 +34,14 @@ export const postCreatedAllTable = async (body: CreateAllTableRequest) => {
 
 // PATCH /api/tables/bulk/{storeId} 테이블 QR 이미지 일괄 업데이트
 export const patchTableQrImages = async (storeId: number, body: UpdateTableQrImagesRequest) => {
-  return await apiClient.patch<void>(`/api/tables/bulk/${storeId}`, {
+  return await apiClient.patch<AllTableListResponse>(`/api/tables/bulk/${storeId}`, {
+    body,
+  });
+};
+
+// PATCH /api/tables/{id} 테이블 QR 이미지 업데이트
+export const patchTableQrImage = async (tableId: number, body: UpdateTableQrImageRequest) => {
+  return await apiClient.patch<TableResponse>(`/api/tables/${tableId}`, {
     body,
   });
 };
