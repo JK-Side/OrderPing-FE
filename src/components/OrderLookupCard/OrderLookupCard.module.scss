@@ -98,12 +98,19 @@
 }
 
 .rejectButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: $gray-20;
   color: $grayscale-80;
   border: none;
+  padding: 4px 12px;
+  border-radius: 8px;
+  gap: 6px;
+  font-weight: 600;
 
   &:hover {
-    background-color: $gray-40;
+    background-color: $gray-30;
   }
 }
 
