@@ -1,10 +1,13 @@
-﻿import InfoIcon from '@/assets/icons/info-circle.svg?react';
+﻿import { useState } from 'react';
+import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import OrderLookupCard from '@/components/OrderLookupCard';
 import { orderLookupMock } from '@/mocks/orderLookup';
+import OrderDetailModal, { type OrderDetailItem } from '@/pages/StoreOrders/components/OrderDetailModal';
 import styles from './StoreOrders.module.scss';
 
 type OrderCardData = {
   id: string;
+  orderId: number;
   tableNumber: number;
   depositorName: string;
   depositAmount: number;
@@ -53,6 +56,7 @@ const createOrderSections = (orders: typeof orderLookupMock): OrderSection[] =>
       .filter((order) => config.statuses.includes(order.status))
       .map((order) => ({
         id: `${config.key}-${order.id}`,
+        orderId: order.id,
         tableNumber: order.tableId,
         depositorName: order.depositorName,
         depositAmount: order.cashAmount,
@@ -60,8 +64,52 @@ const createOrderSections = (orders: typeof orderLookupMock): OrderSection[] =>
       })),
   }));
 
+const DEFAULT_DETAIL_ITEMS: OrderDetailItem[] = [
+  {
+    name: '하츄핑의 특제 핑크퐁이 아닌 핑크탕',
+    quantity: 2,
+    price: 49000,
+  },
+  {
+    name: '바로핑의 특제 치킨 갈릭 소스',
+    quantity: 14,
+    price: 143000,
+  },
+  {
+    name: '오로라핑의 아름다운 무지개 전골',
+    quantity: 1,
+    price: 16000,
+  },
+  {
+    name: '궁금핑이 만든 요리가 궁금하신가요? 그러기 위해...',
+    quantity: 1,
+    price: 8000,
+  },
+];
+
+const ORDER_DETAIL_ITEMS: Record<number, OrderDetailItem[]> = {
+  1: DEFAULT_DETAIL_ITEMS,
+};
+
 export default function StoreOrders() {
   const orderSections = createOrderSections(orderLookupMock);
+  const [selectedOrder, setSelectedOrder] = useState<(typeof orderLookupMock)[number] | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+
+  const handleOpenDetail = (orderId: number) => {
+    const nextOrder = orderLookupMock.find((order) => order.id === orderId) ?? null;
+    setSelectedOrder(nextOrder);
+    setIsDetailOpen(true);
+  };
+
+  const handleDetailOpenChange = (nextOpen: boolean) => {
+    setIsDetailOpen(nextOpen);
+    if (!nextOpen) {
+      setSelectedOrder(null);
+    }
+  };
+
+  const detailItems = selectedOrder ? ORDER_DETAIL_ITEMS[selectedOrder.id] ?? DEFAULT_DETAIL_ITEMS : DEFAULT_DETAIL_ITEMS;
 
   return (
     <section className={styles.storeOrders}>
@@ -88,12 +136,19 @@ export default function StoreOrders() {
                   depositorName={order.depositorName}
                   depositAmount={order.depositAmount}
                   couponAmount={order.couponAmount}
+                  onDetailClick={() => handleOpenDetail(order.orderId)}
                 />
               ))}
             </div>
           </div>
         ))}
       </div>
+      <OrderDetailModal
+        open={isDetailOpen}
+        onOpenChange={handleDetailOpenChange}
+        order={selectedOrder}
+        items={detailItems}
+      />
     </section>
   );
 }
