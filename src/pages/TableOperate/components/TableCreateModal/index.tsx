@@ -18,6 +18,20 @@ import styles from './TableCreateModal.module.scss';
 const QR_IMAGE_SIZE = 256;
 const QR_S3_DIRECTORY = 'tables';
 
+type QrUploadTarget = {
+  id: number;
+  storeId: number;
+  tableNum: number;
+};
+
+type QrUploadEntry = QrUploadTarget & {
+  qrImageUrl?: string;
+};
+
+type QrUploadEntryWithImage = QrUploadEntry & {
+  qrImageUrl: string;
+};
+
 const createQrSvgMarkup = (value: string) => {
   return `<?xml version="1.0" encoding="UTF-8"?>${renderToStaticMarkup(
     <QRCodeSVG value={value} size={QR_IMAGE_SIZE} level="M" includeMargin />,
@@ -36,6 +50,27 @@ const createQrFileName = (storeId: number, tableId: number) => {
       ? crypto.randomUUID()
       : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   return `table-${storeId}-${tableId}-${uuid}.svg`;
+};
+
+const buildRetryMessage = (uploadFailureCount: number, updateFailureCount: number) => {
+  if (uploadFailureCount > 0 && updateFailureCount === 0) {
+    return `${uploadFailureCount}개의 QR 업로드가 실패했습니다.`;
+  }
+  if (uploadFailureCount === 0 && updateFailureCount > 0) {
+    return `${updateFailureCount}개의 QR 등록이 실패했습니다.`;
+  }
+  return `${uploadFailureCount + updateFailureCount}개의 QR 업로드/등록이 실패했습니다.`;
+};
+
+const resolveErrorMessage = (error: unknown) => {
+  const status = (error as { status?: number })?.status;
+  return status === 400
+    ? '잘못된 요청입니다.'
+    : status === 401
+      ? '인증이 필요합니다.'
+      : status === 403
+        ? '본인 매장이 아닙니다.'
+        : '테이블 생성에 실패했습니다.';
 };
 
 interface TableCreateModalProps {
@@ -61,6 +96,8 @@ export default function TableCreateModal({
 }: TableCreateModalProps) {
   const [open, setOpen] = useState(false);
   const [isUploadingQr, setIsUploadingQr] = useState(false);
+  const [retryEntries, setRetryEntries] = useState<QrUploadEntry[]>([]);
+  const [retryMessage, setRetryMessage] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { mutateAsync: createAllTables, isPending } = useCreateAllTable();
@@ -89,11 +126,68 @@ export default function TableCreateModal({
         tableColumns: '',
         tableRows: '',
       });
+      setRetryEntries([]);
+      setRetryMessage(null);
+      setIsUploadingQr(false);
+    }
+  };
+
+  const uploadQrImages = async (targets: QrUploadTarget[]) => {
+    const results = await Promise.allSettled(
+      targets.map(async (table) => {
+        const qrValue = createQrValue(table.storeId, table.tableNum);
+        const svgMarkup = createQrSvgMarkup(qrValue);
+        const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml' });
+        const imageUrl = await upload({
+          directory: QR_S3_DIRECTORY,
+          fileName: createQrFileName(table.storeId, table.tableNum),
+          file: svgBlob,
+          contentType: 'image/svg+xml',
+          errorMessage: 'Failed to upload QR image.',
+        });
+
+        return {
+          ...table,
+          qrImageUrl: imageUrl,
+        };
+      }),
+    );
+
+    const succeeded: QrUploadEntryWithImage[] = [];
+    const failed: QrUploadEntry[] = [];
+
+    results.forEach((result, index) => {
+      const table = targets[index];
+      if (result.status === 'fulfilled') {
+        succeeded.push(result.value);
+      } else {
+        failed.push({ ...table });
+      }
+    });
+
+    return { succeeded, failed };
+  };
+
+  const updateQrImages = async (entries: QrUploadEntryWithImage[]) => {
+    if (entries.length === 0) return [] as QrUploadEntryWithImage[];
+
+    try {
+      await updateTableQrImages({
+        updates: entries.map((table) => ({
+          tableId: table.id,
+          qrImageUrl: table.qrImageUrl,
+        })),
+      });
+      return [] as QrUploadEntryWithImage[];
+    } catch (error) {
+      console.error('Failed to update table QR images', error);
+      return entries;
     }
   };
 
   const handleSubmitForm: SubmitHandler<TableCreateForm> = async (data) => {
     if (!storeId) return;
+    if (retryEntries.length > 0) return;
 
     try {
       const tableCount = Number(data.tableCount);
@@ -114,56 +208,88 @@ export default function TableCreateModal({
         count: tableCount,
       });
 
-      const response = await Promise.all(
-        tables.map(async (table) => {
-          const qrValue = createQrValue(table.storeId, table.tableNum);
-          const svgMarkup = createQrSvgMarkup(qrValue);
-          const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml' });
-          const imageUrl = await upload({
-            directory: QR_S3_DIRECTORY,
-            fileName: createQrFileName(storeId, table.tableNum),
-            file: svgBlob,
-            contentType: 'image/svg+xml',
-            errorMessage: 'Failed to upload QR image.',
-          });
+      const targets = tables.map((table) => ({
+        id: table.id,
+        storeId: table.storeId,
+        tableNum: table.tableNum,
+      }));
 
-          return {
-            ...table,
-            qrImageUrl: imageUrl,
-          };
-        }),
-      );
+      const { succeeded, failed } = await uploadQrImages(targets);
+      const updateFailures = await updateQrImages(succeeded);
+      const pendingRetries = [...failed, ...updateFailures];
 
-      // TODO: Handle partial failures and retries once backend supports recovery flow.
-      await updateTableQrImages({
-        updates: response.map((table) => ({
-          tableId: table.id,
-          qrImageUrl: table.qrImageUrl,
-        })),
-      });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
-      onCreated?.(response, { columns: tableColumns, rows: tableRows });
-      toast({
-        message: '테이블이 생성되었습니다.',
-        variant: 'info',
-      });
-      setOpen(false);
-    } catch (error) {
-      const status = (error as { status?: number })?.status;
-      const errorMessage =
-        status === 400
-          ? '잘못된 요청입니다.'
-          : status === 401
-            ? '인증이 필요합니다.'
-            : status === 403
-              ? '본인 매장이 아닙니다.'
-              : '테이블 생성에 실패했습니다.';
+      onCreated?.(tables, { columns: tableColumns, rows: tableRows });
 
+      if (pendingRetries.length > 0) {
+        const message = buildRetryMessage(failed.length, updateFailures.length);
+        setRetryEntries(pendingRetries);
+        setRetryMessage(message);
+        toast({
+          message,
+          variant: 'error',
+        });
+      } else {
+        setRetryEntries([]);
+        setRetryMessage(null);
+        toast({
+          message: '테이블이 생성되었습니다.',
+          variant: 'info',
+        });
+        setOpen(false);
+      }
+    } catch (error) {
       toast({
-        message: errorMessage,
+        message: resolveErrorMessage(error),
         variant: 'error',
       });
       console.error('Failed to create table', error);
+    } finally {
+      setIsUploadingQr(false);
+    }
+  };
+
+  const handleRetry = async () => {
+    if (retryEntries.length === 0 || !storeId) return;
+
+    try {
+      setIsUploadingQr(true);
+
+      const alreadyUploaded = retryEntries.filter((entry) => entry.qrImageUrl) as QrUploadEntryWithImage[];
+      const needsUpload = retryEntries.filter((entry) => !entry.qrImageUrl);
+      const { succeeded, failed } = needsUpload.length > 0 ? await uploadQrImages(needsUpload) : { succeeded: [], failed: [] };
+
+      const updateTargets = [...alreadyUploaded, ...succeeded];
+      const updateFailures = await updateQrImages(updateTargets);
+      const pendingRetries = [...failed, ...updateFailures];
+
+      if (updateTargets.length > 0) {
+        await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
+      }
+
+      if (pendingRetries.length > 0) {
+        const message = buildRetryMessage(failed.length, updateFailures.length);
+        setRetryEntries(pendingRetries);
+        setRetryMessage(message);
+        toast({
+          message,
+          variant: 'error',
+        });
+      } else {
+        setRetryEntries([]);
+        setRetryMessage(null);
+        toast({
+          message: 'QR 업로드가 완료되었습니다.',
+          variant: 'info',
+        });
+        setOpen(false);
+      }
+    } catch (error) {
+      toast({
+        message: resolveErrorMessage(error),
+        variant: 'error',
+      });
+      console.error('Failed to retry QR upload', error);
     } finally {
       setIsUploadingQr(false);
     }
@@ -268,13 +394,28 @@ export default function TableCreateModal({
                 />
               </Input>
             </div>
+            {retryMessage ? (
+              <div className={styles.retryNotice} role="status" aria-live="polite">
+                <span className={styles.retryText}>{retryMessage}</span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className={styles.retryButton}
+                  disabled={isUploadingQr}
+                  onClick={handleRetry}
+                >
+                  재시도
+                </Button>
+              </div>
+            ) : null}
           </ModalBody>
           <ModalFooter>
             <Button
               type="submit"
               size="md"
               fullWidth
-              disabled={!isValid || isSubmitting || isUploadingQr}
+              disabled={!isValid || isSubmitting || isUploadingQr || retryEntries.length > 0}
               isLoading={isPending || isUploadingQr}
             >
               {name}
