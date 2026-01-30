@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+﻿import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import type { OrderLookupResponse, OrderStatus } from '@/api/order/entity';
@@ -25,6 +25,7 @@ type OrderSection = {
   key: string;
   title: string;
   hint?: string;
+  emptyLabel: string;
   orders: OrderCardData[];
 };
 
@@ -32,6 +33,7 @@ type OrderSectionConfig = {
   key: string;
   title: string;
   hint?: string;
+  emptyLabel: string;
   statuses: OrderStatus[];
 };
 
@@ -40,16 +42,19 @@ const ORDER_SECTION_CONFIGS: OrderSectionConfig[] = [
     key: 'payment',
     title: '결제 확인 전',
     hint: '입금자명과 입금 금액을 비교해 주세요!',
+    emptyLabel: 'Pending',
     statuses: ['PENDING'],
   },
   {
     key: 'cooking',
     title: '조리 중',
+    emptyLabel: 'Cooking',
     statuses: ['COOKING'],
   },
   {
     key: 'served',
     title: '서빙 완료',
+    emptyLabel: 'Complete',
     statuses: ['COMPLETE'],
   },
 ];
@@ -59,6 +64,7 @@ const createOrderSections = (orders: OrderLookupResponse[]): OrderSection[] =>
     key: config.key,
     title: config.title,
     hint: config.hint,
+    emptyLabel: config.emptyLabel,
     orders: orders
       .filter((order) => config.statuses.includes(order.status))
       .map((order) => ({
@@ -168,7 +174,7 @@ export default function StoreOrders() {
       }
     } catch (error) {
       toast({
-        message: '�ֹ� ���� ���濡 �����߾��.',
+        message: 'Failed to update order status.',
         description: error instanceof Error ? error.message : undefined,
         variant: 'error',
       });
@@ -201,20 +207,24 @@ export default function StoreOrders() {
             <div className={styles.sectionDivider} />
 
             <div className={styles.cardGrid}>
-              {section.orders.map((order) => (
-                <OrderLookupCard
-                  key={order.id}
-                  tableNumber={order.tableNumber}
-                  depositorName={order.depositorName}
-                  depositAmount={order.depositAmount}
-                  couponAmount={order.couponAmount}
-                  onDetailClick={() => handleOpenDetail(order.orderId)}
-                  onReject={() => handleOpenReject(order)}
-                  onAccept={() => handleAccept(order)}
-                  isAccepting={acceptingOrderId === order.orderId}
-                  isAcceptDisabled={!storeId || order.status === 'COMPLETE'}
-                />
-              ))}
+              {section.orders.length === 0 ? (
+                <div className={styles.emptyState}>No {section.emptyLabel} orders.</div>
+              ) : (
+                section.orders.map((order) => (
+                  <OrderLookupCard
+                    key={order.id}
+                    tableNumber={order.tableNumber}
+                    depositorName={order.depositorName}
+                    depositAmount={order.depositAmount}
+                    couponAmount={order.couponAmount}
+                    onDetailClick={() => handleOpenDetail(order.orderId)}
+                    onReject={() => handleOpenReject(order)}
+                    onAccept={() => handleAccept(order)}
+                    isAccepting={acceptingOrderId === order.orderId}
+                    isAcceptDisabled={!storeId || order.status === 'COMPLETE'}
+                  />
+                ))
+              )}
             </div>
           </div>
         ))}

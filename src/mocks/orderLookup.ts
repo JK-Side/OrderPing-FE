@@ -1,16 +1,7 @@
-﻿export type OrderLookupStatus = 'PENDING' | 'COOKING' | 'SERVED';
+import type { OrderLookupResponse, OrderStatus } from '@/api/order/entity';
 
-export type OrderLookupResponse = {
-  id: number;
-  tableId: number;
-  storeId: number;
-  depositorName: string;
-  status: OrderLookupStatus;
-  totalPrice: number;
-  couponAmount: number;
-  cashAmount: number;
-  createdAt: string;
-};
+export type { OrderLookupResponse };
+export type OrderLookupStatus = OrderStatus;
 
 export const orderLookupMock: OrderLookupResponse[] = [
   {
@@ -95,7 +86,7 @@ export const orderLookupMock: OrderLookupResponse[] = [
     tableId: 7,
     storeId: 1,
     depositorName: '소중대정민서',
-    status: 'SERVED',
+    status: 'COMPLETE',
     totalPrice: 75900,
     couponAmount: 0,
     cashAmount: 75900,
@@ -106,7 +97,7 @@ export const orderLookupMock: OrderLookupResponse[] = [
     tableId: 3,
     storeId: 1,
     depositorName: '당근김소민',
-    status: 'SERVED',
+    status: 'COMPLETE',
     totalPrice: 24000,
     couponAmount: 0,
     cashAmount: 24000,
@@ -117,7 +108,7 @@ export const orderLookupMock: OrderLookupResponse[] = [
     tableId: 5,
     storeId: 1,
     depositorName: '갑자기백수된이동우',
-    status: 'SERVED',
+    status: 'COMPLETE',
     totalPrice: 28900,
     couponAmount: 10000,
     cashAmount: 18900,
@@ -128,7 +119,7 @@ export const orderLookupMock: OrderLookupResponse[] = [
     tableId: 17,
     storeId: 1,
     depositorName: '정민구독립투사',
-    status: 'SERVED',
+    status: 'COMPLETE',
     totalPrice: 34000,
     couponAmount: 0,
     cashAmount: 34000,
