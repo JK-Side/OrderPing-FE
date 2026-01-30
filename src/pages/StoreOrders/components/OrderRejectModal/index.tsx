@@ -8,12 +8,13 @@ interface OrderRejectModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onConfirm?: () => void;
+  isLoading?: boolean;
 }
 
-export default function OrderRejectModal({ open, onOpenChange, onConfirm }: OrderRejectModalProps) {
+export default function OrderRejectModal({ open, onOpenChange, onConfirm, isLoading = false }: OrderRejectModalProps) {
   const handleConfirm = () => {
+    if (isLoading) return;
     onConfirm?.();
-    onOpenChange(false);
   };
 
   return (
@@ -26,10 +27,23 @@ export default function OrderRejectModal({ open, onOpenChange, onConfirm }: Orde
           <Dialog.Title className={styles.message}>정말 주문을 취소할까요?</Dialog.Title>
         </ModalBody>
         <ModalFooter className={styles.footer}>
-          <Button type="button" variant="danger" className={styles.footerButton} onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="danger"
+            className={styles.footerButton}
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+          >
             아니요
           </Button>
-          <Button type="button" className={styles.footerButton} onClick={handleConfirm}>
+          <Button
+            type="button"
+            className={styles.footerButton}
+            onClick={handleConfirm}
+            isLoading={isLoading}
+            disabled={isLoading}
+            loadingText="Deleting..."
+          >
             네
           </Button>
         </ModalFooter>

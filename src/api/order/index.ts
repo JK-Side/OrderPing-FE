@@ -12,3 +12,7 @@ export const patchOrderStatus = async (id: number, body: UpdateOrderStatusReques
     body,
   });
 };
+
+export const deleteOrderById = async (id: number) => {
+  return await apiClient.delete<void>(`/api/orders/${id}`);
+};

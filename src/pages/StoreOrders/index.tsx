@@ -7,6 +7,7 @@ import OrderLookupCard from '@/components/OrderLookupCard';
 import { useToast } from '@/components/Toast/useToast';
 import OrderDetailModal, { type OrderDetailItem } from '@/pages/StoreOrders/components/OrderDetailModal';
 import OrderRejectModal from '@/pages/StoreOrders/components/OrderRejectModal';
+import { useDeleteOrder } from '@/pages/StoreOrders/hooks/useDeleteOrder';
 import { useOrdersByStore } from '@/pages/StoreOrders/hooks/useOrdersByStore';
 import { useUpdateOrderStatus } from '@/pages/StoreOrders/hooks/useUpdateOrderStatus';
 import styles from './StoreOrders.module.scss';
@@ -117,7 +118,9 @@ export default function StoreOrders() {
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [pendingRejectOrder, setPendingRejectOrder] = useState<OrderCardData | null>(null);
   const [acceptingOrderId, setAcceptingOrderId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { mutateAsync: updateOrderStatus } = useUpdateOrderStatus();
+  const { mutateAsync: deleteOrder } = useDeleteOrder();
   const { toast } = useToast();
 
   const handleOpenDetail = (orderId: number) => {
@@ -137,16 +140,61 @@ export default function StoreOrders() {
     setIsRejectOpen(true);
   };
 
+  const handleOpenRejectFromDetail = () => {
+    if (!selectedOrder) return;
+
+    handleOpenReject({
+      id: `detail-${selectedOrder.id}`,
+      orderId: selectedOrder.id,
+      tableNumber: selectedOrder.tableId,
+      depositorName: selectedOrder.depositorName,
+      depositAmount: selectedOrder.cashAmount,
+      couponAmount: selectedOrder.couponAmount,
+      status: selectedOrder.status,
+    });
+    handleDetailOpenChange(false);
+  };
+
   const handleRejectOpenChange = (nextOpen: boolean) => {
     setIsRejectOpen(nextOpen);
     if (!nextOpen) {
       setPendingRejectOrder(null);
+      setIsDeleting(false);
     }
   };
 
-  const handleConfirmReject = () => {
+  const handleConfirmReject = async () => {
     if (!pendingRejectOrder) return;
-    setPendingRejectOrder(null);
+
+    try {
+      setIsDeleting(true);
+      await deleteOrder(pendingRejectOrder.orderId);
+
+      if (storeId) {
+        queryClient.setQueryData<OrderLookupResponse[]>(['orders', storeId], (prev) =>
+          prev ? prev.filter((item) => item.id !== pendingRejectOrder.orderId) : prev,
+        );
+      }
+
+      toast({
+        message: '주문이 취소되었습니다.',
+        variant: 'success',
+      });
+
+      setIsRejectOpen(false);
+      setPendingRejectOrder(null);
+    } catch (error) {
+      toast({
+        message: '주문 취소에 실패했습니다.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('주문 취소에 실패했습니다.', error);
+      setIsRejectOpen(false);
+      setPendingRejectOrder(null);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const resolveNextStatus = (status: OrderStatus) => {
@@ -174,11 +222,11 @@ export default function StoreOrders() {
       }
     } catch (error) {
       toast({
-        message: 'Failed to update order status.',
+        message: '주문 상태 업데이트에 실패했습니다.',
         description: error instanceof Error ? error.message : undefined,
         variant: 'error',
       });
-      console.error('Failed to update order status', error);
+      console.error('주문 상태 업데이트에 실패했습니다.', error);
     } finally {
       setAcceptingOrderId((prev) => (prev === order.orderId ? null : prev));
     }
@@ -234,8 +282,14 @@ export default function StoreOrders() {
         onOpenChange={handleDetailOpenChange}
         order={selectedOrder}
         items={detailItems}
+        onReject={handleOpenRejectFromDetail}
       />
-      <OrderRejectModal open={isRejectOpen} onOpenChange={handleRejectOpenChange} onConfirm={handleConfirmReject} />
+      <OrderRejectModal
+        open={isRejectOpen}
+        onOpenChange={handleRejectOpenChange}
+        onConfirm={handleConfirmReject}
+        isLoading={isDeleting}
+      />
     </section>
   );
 }
