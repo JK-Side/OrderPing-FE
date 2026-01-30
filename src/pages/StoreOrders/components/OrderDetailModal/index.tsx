@@ -1,6 +1,6 @@
 ﻿import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
-import type { OrderLookupResponse } from '@/mocks/orderLookup';
+import type { OrderLookupResponse } from '@/api/order/entity';
 import styles from './OrderDetailModal.module.scss';
 
 export type OrderDetailItem = {

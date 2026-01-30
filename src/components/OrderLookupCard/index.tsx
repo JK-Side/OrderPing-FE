@@ -15,6 +15,8 @@ interface OrderLookupCardProps extends HTMLAttributes<HTMLElement> {
   onDetailClick?: ClickHandler;
   onAccept?: ClickHandler;
   onReject?: ClickHandler;
+  isAccepting?: boolean;
+  isAcceptDisabled?: boolean;
 }
 
 const formatTableNumber = (value: number | string) => {
@@ -42,6 +44,8 @@ export default function OrderLookupCard({
   onDetailClick,
   onAccept,
   onReject,
+  isAccepting = false,
+  isAcceptDisabled = false,
   className,
   ...rest
 }: OrderLookupCardProps) {
@@ -80,7 +84,14 @@ export default function OrderLookupCard({
           <CloseIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
           거절
         </button>
-        <Button type="button" size="sm" className={styles.actionButton} onClick={onAccept}>
+        <Button
+          type="button"
+          size="sm"
+          className={styles.actionButton}
+          onClick={onAccept}
+          isLoading={isAccepting}
+          disabled={isAcceptDisabled || isAccepting}
+        >
           <CheckIcon className={styles.actionIcon} aria-hidden="true" />
           수락
         </Button>
