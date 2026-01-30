@@ -3,6 +3,7 @@ import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import OrderLookupCard from '@/components/OrderLookupCard';
 import { orderLookupMock } from '@/mocks/orderLookup';
 import OrderDetailModal, { type OrderDetailItem } from '@/pages/StoreOrders/components/OrderDetailModal';
+import OrderRejectModal from '@/pages/StoreOrders/components/OrderRejectModal';
 import styles from './StoreOrders.module.scss';
 
 type OrderCardData = {
@@ -95,6 +96,8 @@ export default function StoreOrders() {
   const orderSections = createOrderSections(orderLookupMock);
   const [selectedOrder, setSelectedOrder] = useState<(typeof orderLookupMock)[number] | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isRejectOpen, setIsRejectOpen] = useState(false);
+  const [pendingRejectOrder, setPendingRejectOrder] = useState<OrderCardData | null>(null);
 
   const handleOpenDetail = (orderId: number) => {
     const nextOrder = orderLookupMock.find((order) => order.id === orderId) ?? null;
@@ -107,6 +110,23 @@ export default function StoreOrders() {
     if (!nextOpen) {
       setSelectedOrder(null);
     }
+  };
+
+  const handleOpenReject = (order: OrderCardData) => {
+    setPendingRejectOrder(order);
+    setIsRejectOpen(true);
+  };
+
+  const handleRejectOpenChange = (nextOpen: boolean) => {
+    setIsRejectOpen(nextOpen);
+    if (!nextOpen) {
+      setPendingRejectOrder(null);
+    }
+  };
+
+  const handleConfirmReject = () => {
+    if (!pendingRejectOrder) return;
+    setPendingRejectOrder(null);
   };
 
   const detailItems = selectedOrder ? ORDER_DETAIL_ITEMS[selectedOrder.id] ?? DEFAULT_DETAIL_ITEMS : DEFAULT_DETAIL_ITEMS;
@@ -137,6 +157,7 @@ export default function StoreOrders() {
                   depositAmount={order.depositAmount}
                   couponAmount={order.couponAmount}
                   onDetailClick={() => handleOpenDetail(order.orderId)}
+                  onReject={() => handleOpenReject(order)}
                 />
               ))}
             </div>
@@ -148,6 +169,11 @@ export default function StoreOrders() {
         onOpenChange={handleDetailOpenChange}
         order={selectedOrder}
         items={detailItems}
+      />
+      <OrderRejectModal
+        open={isRejectOpen}
+        onOpenChange={handleRejectOpenChange}
+        onConfirm={handleConfirmReject}
       />
     </section>
   );

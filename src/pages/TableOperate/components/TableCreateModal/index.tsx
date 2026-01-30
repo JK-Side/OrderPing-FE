@@ -257,7 +257,8 @@ export default function TableCreateModal({
 
       const alreadyUploaded = retryEntries.filter((entry) => entry.qrImageUrl) as QrUploadEntryWithImage[];
       const needsUpload = retryEntries.filter((entry) => !entry.qrImageUrl);
-      const { succeeded, failed } = needsUpload.length > 0 ? await uploadQrImages(needsUpload) : { succeeded: [], failed: [] };
+      const { succeeded, failed } =
+        needsUpload.length > 0 ? await uploadQrImages(needsUpload) : { succeeded: [], failed: [] };
 
       const updateTargets = [...alreadyUploaded, ...succeeded];
       const updateFailures = await updateQrImages(updateTargets);

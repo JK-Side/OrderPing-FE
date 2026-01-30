@@ -1,0 +1,61 @@
+@use '@/styles/colors' as *;
+
+.modalContent {
+  width: min(420px, 90vw);
+  background-color: $background;
+  border-radius: 20px;
+}
+
+.closeButton {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: $gray-40;
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+
+.closeIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.closeIcon path {
+  fill: currentColor;
+}
+
+.body {
+  padding: 52px 24px 30px;
+  text-align: center;
+}
+
+.message {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $gray-90;
+}
+
+.footer {
+  padding: 16px 24px 28px;
+  border-top: none;
+  gap: 16px;
+}
+
+.footerButton {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .body {
+    padding-top: 44px;
+  }
+}
