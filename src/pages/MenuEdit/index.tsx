@@ -110,7 +110,7 @@ export default function MenuEdit() {
       await deleteMenu(resolvedMenuId);
       toast({
         message: '메뉴가 삭제되었습니다.',
-        variant: 'success',
+        variant: 'info',
       });
       navigate(`/store/operate/${storeId}`);
     } catch (error) {
@@ -204,7 +204,6 @@ export default function MenuEdit() {
   );
 
   const previewImage = previewUrl ?? menuDetail?.imageUrl;
-  console.log('previewImage:', previewImage);
 
   return (
     <section className={styles.menuEdit}>
