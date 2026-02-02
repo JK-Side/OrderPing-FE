@@ -4,7 +4,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import PlusIcon from '@/assets/icons/plus.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
+import { Modal, ModalBody, ModalContent, ModalFooter } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
+import { useDeleteMenu } from '@/pages/MenuEdit/hooks/useDeleteMenu';
 import { useMenuById } from '@/pages/MenuEdit/hooks/useMenuById';
 import { useUpdateMenu } from '@/pages/MenuEdit/hooks/useUpdateMenu';
 import { MESSAGES, REGEX } from '@/static/validation';
@@ -31,8 +33,10 @@ export default function MenuEdit() {
   const storeId = Number.isFinite(parsedStoreId) ? parsedStoreId : undefined;
   const resolvedMenuId = Number.isFinite(parsedMenuId) ? parsedMenuId : undefined;
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { data: menuDetail, isError: isMenuError } = useMenuById(resolvedMenuId);
   const { mutateAsync: updateMenu } = useUpdateMenu();
+  const { mutateAsync: deleteMenu, isPending: isDeleting } = useDeleteMenu();
   const { toast } = useToast();
   const { upload } = usePresignedUploader();
   const {
@@ -92,6 +96,41 @@ export default function MenuEdit() {
       navigate(`/store/operate/${storeId}`);
     } else {
       navigate(-1);
+    }
+  };
+
+  const handleDeleteOpenChange = (open: boolean) => {
+    if (isDeleting) return;
+    setIsDeleteOpen(open);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!storeId || !resolvedMenuId) return;
+    try {
+      await deleteMenu(resolvedMenuId);
+      toast({
+        message: '메뉴가 삭제되었습니다.',
+        variant: 'success',
+      });
+      navigate(`/store/operate/${storeId}`);
+    } catch (error) {
+      const status = (error as { status?: number })?.status;
+      const errorMessage =
+        status === 401
+          ? '로그인이 필요합니다.'
+          : status === 403
+            ? '내 주점과 일치하지 않습니다.'
+            : status === 404
+              ? '메뉴를 찾을 수 없습니다.'
+              : '메뉴 삭제에 실패했습니다.';
+
+      toast({
+        message: errorMessage,
+        variant: 'error',
+      });
+      console.error('Failed to delete menu', error);
+    } finally {
+      setIsDeleteOpen(false);
     }
   };
 
@@ -165,11 +204,20 @@ export default function MenuEdit() {
   );
 
   const previewImage = previewUrl ?? menuDetail?.imageUrl;
+  console.log('previewImage:', previewImage);
 
   return (
     <section className={styles.menuEdit}>
       <header className={styles.header}>
         <h2 className={styles.title}>메뉴 수정</h2>
+        <Button
+          type="button"
+          variant="danger"
+          onClick={() => setIsDeleteOpen(true)}
+          disabled={!resolvedMenuId || !storeId || isDeleting}
+        >
+          메뉴 삭제
+        </Button>
       </header>
       <div className={styles.divider} />
 
@@ -315,6 +363,36 @@ export default function MenuEdit() {
           </Button>
         </div>
       </form>
+
+      <Modal open={isDeleteOpen} onOpenChange={handleDeleteOpenChange}>
+        <ModalContent className={styles.deleteModalContent}>
+          <ModalBody className={styles.deleteModalBody}>
+            <p className={styles.deleteModalMessage}>해당 메뉴를 정말로 삭제하시겠습니까?</p>
+          </ModalBody>
+          <ModalFooter className={styles.deleteModalFooter}>
+            <Button
+              type="button"
+              variant="danger"
+              className={styles.deleteModalButton}
+              onClick={() => setIsDeleteOpen(false)}
+              disabled={isDeleting}
+            >
+              취소
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className={styles.deleteModalButton}
+              onClick={handleConfirmDelete}
+              isLoading={isDeleting}
+              disabled={isDeleting}
+              loadingText="삭제 중..."
+            >
+              삭제
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </section>
   );
 }

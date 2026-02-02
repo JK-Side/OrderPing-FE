@@ -182,6 +182,36 @@
   min-width: 120px;
 }
 
+.deleteModalContent {
+  width: min(420px, 90vw);
+  background-color: $background;
+  border-radius: 20px;
+}
+
+.deleteModalBody {
+  padding: 40px 24px 24px;
+  text-align: center;
+}
+
+.deleteModalMessage {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $gray-90;
+}
+
+.deleteModalFooter {
+  padding: 0 24px 28px;
+  border-top: none;
+  gap: 16px;
+}
+
+.deleteModalButton {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+}
+
 @media (max-width: 900px) {
   .menuEdit {
     padding: 56px 24px 80px;

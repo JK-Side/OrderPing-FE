@@ -37,3 +37,7 @@ export const putMenuById = async (id: number, body: UpdateMenuRequest) => {
     body,
   });
 };
+
+export const deleteMenuById = async (id: number) => {
+  return await apiClient.delete<void>(`/api/menus/${id}`);
+};
