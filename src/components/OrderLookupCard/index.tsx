@@ -1,5 +1,7 @@
 ﻿import type { HTMLAttributes } from 'react';
+import type { OrderStatus } from '@/api/order/entity';
 import ArrowRightIcon from '@/assets/icons/arrow-right.svg?react';
+import BackIcon from '@/assets/icons/back.svg?react';
 import CheckIcon from '@/assets/icons/check.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import Button from '@/components/Button';
@@ -12,6 +14,7 @@ interface OrderLookupCardProps extends HTMLAttributes<HTMLElement> {
   depositorName: string;
   depositAmount: number;
   couponAmount?: number;
+  stat?: OrderStatus;
   onDetailClick?: ClickHandler;
   onAccept?: ClickHandler;
   onReject?: ClickHandler;
@@ -41,6 +44,7 @@ export default function OrderLookupCard({
   depositorName,
   depositAmount,
   couponAmount,
+  stat,
   onDetailClick,
   onAccept,
   onReject,
@@ -51,8 +55,11 @@ export default function OrderLookupCard({
 }: OrderLookupCardProps) {
   const cardClassName = className ? `${styles.card} ${className}` : styles.card;
 
+  const prevBtnText = stat === 'PENDING' ? '거절' : '이전';
+  const nextBtnText = stat === 'PENDING' ? '수락' : '다음';
+
   return (
-    <article className={cardClassName} {...rest}>
+    <article className={cardClassName} data-status={stat} {...rest}>
       <div className={styles.header}>
         <span className={styles.tableNumber}>{formatTableNumber(tableNumber)}</span>
         <button type="button" className={styles.detailButton} onClick={onDetailClick}>
@@ -81,20 +88,26 @@ export default function OrderLookupCard({
 
       <div className={styles.actions}>
         <button type="button" className={styles.rejectButton} onClick={onReject}>
-          <CloseIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
-          거절
+          {stat === 'PENDING' ? (
+            <CloseIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
+          ) : (
+            <BackIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
+          )}
+          {prevBtnText}
         </button>
-        <Button
-          type="button"
-          size="sm"
-          className={styles.actionButton}
-          onClick={onAccept}
-          isLoading={isAccepting}
-          disabled={isAcceptDisabled || isAccepting}
-        >
-          <CheckIcon className={styles.actionIcon} aria-hidden="true" />
-          수락
-        </Button>
+        {stat !== 'COMPLETE' && (
+          <Button
+            type="button"
+            size="sm"
+            className={styles.actionButton}
+            onClick={onAccept}
+            isLoading={isAccepting}
+            disabled={isAcceptDisabled || isAccepting}
+          >
+            <CheckIcon className={styles.actionIcon} aria-hidden="true" />
+            {nextBtnText}
+          </Button>
+        )}
       </div>
     </article>
   );

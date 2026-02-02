@@ -40,7 +40,7 @@ type OrderSectionConfig = {
 
 const ORDER_SECTION_CONFIGS: OrderSectionConfig[] = [
   {
-    key: 'payment',
+    key: 'pending',
     title: '결제 확인 전',
     hint: '입금자명과 입금 금액을 비교해 주세요!',
     emptyLabel: 'Pending',
@@ -270,6 +270,7 @@ export default function StoreOrders() {
                     onAccept={() => handleAccept(order)}
                     isAccepting={acceptingOrderId === order.orderId}
                     isAcceptDisabled={!storeId || order.status === 'COMPLETE'}
+                    stat={order.status}
                   />
                 ))
               )}
