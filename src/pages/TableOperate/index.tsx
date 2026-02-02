@@ -5,7 +5,7 @@ import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
-import AlternativeImg from '@/assets/img/basic-img.png';
+import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
 import StoreSummaryCard from '@/components/StoreSummaryCard';
 import summaryStyles from '@/components/StoreSummaryCard/StoreSummaryCard.module.scss';
@@ -56,7 +56,7 @@ export default function StoreStart() {
 
   const storeName = storeDetail?.name ?? '주점';
   const storeImageUrl = storeDetail?.imageUrl ?? '';
-  const storeImage = storeImageUrl || AlternativeImg;
+  const storeImage = storeImageUrl || StoreDefault;
   const storeDescription = storeDetail?.description ?? '';
 
   const hasTables = tables.length > 0;

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import SettingIcon from '@/assets/icons/setting-1.svg?react';
-import AlternativeImg from '@/assets/img/basic-img.png';
+import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
 import styles from './ReadyMain.module.scss';
 
@@ -19,7 +19,7 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
   const navigate = useNavigate();
   const storeName = store?.name ?? '주점';
   const storeImageUrl = store?.imageUrl ?? '';
-  const storeImage = storeImageUrl || AlternativeImg;
+  const storeImage = storeImageUrl || StoreDefault;
 
   return (
     <section className={styles.readyMain}>
@@ -39,11 +39,7 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
             <div className={styles.storeImageWrap}>
               <img className={styles.storeImage} src={storeImage} alt={`${storeName} 주점`} />
             </div>
-            <Button
-              className={styles.storeButton}
-              size="md"
-              onClick={() => navigate(`/store/${store!.id}/start`)}
-            >
+            <Button className={styles.storeButton} size="md" onClick={() => navigate(`/store/${store!.id}/start`)}>
               주점 시작
             </Button>
           </div>

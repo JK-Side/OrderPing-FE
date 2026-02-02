@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import WarningIcon from '@/assets/icons/warning-circle.svg?react';
-import AlternativeImg from '@/assets/img/basic-img.png';
+import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
 import StoreSummaryCard from '@/components/StoreSummaryCard';
 import summaryStyles from '@/components/StoreSummaryCard/StoreSummaryCard.module.scss';
@@ -22,7 +22,7 @@ export default function StoreOperate() {
   const { data: storeDetail } = useStoreById(storeId);
   const storeName = storeDetail?.name ?? '주점';
   const storeImageUrl = storeDetail?.imageUrl ?? '';
-  const storeImage = storeImageUrl || AlternativeImg;
+  const storeImage = storeImageUrl || StoreDefault;
   const storeDescription = storeDetail?.description ?? '주점 소개를 입력해 주세요.';
   const { data: mainMenus = [], isError: isMainMenuError } = useMenusByCategory(storeId, CATEGORY_MAIN);
   const { data: sideMenus = [], isError: isSideMenuError } = useMenusByCategory(storeId, CATEGORY_SIDE);

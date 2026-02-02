@@ -1,4 +1,4 @@
-import AlternativeImg from '@/assets/img/basic-img.png';
+import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import styles from './StoreSummaryCard.module.scss';
 
 interface StoreSummaryCardProps {
@@ -8,13 +8,8 @@ interface StoreSummaryCardProps {
   actions?: React.ReactNode;
 }
 
-export default function StoreSummaryCard({
-  storeName,
-  storeDescription,
-  imageUrl,
-  actions,
-}: StoreSummaryCardProps) {
-  const storeImage = imageUrl || AlternativeImg;
+export default function StoreSummaryCard({ storeName, storeDescription, imageUrl, actions }: StoreSummaryCardProps) {
+  const storeImage = imageUrl || StoreDefault;
 
   return (
     <div className={styles.summaryCard}>

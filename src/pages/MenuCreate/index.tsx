@@ -6,7 +6,6 @@ import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { useToast } from '@/components/Toast/useToast';
 import { useCreateMenu } from '@/pages/MenuCreate/hooks/useCreateMenu';
-import type { MenuCreateForm } from '@/pages/MenuCreate/types';
 import { MESSAGES, REGEX } from '@/static/validation';
 import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
 import styles from './MenuCreate.module.scss';
@@ -14,11 +13,21 @@ import styles from './MenuCreate.module.scss';
 const CATEGORY_MAIN = 1;
 const CATEGORY_SIDE = 2;
 
+export interface MenuCreateForm {
+  name: string;
+  price: string;
+  stock: string;
+  categoryId: number;
+  description?: string;
+  menuImage?: FileList;
+}
+
 export default function MenuCreate() {
   const navigate = useNavigate();
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
-  const storeId = Number.isFinite(parsedId) ? parsedId : undefined;  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { mutateAsync: createMenu } = useCreateMenu();
   const { toast } = useToast();
   const { upload } = usePresignedUploader();
@@ -71,23 +80,27 @@ export default function MenuCreate() {
     };
   }, [previewUrl]);
 
-  const uploadMenuImage = useCallback(async (menuImage?: FileList) => {
-    if (!menuImage?.length) {
-      return '';
-    }
+  const uploadMenuImage = useCallback(
+    async (menuImage?: FileList) => {
+      if (!menuImage?.length) {
+        return '';
+      }
 
-    const file = menuImage[0];
-    return await upload({
-      directory: 'menus',
-      fileName: file.name,
-      file,
-      errorMessage: 'Failed to upload menu image.',
-    });
-  }, [upload]);
+      const file = menuImage[0];
+      return await upload({
+        directory: 'menus',
+        fileName: file.name,
+        file,
+        errorMessage: 'Failed to upload menu image.',
+      });
+    },
+    [upload],
+  );
 
   const handleSubmitMenu = useCallback<SubmitHandler<MenuCreateForm>>(
     async (data) => {
-      if (!storeId) return;      try {
+      if (!storeId) return;
+      try {
         const imageUrl = await uploadMenuImage(data.menuImage);
         await createMenu({
           storeId,
@@ -251,7 +264,6 @@ export default function MenuCreate() {
             </Input>
           </div>
         </div>
-
         <div className={styles.actions}>
           <Button type="button" variant="ghost" className={styles.cancelButton} onClick={handleCancel}>
             취소
@@ -259,7 +271,8 @@ export default function MenuCreate() {
           <Button type="submit" size="md" className={styles.submitButton} disabled={!canSubmit || isSubmitting}>
             메뉴 추가
           </Button>
-        </div>      </form>
+        </div>{' '}
+      </form>
     </section>
   );
 }
