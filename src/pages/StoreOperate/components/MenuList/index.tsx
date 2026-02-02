@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import type { MenuResponse } from '@/api/menu/entity';
 import SettingIcon from '@/assets/icons/setting-3.svg?react';
+import MenuDefault from '@/assets/imgs/menu_default.svg?url';
 import styles from './MenuList.module.scss';
 
 interface MenuListProps {
@@ -22,8 +23,13 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
         {menus.map((menu) => (
           <article key={menu.id} className={styles.menuCard}>
             <div className={styles.menuImageWrap}>
-              <img className={styles.menuImage} src={menu.imageUrl} alt={menu.name} />
-              <button type="button" className={styles.menuAction} aria-label={`${menu.name} 설정`} onClick={() => navigate(`/store/${menu.storeId}/menu/${menu.id}/edit`)}>
+              <img className={styles.menuImage} src={menu.imageUrl || MenuDefault} alt={menu.name} />
+              <button
+                type="button"
+                className={styles.menuAction}
+                aria-label={`${menu.name} 설정`}
+                onClick={() => navigate(`/store/${menu.storeId}/menu/${menu.id}/edit`)}
+              >
                 <SettingIcon className={styles.menuActionIcon} aria-hidden="true" />
               </button>
             </div>
