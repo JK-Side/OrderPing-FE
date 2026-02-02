@@ -1,6 +1,6 @@
-﻿import Button from '@/components/Button';
+﻿import type { OrderLookupResponse } from '@/api/order/entity';
+import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
-import type { OrderLookupResponse } from '@/mocks/orderLookup';
 import styles from './OrderDetailModal.module.scss';
 
 export type OrderDetailItem = {
@@ -14,6 +14,7 @@ interface OrderDetailModalProps {
   onOpenChange: (open: boolean) => void;
   order: OrderLookupResponse | null;
   items: OrderDetailItem[];
+  onReject?: () => void;
 }
 
 const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
@@ -32,7 +33,7 @@ const formatDateTime = (value: string) => {
 
 const formatTableLabel = (tableId: number) => `테이블 ${String(tableId).padStart(2, '0')}`;
 
-export default function OrderDetailModal({ open, onOpenChange, order, items }: OrderDetailModalProps) {
+export default function OrderDetailModal({ open, onOpenChange, order, items, onReject }: OrderDetailModalProps) {
   if (!order) return null;
 
   return (
@@ -93,7 +94,7 @@ export default function OrderDetailModal({ open, onOpenChange, order, items }: O
         </ModalBody>
         <ModalFooter className={styles.footer}>
           <div className={styles.footerButtons}>
-            <Button type="button" variant="danger" className={styles.footerButton}>
+            <Button type="button" variant="danger" className={styles.footerButton} onClick={onReject}>
               거절
             </Button>
             <Button type="button" className={styles.footerButton}>

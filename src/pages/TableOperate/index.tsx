@@ -11,10 +11,10 @@ import StoreSummaryCard from '@/components/StoreSummaryCard';
 import summaryStyles from '@/components/StoreSummaryCard/StoreSummaryCard.module.scss';
 import StoreSettingsModal from '@/pages/StoreOperate/components/StoreSettingsModal';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
-import OrderCard from '@/pages/StoreStart/components/OrderCard';
-import TableCreateModal from '@/pages/StoreStart/components/TableCreateModal';
 import { useTablesByStore } from '@/pages/StoreStart/hooks/useTablesByStore';
-import styles from './StoreStart.module.scss';
+import OrderCard from '@/pages/TableOperate/components/OrderCard';
+import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
+import styles from './TableOperate.module.scss';
 
 type OrderStatus = 'served' | 'cooking' | 'payment';
 const DEFAULT_ORDER_STATUS: OrderStatus = 'cooking';

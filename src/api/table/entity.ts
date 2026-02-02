@@ -11,7 +11,7 @@ export interface TableResponse {
   tableNum: number;
   status: TableStatus;
   qrToken: string;
-  qrUrl: string;
+  qrUrl: string | null;
   qrImageUrl: string;
 }
 
@@ -24,11 +24,15 @@ export interface CreateAllTableRequest {
 
 export interface UpdateTableQrImagePayload {
   tableId: number;
-  qrImage: string;
+  qrImageUrl: string;
 }
 
 export interface UpdateTableQrImagesRequest {
   updates: UpdateTableQrImagePayload[];
+}
+
+export interface UpdateTableQrImageRequest {
+  qrImageUrl: string;
 }
 
 interface CreateAllTableResponse {
@@ -37,7 +41,7 @@ interface CreateAllTableResponse {
   tableNum: number;
   status: TableStatus;
   qrToken: string;
-  qrUrl: string;
+  qrUrl: string | null;
   qrImageUrl: string;
 }
 
