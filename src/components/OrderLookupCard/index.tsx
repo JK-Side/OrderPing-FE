@@ -94,7 +94,7 @@ export default function OrderLookupCard({
       <div className={styles.header}>
         <span className={styles.tableNumber}>{formatTableNumber(tableNumber)}</span>
         <button type="button" className={styles.detailButton} onClick={onDetailClick}>
-          자세히보기
+          자세히 보기
           <ArrowRightIcon className={styles.detailIcon} aria-hidden="true" />
         </button>
       </div>

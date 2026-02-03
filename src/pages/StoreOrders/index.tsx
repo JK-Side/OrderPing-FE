@@ -5,9 +5,10 @@ import type { OrderLookupResponse, OrderStatus } from '@/api/order/entity';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import OrderLookupCard from '@/components/OrderLookupCard';
 import { useToast } from '@/components/Toast/useToast';
-import OrderDetailModal, { type OrderDetailItem } from '@/pages/StoreOrders/components/OrderDetailModal';
+import OrderDetailModal from '@/pages/StoreOrders/components/OrderDetailModal';
 import OrderRejectModal from '@/pages/StoreOrders/components/OrderRejectModal';
 import { useDeleteOrder } from '@/pages/StoreOrders/hooks/useDeleteOrder';
+import { useOrderById } from '@/pages/StoreOrders/hooks/useOrderById';
 import { useOrdersByStore } from '@/pages/StoreOrders/hooks/useOrdersByStore';
 import { useUpdateOrderStatus } from '@/pages/StoreOrders/hooks/useUpdateOrderStatus';
 import styles from './StoreOrders.module.scss';
@@ -79,32 +80,6 @@ const createOrderSections = (orders: OrderLookupResponse[]): OrderSection[] =>
       })),
   }));
 
-const DEFAULT_DETAIL_ITEMS: OrderDetailItem[] = [
-  {
-    name: '하츄핑의 특제 핑크퐁이 아닌 핑크탕',
-    quantity: 2,
-    price: 49000,
-  },
-  {
-    name: '바로핑의 특제 치킨 갈릭 소스',
-    quantity: 14,
-    price: 143000,
-  },
-  {
-    name: '오로라핑의 아름다운 무지개 전골',
-    quantity: 1,
-    price: 16000,
-  },
-  {
-    name: '궁금핑이 만든 요리가 궁금하신가요? 그러기 위해...',
-    quantity: 1,
-    price: 8000,
-  },
-];
-
-const ORDER_DETAIL_ITEMS: Record<number, OrderDetailItem[]> = {
-  1: DEFAULT_DETAIL_ITEMS,
-};
 
 export default function StoreOrders() {
   const { id } = useParams();
@@ -114,6 +89,7 @@ export default function StoreOrders() {
   const { data: orders = [] } = useOrdersByStore(storeId);
   const orderSections = createOrderSections(orders);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const { data: orderDetail } = useOrderById(selectedOrderId ?? undefined);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [pendingRejectOrder, setPendingRejectOrder] = useState<OrderCardData | null>(null);
@@ -269,9 +245,6 @@ export default function StoreOrders() {
   };
 
   const selectedOrder = selectedOrderId ? (orders.find((order) => order.id === selectedOrderId) ?? null) : null;
-  const detailItems = selectedOrder
-    ? (ORDER_DETAIL_ITEMS[selectedOrder.id] ?? DEFAULT_DETAIL_ITEMS)
-    : DEFAULT_DETAIL_ITEMS;
 
   return (
     <section className={styles.storeOrders}>
@@ -319,8 +292,8 @@ export default function StoreOrders() {
       <OrderDetailModal
         open={isDetailOpen}
         onOpenChange={handleDetailOpenChange}
-        order={selectedOrder}
-        items={detailItems}
+        order={orderDetail ?? selectedOrder}
+        menus={orderDetail?.menus ?? []}
         onReject={handleOpenRejectFromDetail}
       />
       <OrderRejectModal

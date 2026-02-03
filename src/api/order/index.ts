@@ -1,5 +1,5 @@
 import { apiClient } from '..';
-import type { OrderResponse, OrderStatusQuery, UpdateOrderStatusRequest } from './entity';
+import type { OrderDetailResponse, OrderResponse, OrderStatusQuery, UpdateOrderStatusRequest } from './entity';
 
 export const getOrdersByStore = async (storeId: number, status?: OrderStatusQuery) => {
   return await apiClient.get<OrderResponse[]>('/api/orders', {
@@ -11,6 +11,10 @@ export const patchOrderStatus = async (id: number, body: UpdateOrderStatusReques
   return await apiClient.patch<OrderResponse>(`/api/orders/${id}/status`, {
     body,
   });
+};
+
+export const getOrderById = async (id: number) => {
+  return await apiClient.get<OrderDetailResponse>(`/api/orders/${id}`);
 };
 
 export const deleteOrderById = async (id: number) => {
