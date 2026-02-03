@@ -62,12 +62,8 @@ const ORDER_SECTION_CONFIGS: OrderSectionConfig[] = [
 ];
 
 const createOrderSections = (orders: OrderLookupResponse[]): OrderSection[] =>
-  ORDER_SECTION_CONFIGS.map((config) => ({
-    key: config.key,
-    title: config.title,
-    hint: config.hint,
-    emptyLabel: config.emptyLabel,
-    orders: orders
+  ORDER_SECTION_CONFIGS.map((config) => {
+    const sectionOrders = orders
       .filter((order) => config.statuses.includes(order.status))
       .map((order) => ({
         id: `${config.key}-${order.id}`,
@@ -77,8 +73,21 @@ const createOrderSections = (orders: OrderLookupResponse[]): OrderSection[] =>
         depositAmount: order.cashAmount,
         couponAmount: order.couponAmount,
         status: order.status,
-      })),
-  }));
+      }));
+
+    const ordered =
+      config.key === 'served'
+        ? [...sectionOrders].reverse()
+        : sectionOrders;
+
+    return {
+      key: config.key,
+      title: config.title,
+      hint: config.hint,
+      emptyLabel: config.emptyLabel,
+      orders: ordered,
+    };
+  });
 
 
 export default function StoreOrders() {
