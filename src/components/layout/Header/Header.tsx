@@ -9,11 +9,12 @@ const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;
 export default function Header() {
   const { pathname } = useLocation();
   const { isLoggedIn, clearAccessToken } = useAuth();
-  const isStoreContextPage = /^\/store\/[^/]+\/(start|orders)/.test(pathname);
+  const isHomePage = pathname === '/';
+  const storeId =
+    pathname.match(/^\/store\/operate\/([^/]+)/)?.[1]
+    ?? pathname.match(/^\/store\/([^/]+)\/(start|orders|menu)/)?.[1];
   const isStoreStartPage = /^\/store\/[^/]+\/start/.test(pathname);
   const isStoreOrdersPage = /^\/store\/[^/]+\/orders/.test(pathname);
-  const storeIdMatch = pathname.match(/^\/store\/([^/]+)\/(start|orders)/);
-  const storeId = storeIdMatch?.[1];
   const menuManagePath = storeId ? `/store/operate/${storeId}` : '/';
   const orderManagePath = storeId ? `/store/${storeId}/orders` : '/';
   const tableManagePath = storeId ? `/store/${storeId}/start` : '/';
@@ -41,7 +42,7 @@ export default function Header() {
       </Link>
 
       <nav className={styles.nav}>
-        {isStoreContextPage ? (
+        {!isHomePage ? (
           <>
             <Link to={menuManagePath} className={styles.navItem}>
               메뉴 관리
