@@ -10,6 +10,7 @@ import { useToast } from '@/components/Toast/useToast';
 import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
 import TableOrderModal from '@/pages/TableOperate/components/TableOrderModal';
+import TableServiceModal from '@/pages/TableOperate/components/TableServiceModal';
 import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
@@ -69,6 +70,8 @@ export default function TableOperate() {
   const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [serviceTableId, setServiceTableId] = useState<number | null>(null);
+  const [isServiceOpen, setIsServiceOpen] = useState(false);
 
   const useGridLayout = !!tableLayout && tableLayout.columns > 0 && tableLayout.rows > 0;
   const tableGridStyle = useGridLayout
@@ -131,6 +134,22 @@ export default function TableOperate() {
       setSelectedTableId(null);
     }
   };
+
+  const handleServiceOpen = (table: TableResponse) => {
+    setServiceTableId(table.id);
+    setIsServiceOpen(true);
+    handleDetailOpenChange(false);
+  };
+
+  const handleServiceOpenChange = (open: boolean) => {
+    setIsServiceOpen(open);
+    if (!open) {
+      setServiceTableId(null);
+    }
+  };
+
+  const selectedTable = selectedTableId ? tables.find((table) => table.id === selectedTableId) ?? null : null;
+  const serviceTable = serviceTableId ? tables.find((table) => table.id === serviceTableId) ?? null : null;
 
   return (
     <section className={styles.tableOperate}>
@@ -215,8 +234,11 @@ export default function TableOperate() {
       <TableOrderModal
         open={isDetailOpen}
         onOpenChange={handleDetailOpenChange}
-        table={selectedTableId ? tables.find((table) => table.id === selectedTableId) ?? null : null}
+        onServiceAdd={selectedTable ? () => handleServiceOpen(selectedTable) : undefined}
+        table={selectedTable}
       />
+
+      <TableServiceModal open={isServiceOpen} onOpenChange={handleServiceOpenChange} table={serviceTable} />
     </section>
   );
 }

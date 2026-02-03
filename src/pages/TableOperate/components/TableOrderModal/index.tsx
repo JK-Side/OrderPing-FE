@@ -7,6 +7,7 @@ import styles from './TableOrderModal.module.scss';
 interface TableOrderModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onServiceAdd?: () => void;
   table: TableResponse | null;
 }
 
@@ -26,7 +27,7 @@ const resolveQrValue = (table: TableResponse) => {
   return url.toString();
 };
 
-export default function TableOrderModal({ open, onOpenChange, table }: TableOrderModalProps) {
+export default function TableOrderModal({ open, onOpenChange, onServiceAdd, table }: TableOrderModalProps) {
   if (!table) return null;
 
   const menus = table.orderMenus ?? [];
@@ -101,7 +102,7 @@ export default function TableOrderModal({ open, onOpenChange, table }: TableOrde
         </ModalBody>
         <ModalFooter className={styles.footer}>
           <div className={styles.footerButtons}>
-            <Button type="button" className={styles.footerButton} onClick={() => onOpenChange(false)}>
+            <Button type="button" className={styles.footerButton} onClick={onServiceAdd} disabled={!onServiceAdd}>
               서비스 추가
             </Button>
             <Button type="button" variant="danger" className={styles.footerButton} onClick={() => onOpenChange(false)}>
