@@ -1,10 +1,12 @@
 import type { ComponentType, SVGProps } from 'react';
+import CheckIcon from '@/assets/icons/check.svg?react';
 import CookingIcon from '@/assets/icons/cooking.svg?react';
 import PaymentIcon from '@/assets/icons/payment.svg?react';
 import ServedIcon from '@/assets/icons/served.svg?react';
 import styles from './OrderCard.module.scss';
 
 type OrderStatus = 'served' | 'cooking' | 'payment';
+type ClickHandler = () => void;
 
 interface OrderMenuItem {
   name: string;
@@ -17,6 +19,8 @@ interface OrderCardProps {
   totalPrice?: number;
   status?: OrderStatus;
   isEmpty?: boolean;
+  isSelected?: boolean;
+  onToggleSelect?: ClickHandler;
 }
 
 const STATUS_CONFIG: Record<
@@ -48,19 +52,36 @@ const STATUS_CONFIG: Record<
   },
 };
 
-export default function OrderCard({ tableName, items = [], totalPrice, status, isEmpty }: OrderCardProps) {
+export default function OrderCard({
+  tableName,
+  items = [],
+  totalPrice,
+  status,
+  isEmpty,
+  isSelected = false,
+  onToggleSelect,
+}: OrderCardProps) {
   const isEmptyState = isEmpty ?? items.length === 0;
   const displayItems = items.slice(0, 3);
   const extraCount = Math.max(items.length - 3, 0);
   const statusConfig = status ? STATUS_CONFIG[status] : null;
 
   const cardClassName = !isEmptyState && statusConfig ? statusConfig.cardClassName : '';
+  const selectBoxClassName = isSelected ? `${styles.selectBox} ${styles.selectBoxSelected}` : styles.selectBox;
 
   return (
     <article className={`${styles.card} ${cardClassName}`}>
       <div className={styles.headerRow}>
         <h4 className={styles.tableName}>{tableName}</h4>
-        <button type="button" className={styles.selectBox} aria-label={`${tableName} 선택`} />
+        <button
+          type="button"
+          className={selectBoxClassName}
+          aria-label={`${tableName} 선택`}
+          aria-pressed={isSelected}
+          onClick={onToggleSelect}
+        >
+          {isSelected ? <CheckIcon className={styles.selectIcon} aria-hidden="true" /> : null}
+        </button>
       </div>
 
       {isEmptyState ? (

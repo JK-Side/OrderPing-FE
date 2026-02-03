@@ -1,4 +1,12 @@
 export type TableStatus = 'OCCUPIED' | 'EMPTY' | 'RESERVED' | 'CLOSED';
+export type TableOrderStatus = 'PENDING' | 'COOKING' | 'COMPLETE';
+
+export interface TableOrderMenu {
+  menuId: number;
+  menuName: string;
+  quantity: number;
+  price: number;
+}
 
 export interface CreateTableRequest {
   storeId: number;
@@ -13,6 +21,9 @@ export interface TableResponse {
   qrToken: string;
   qrUrl: string | null;
   qrImageUrl: string;
+  orderMenus?: TableOrderMenu[];
+  totalOrderAmount?: number;
+  orderStatus?: TableOrderStatus | null;
 }
 
 export type TableListResponse = TableResponse[];

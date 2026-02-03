@@ -49,6 +49,26 @@
   border: 2px dotted $gray-50;
   background: transparent;
   padding: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.selectBoxSelected {
+  border: 2px solid var(--Primary-primary-50, #1c95ff);
+  background: $primary-50;
+}
+
+.selectIcon {
+  width: 14px;
+  height: 14px;
+  color: $white;
+}
+
+.selectIcon path {
+  fill: currentColor;
 }
 
 .menuList {

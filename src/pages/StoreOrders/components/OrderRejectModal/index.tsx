@@ -42,7 +42,7 @@ export default function OrderRejectModal({ open, onOpenChange, onConfirm, isLoad
             onClick={handleConfirm}
             isLoading={isLoading}
             disabled={isLoading}
-            loadingText="Deleting..."
+            loadingText="취소 중..."
           >
             네
           </Button>

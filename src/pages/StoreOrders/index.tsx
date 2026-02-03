@@ -5,9 +5,10 @@ import type { OrderLookupResponse, OrderStatus } from '@/api/order/entity';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import OrderLookupCard from '@/components/OrderLookupCard';
 import { useToast } from '@/components/Toast/useToast';
-import OrderDetailModal, { type OrderDetailItem } from '@/pages/StoreOrders/components/OrderDetailModal';
+import OrderDetailModal from '@/pages/StoreOrders/components/OrderDetailModal';
 import OrderRejectModal from '@/pages/StoreOrders/components/OrderRejectModal';
 import { useDeleteOrder } from '@/pages/StoreOrders/hooks/useDeleteOrder';
+import { useOrderById } from '@/pages/StoreOrders/hooks/useOrderById';
 import { useOrdersByStore } from '@/pages/StoreOrders/hooks/useOrdersByStore';
 import { useUpdateOrderStatus } from '@/pages/StoreOrders/hooks/useUpdateOrderStatus';
 import styles from './StoreOrders.module.scss';
@@ -40,7 +41,7 @@ type OrderSectionConfig = {
 
 const ORDER_SECTION_CONFIGS: OrderSectionConfig[] = [
   {
-    key: 'payment',
+    key: 'pending',
     title: '결제 확인 전',
     hint: '입금자명과 입금 금액을 비교해 주세요!',
     emptyLabel: 'Pending',
@@ -61,12 +62,8 @@ const ORDER_SECTION_CONFIGS: OrderSectionConfig[] = [
 ];
 
 const createOrderSections = (orders: OrderLookupResponse[]): OrderSection[] =>
-  ORDER_SECTION_CONFIGS.map((config) => ({
-    key: config.key,
-    title: config.title,
-    hint: config.hint,
-    emptyLabel: config.emptyLabel,
-    orders: orders
+  ORDER_SECTION_CONFIGS.map((config) => {
+    const sectionOrders = orders
       .filter((order) => config.statuses.includes(order.status))
       .map((order) => ({
         id: `${config.key}-${order.id}`,
@@ -76,35 +73,22 @@ const createOrderSections = (orders: OrderLookupResponse[]): OrderSection[] =>
         depositAmount: order.cashAmount,
         couponAmount: order.couponAmount,
         status: order.status,
-      })),
-  }));
+      }));
 
-const DEFAULT_DETAIL_ITEMS: OrderDetailItem[] = [
-  {
-    name: '하츄핑의 특제 핑크퐁이 아닌 핑크탕',
-    quantity: 2,
-    price: 49000,
-  },
-  {
-    name: '바로핑의 특제 치킨 갈릭 소스',
-    quantity: 14,
-    price: 143000,
-  },
-  {
-    name: '오로라핑의 아름다운 무지개 전골',
-    quantity: 1,
-    price: 16000,
-  },
-  {
-    name: '궁금핑이 만든 요리가 궁금하신가요? 그러기 위해...',
-    quantity: 1,
-    price: 8000,
-  },
-];
+    const ordered =
+      config.key === 'served'
+        ? [...sectionOrders].reverse()
+        : sectionOrders;
 
-const ORDER_DETAIL_ITEMS: Record<number, OrderDetailItem[]> = {
-  1: DEFAULT_DETAIL_ITEMS,
-};
+    return {
+      key: config.key,
+      title: config.title,
+      hint: config.hint,
+      emptyLabel: config.emptyLabel,
+      orders: ordered,
+    };
+  });
+
 
 export default function StoreOrders() {
   const { id } = useParams();
@@ -114,10 +98,12 @@ export default function StoreOrders() {
   const { data: orders = [] } = useOrdersByStore(storeId);
   const orderSections = createOrderSections(orders);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const { data: orderDetail } = useOrderById(selectedOrderId ?? undefined);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [pendingRejectOrder, setPendingRejectOrder] = useState<OrderCardData | null>(null);
   const [acceptingOrderId, setAcceptingOrderId] = useState<number | null>(null);
+  const [revertingOrderId, setRevertingOrderId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { mutateAsync: updateOrderStatus } = useUpdateOrderStatus();
   const { mutateAsync: deleteOrder } = useDeleteOrder();
@@ -203,6 +189,12 @@ export default function StoreOrders() {
     return status;
   };
 
+  const resolvePrevStatus = (status: OrderStatus) => {
+    if (status === 'COMPLETE') return 'COOKING';
+    if (status === 'COOKING') return 'PENDING';
+    return status;
+  };
+
   const handleAccept = async (order: OrderCardData) => {
     if (order.status === 'COMPLETE') return;
     if (acceptingOrderId === order.orderId) return;
@@ -232,10 +224,36 @@ export default function StoreOrders() {
     }
   };
 
+  const handlePrev = async (order: OrderCardData) => {
+    if (order.status === 'PENDING') return;
+    if (revertingOrderId === order.orderId) return;
+    const prevStatus = resolvePrevStatus(order.status);
+
+    try {
+      setRevertingOrderId(order.orderId);
+      await updateOrderStatus({
+        id: order.orderId,
+        body: { status: prevStatus },
+      });
+
+      if (storeId) {
+        queryClient.setQueryData<OrderLookupResponse[]>(['orders', storeId], (prev) =>
+          prev ? prev.map((item) => (item.id === order.orderId ? { ...item, status: prevStatus } : item)) : prev,
+        );
+      }
+    } catch (error) {
+      toast({
+        message: '주문 상태 업데이트에 실패했습니다.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('주문 상태 업데이트에 실패했습니다.', error);
+    } finally {
+      setRevertingOrderId((prev) => (prev === order.orderId ? null : prev));
+    }
+  };
+
   const selectedOrder = selectedOrderId ? (orders.find((order) => order.id === selectedOrderId) ?? null) : null;
-  const detailItems = selectedOrder
-    ? (ORDER_DETAIL_ITEMS[selectedOrder.id] ?? DEFAULT_DETAIL_ITEMS)
-    : DEFAULT_DETAIL_ITEMS;
 
   return (
     <section className={styles.storeOrders}>
@@ -266,10 +284,13 @@ export default function StoreOrders() {
                     depositAmount={order.depositAmount}
                     couponAmount={order.couponAmount}
                     onDetailClick={() => handleOpenDetail(order.orderId)}
+                    onPrev={() => handlePrev(order)}
                     onReject={() => handleOpenReject(order)}
                     onAccept={() => handleAccept(order)}
                     isAccepting={acceptingOrderId === order.orderId}
+                    isReverting={revertingOrderId === order.orderId}
                     isAcceptDisabled={!storeId || order.status === 'COMPLETE'}
+                    stat={order.status}
                   />
                 ))
               )}
@@ -280,8 +301,8 @@ export default function StoreOrders() {
       <OrderDetailModal
         open={isDetailOpen}
         onOpenChange={handleDetailOpenChange}
-        order={selectedOrder}
-        items={detailItems}
+        order={orderDetail ?? selectedOrder}
+        menus={orderDetail?.menus ?? []}
         onReject={handleOpenRejectFromDetail}
       />
       <OrderRejectModal

@@ -1,6 +1,6 @@
 @use '@/styles/colors' as *;
 
-.storeStart {
+.tableOperate {
   padding: 80px 80px 120px;
 }
 
@@ -128,7 +128,7 @@
 }
 
 @media (max-width: 900px) {
-  .storeStart {
+  .tableOperate {
     padding: 56px 24px 80px;
   }
 

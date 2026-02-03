@@ -109,7 +109,7 @@
   gap: 6px;
   font-weight: 600;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: $gray-30;
   }
 }

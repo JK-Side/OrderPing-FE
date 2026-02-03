@@ -3,7 +3,7 @@ import clsx from 'clsx';
 
 import styles from './Button.module.scss';
 
-type ButtonVariant = 'primary' | 'ghost' | 'danger';
+type ButtonVariant = 'primary' | 'ghost' | 'danger' | 'secondary';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

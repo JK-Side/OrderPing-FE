@@ -1,19 +1,13 @@
-﻿import type { OrderLookupResponse } from '@/api/order/entity';
+﻿import type { OrderDetailResponse, OrderLookupResponse, OrderMenuItem } from '@/api/order/entity';
 import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import styles from './OrderDetailModal.module.scss';
 
-export type OrderDetailItem = {
-  name: string;
-  quantity: number;
-  price: number;
-};
-
 interface OrderDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  order: OrderLookupResponse | null;
-  items: OrderDetailItem[];
+  order: OrderLookupResponse | OrderDetailResponse | null;
+  menus: OrderMenuItem[];
   onReject?: () => void;
 }
 
@@ -33,7 +27,7 @@ const formatDateTime = (value: string) => {
 
 const formatTableLabel = (tableId: number) => `테이블 ${String(tableId).padStart(2, '0')}`;
 
-export default function OrderDetailModal({ open, onOpenChange, order, items, onReject }: OrderDetailModalProps) {
+export default function OrderDetailModal({ open, onOpenChange, order, menus, onReject }: OrderDetailModalProps) {
   if (!order) return null;
 
   return (
@@ -52,13 +46,21 @@ export default function OrderDetailModal({ open, onOpenChange, order, items, onR
               <span className={styles.menuQuantity}>수량</span>
               <span className={styles.menuHeaderPrice}>가격</span>
             </div>
-            {items.map((item) => (
-              <div key={item.name} className={styles.menuRow}>
-                <span className={styles.menuName}>{item.name}</span>
-                <span className={styles.menuQuantity}>{item.quantity}</span>
-                <span className={styles.menuPrice}>{formatCurrency(item.price)}</span>
+            {menus.length > 0 ? (
+              menus.map((item) => (
+                <div key={`${item.menuId}-${item.menuName}`} className={styles.menuRow}>
+                  <span className={styles.menuName}>{item.menuName}</span>
+                  <span className={styles.menuQuantity}>{item.quantity}</span>
+                  <span className={styles.menuPrice}>{formatCurrency(item.price)}</span>
+                </div>
+              ))
+            ) : (
+              <div className={styles.menuRow}>
+                <span className={styles.menuName}>로딩 중입니다.</span>
+                <span className={styles.menuQuantity}>-</span>
+                <span className={styles.menuPrice}>-</span>
               </div>
-            ))}
+            )}
           </div>
 
           <div className={styles.summary}>

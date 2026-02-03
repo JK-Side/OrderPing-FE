@@ -20,6 +20,18 @@ export interface OrderResponse {
   createdAt: string;
 }
 
+export interface OrderMenuItem {
+  menuId: number;
+  menuName: string;
+  quantity: number;
+  price: number;
+  isService: boolean;
+}
+
+export interface OrderDetailResponse extends OrderResponse {
+  menus: OrderMenuItem[];
+}
+
 export interface OrderLookupResponse {
   id: number;
   tableId: number;
