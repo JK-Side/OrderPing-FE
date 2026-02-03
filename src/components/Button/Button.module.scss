@@ -112,6 +112,28 @@
   }
 }
 
+.secondary {
+  background: $grayscale-80;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $grayscale-60;
+  }
+
+  &:active:not(:disabled) {
+    background: $grayscale-90;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $primary-20;
+  }
+
+  &:disabled {
+    background: $gray-20;
+    color: $grayscale-50;
+  }
+}
+
 /* =========================
     Utils
 ========================= */

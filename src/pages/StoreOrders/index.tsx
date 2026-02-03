@@ -118,6 +118,7 @@ export default function StoreOrders() {
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [pendingRejectOrder, setPendingRejectOrder] = useState<OrderCardData | null>(null);
   const [acceptingOrderId, setAcceptingOrderId] = useState<number | null>(null);
+  const [revertingOrderId, setRevertingOrderId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { mutateAsync: updateOrderStatus } = useUpdateOrderStatus();
   const { mutateAsync: deleteOrder } = useDeleteOrder();
@@ -203,6 +204,12 @@ export default function StoreOrders() {
     return status;
   };
 
+  const resolvePrevStatus = (status: OrderStatus) => {
+    if (status === 'COMPLETE') return 'COOKING';
+    if (status === 'COOKING') return 'PENDING';
+    return status;
+  };
+
   const handleAccept = async (order: OrderCardData) => {
     if (order.status === 'COMPLETE') return;
     if (acceptingOrderId === order.orderId) return;
@@ -229,6 +236,35 @@ export default function StoreOrders() {
       console.error('주문 상태 업데이트에 실패했습니다.', error);
     } finally {
       setAcceptingOrderId((prev) => (prev === order.orderId ? null : prev));
+    }
+  };
+
+  const handlePrev = async (order: OrderCardData) => {
+    if (order.status === 'PENDING') return;
+    if (revertingOrderId === order.orderId) return;
+    const prevStatus = resolvePrevStatus(order.status);
+
+    try {
+      setRevertingOrderId(order.orderId);
+      await updateOrderStatus({
+        id: order.orderId,
+        body: { status: prevStatus },
+      });
+
+      if (storeId) {
+        queryClient.setQueryData<OrderLookupResponse[]>(['orders', storeId], (prev) =>
+          prev ? prev.map((item) => (item.id === order.orderId ? { ...item, status: prevStatus } : item)) : prev,
+        );
+      }
+    } catch (error) {
+      toast({
+        message: '주문 상태 업데이트에 실패했습니다.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('주문 상태 업데이트에 실패했습니다.', error);
+    } finally {
+      setRevertingOrderId((prev) => (prev === order.orderId ? null : prev));
     }
   };
 
@@ -266,9 +302,11 @@ export default function StoreOrders() {
                     depositAmount={order.depositAmount}
                     couponAmount={order.couponAmount}
                     onDetailClick={() => handleOpenDetail(order.orderId)}
+                    onPrev={() => handlePrev(order)}
                     onReject={() => handleOpenReject(order)}
                     onAccept={() => handleAccept(order)}
                     isAccepting={acceptingOrderId === order.orderId}
+                    isReverting={revertingOrderId === order.orderId}
                     isAcceptDisabled={!storeId || order.status === 'COMPLETE'}
                     stat={order.status}
                   />

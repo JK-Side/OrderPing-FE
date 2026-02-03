@@ -14,11 +14,13 @@ interface OrderLookupCardProps extends HTMLAttributes<HTMLElement> {
   depositorName: string;
   depositAmount: number;
   couponAmount?: number;
-  stat?: OrderStatus;
+  stat: OrderStatus;
   onDetailClick?: ClickHandler;
   onAccept?: ClickHandler;
+  onPrev?: ClickHandler;
   onReject?: ClickHandler;
   isAccepting?: boolean;
+  isReverting?: boolean;
   isAcceptDisabled?: boolean;
 }
 
@@ -39,6 +41,33 @@ const formatCurrency = (value?: number) => {
   return `${value.toLocaleString('ko-KR')}원`;
 };
 
+type StatusActionConfig = {
+  prevLabel: string;
+  prevIcon: 'close' | 'back';
+  prevAction: 'reject' | 'prev';
+  nextLabel?: string;
+};
+
+const STATUS_ACTION_CONFIG: Record<OrderStatus, StatusActionConfig> = {
+  PENDING: {
+    prevLabel: '거절',
+    prevIcon: 'close',
+    prevAction: 'reject',
+    nextLabel: '수락',
+  },
+  COOKING: {
+    prevLabel: '이전',
+    prevIcon: 'back',
+    prevAction: 'prev',
+    nextLabel: '다음',
+  },
+  COMPLETE: {
+    prevLabel: '이전',
+    prevIcon: 'back',
+    prevAction: 'prev',
+  },
+};
+
 export default function OrderLookupCard({
   tableNumber,
   depositorName,
@@ -47,16 +76,18 @@ export default function OrderLookupCard({
   stat,
   onDetailClick,
   onAccept,
+  onPrev,
   onReject,
   isAccepting = false,
+  isReverting = false,
   isAcceptDisabled = false,
   className,
   ...rest
 }: OrderLookupCardProps) {
   const cardClassName = className ? `${styles.card} ${className}` : styles.card;
 
-  const prevBtnText = stat === 'PENDING' ? '거절' : '이전';
-  const nextBtnText = stat === 'PENDING' ? '수락' : '다음';
+  const actionConfig = STATUS_ACTION_CONFIG[stat];
+  const handlePrevClick = actionConfig.prevAction === 'reject' ? onReject : onPrev;
 
   return (
     <article className={cardClassName} data-status={stat} {...rest}>
@@ -87,15 +118,23 @@ export default function OrderLookupCard({
       </div>
 
       <div className={styles.actions}>
-        <button type="button" className={styles.rejectButton} onClick={onReject}>
-          {stat === 'PENDING' ? (
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          className={styles.rejectButton}
+          onClick={handlePrevClick}
+          isLoading={isReverting}
+          disabled={isReverting}
+        >
+          {actionConfig.prevIcon === 'close' ? (
             <CloseIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
           ) : (
             <BackIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
           )}
-          {prevBtnText}
-        </button>
-        {stat !== 'COMPLETE' && (
+          {actionConfig.prevLabel}
+        </Button>
+        {!!actionConfig.nextLabel && (
           <Button
             type="button"
             size="sm"
@@ -105,7 +144,7 @@ export default function OrderLookupCard({
             disabled={isAcceptDisabled || isAccepting}
           >
             <CheckIcon className={styles.actionIcon} aria-hidden="true" />
-            {nextBtnText}
+            {actionConfig.nextLabel}
           </Button>
         )}
       </div>
