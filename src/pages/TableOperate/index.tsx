@@ -72,6 +72,7 @@ export default function TableOperate() {
   const storeImage = storeImageUrl || StoreDefault;
   const storeDescription = storeDetail?.description ?? '';
 
+  const sortedTables = [...tables].sort((a, b) => a.tableNum - b.tableNum);
   const hasTables = tables.length > 0;
   const hasActiveOrders = tables.some((table: TableResponse) => table.status === 'OCCUPIED');
   const tableButtonLabel = hasTables ? '테이블 수정' : '테이블 추가';
@@ -99,9 +100,7 @@ export default function TableOperate() {
     if (!storeId || selectedTableIds.length === 0 || isClearing) return;
 
     const selectedTables = tables.filter((table) => selectedTableIds.includes(table.id));
-    const hasOrderTables = selectedTables.some(
-      (table) => (table.orderMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0 || !!table.orderStatus,
-    );
+    const hasOrderTables = selectedTables.some((table) => table.orderStatus && table.orderStatus !== 'COMPLETE');
 
     if (hasOrderTables) {
       toast({
@@ -115,6 +114,10 @@ export default function TableOperate() {
       await Promise.all(selectedTableIds.map((tableId) => clearTable(tableId)));
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
+      toast({
+        message: '테이블 비우기가 완료되었습니다.',
+        variant: 'info',
+      });
     } catch (error) {
       toast({
         message: 'Failed to clear tables.',
@@ -193,7 +196,7 @@ export default function TableOperate() {
             className={`${styles.orderPreview} ${useGridLayout ? styles.orderPreviewGrid : ''}`}
             style={tableGridStyle}
           >
-            {tables.map((table: TableResponse) => {
+            {sortedTables.map((table: TableResponse) => {
               const hasOrders =
                 (table.orderMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0 || !!table.orderStatus;
               const isEmpty = !hasOrders;
