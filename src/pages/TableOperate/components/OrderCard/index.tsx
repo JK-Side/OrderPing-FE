@@ -1,4 +1,5 @@
 import type { ComponentType, SVGProps } from 'react';
+import CheckIcon from '@/assets/icons/check.svg?react';
 import CookingIcon from '@/assets/icons/cooking.svg?react';
 import PaymentIcon from '@/assets/icons/payment.svg?react';
 import ServedIcon from '@/assets/icons/served.svg?react';
@@ -78,7 +79,9 @@ export default function OrderCard({
           aria-label={`${tableName} 선택`}
           aria-pressed={isSelected}
           onClick={onToggleSelect}
-        />
+        >
+          {isSelected ? <CheckIcon className={styles.selectIcon} aria-hidden="true" /> : null}
+        </button>
       </div>
 
       {isEmptyState ? (
