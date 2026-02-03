@@ -24,13 +24,6 @@ interface ServiceAddForm {
 
 const formatTableLabel = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 
-const createServiceSessionId = () => {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return `service-${crypto.randomUUID()}`;
-  }
-  return `service-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-};
-
 export default function TableServiceModal({ open, onOpenChange, table }: TableServiceModalProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();

@@ -1,7 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { QRCodeSVG } from 'qrcode.react';
 import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
+import { useToast } from '@/components/Toast/useToast';
+import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import styles from './TableOrderModal.module.scss';
 
 interface TableOrderModalProps {
@@ -19,6 +22,16 @@ const QR_DISPLAY_SIZE = 100;
 
 const isSvgImageUrl = (url: string) => /\.svg(\?|#|$)/i.test(url) || url.startsWith('data:image/svg+xml');
 
+const resolveOrderStatuses = (rawStatus: TableResponse['orderStatus']) => {
+  if (!rawStatus) return [];
+  return Array.isArray(rawStatus) ? rawStatus : [rawStatus];
+};
+
+const isTableClearable = (rawStatus: TableResponse['orderStatus']) => {
+  const statuses = resolveOrderStatuses(rawStatus);
+  return statuses.length > 0 && statuses.every((status) => status === 'COMPLETE');
+};
+
 const resolveQrValue = (table: TableResponse) => {
   if (table.qrUrl) return table.qrUrl;
   if (typeof window === 'undefined') return '';
@@ -28,9 +41,41 @@ const resolveQrValue = (table: TableResponse) => {
 };
 
 export default function TableOrderModal({ open, onOpenChange, onServiceAdd, table }: TableOrderModalProps) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
+
   if (!table) return null;
 
   const menus = table.orderMenus ?? [];
+  const canClearTable = isTableClearable(table.orderStatus);
+
+  const handleClearTable = async () => {
+    if (!canClearTable) {
+      toast({
+        message: '모든 주문이 완료된 테이블만 비울 수 있습니다.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    try {
+      await clearTable(table.id);
+      await queryClient.invalidateQueries({ queryKey: ['tables', table.storeId] });
+      toast({
+        message: '테이블 비우기가 완료되었습니다.',
+        variant: 'info',
+      });
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        message: '테이블 비우기에 실패했습니다.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('Failed to clear table', error);
+    }
+  };
   const qrValue = resolveQrValue(table);
   const qrNode =
     isSvgImageUrl(table.qrImageUrl) && qrValue ? (
@@ -105,7 +150,14 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
             <Button type="button" className={styles.footerButton} onClick={onServiceAdd} disabled={!onServiceAdd}>
               서비스 추가
             </Button>
-            <Button type="button" variant="danger" className={styles.footerButton} onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="danger"
+              className={styles.footerButton}
+              onClick={handleClearTable}
+              disabled={isClearing || !canClearTable}
+              isLoading={isClearing}
+            >
               테이블 비우기
             </Button>
           </div>
