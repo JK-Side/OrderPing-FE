@@ -9,6 +9,7 @@ import Button from '@/components/Button';
 import { useToast } from '@/components/Toast/useToast';
 import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
+import TableOrderModal from '@/pages/TableOperate/components/TableOrderModal';
 import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
@@ -41,6 +42,9 @@ const resolvePriorityOrderStatus = (rawStatus: TableResponse['orderStatus']) => 
   return ORDER_STATUS_PRIORITY.find((status) => statuses.includes(status));
 };
 
+const hasOrdersForTable = (table: TableResponse) =>
+  (table.orderMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0 || !!table.orderStatus;
+
 export default function TableOperate() {
   const queryClient = useQueryClient();
 
@@ -63,6 +67,8 @@ export default function TableOperate() {
   const tableButtonLabel = hasTables ? '테이블 수정' : '테이블 추가';
   const [isNoticeVisible, setIsNoticeVisible] = useState(true);
   const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
+  const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const useGridLayout = !!tableLayout && tableLayout.columns > 0 && tableLayout.rows > 0;
   const tableGridStyle = useGridLayout
@@ -110,6 +116,19 @@ export default function TableOperate() {
         variant: 'error',
       });
       console.error('Failed to clear tables', error);
+    }
+  };
+
+  const handleOpenDetail = (table: TableResponse) => {
+    if (!hasOrdersForTable(table)) return;
+    setSelectedTableId(table.id);
+    setIsDetailOpen(true);
+  };
+
+  const handleDetailOpenChange = (open: boolean) => {
+    setIsDetailOpen(open);
+    if (!open) {
+      setSelectedTableId(null);
     }
   };
 
@@ -161,8 +180,7 @@ export default function TableOperate() {
             style={tableGridStyle}
           >
             {sortedTables.map((table: TableResponse) => {
-              const hasOrders =
-                (table.orderMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0 || !!table.orderStatus;
+              const hasOrders = hasOrdersForTable(table);
               const isEmpty = !hasOrders;
               const resolvedOrderStatus = resolvePriorityOrderStatus(table.orderStatus);
               const status = hasOrders && resolvedOrderStatus ? resolvedOrderStatus : undefined;
@@ -181,6 +199,7 @@ export default function TableOperate() {
                   totalPrice={table.totalOrderAmount}
                   isSelected={selectedTableIds.includes(table.id)}
                   onToggleSelect={() => handleToggleSelect(table.id)}
+                  onOpenDetail={() => handleOpenDetail(table)}
                 />
               );
             })}
@@ -192,6 +211,12 @@ export default function TableOperate() {
           </div>
         )}
       </div>
+
+      <TableOrderModal
+        open={isDetailOpen}
+        onOpenChange={handleDetailOpenChange}
+        table={selectedTableId ? tables.find((table) => table.id === selectedTableId) ?? null : null}
+      />
     </section>
   );
 }

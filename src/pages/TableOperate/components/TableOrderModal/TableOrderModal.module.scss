@@ -1,0 +1,174 @@
+@use '@/styles/colors' as *;
+
+.modalContent {
+  width: 460px;
+  background-color: $white;
+  border-radius: 20px;
+}
+
+.tableTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: $black;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding: 30px 24px;
+}
+
+.menuTable {
+  width: 100%;
+  display: grid;
+  gap: 2px;
+}
+
+.menuHeader,
+.menuRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 50px 90px;
+  align-items: center;
+  column-gap: 16px;
+}
+
+.menuHeader {
+  font-size: 18px;
+  font-weight: 500;
+  color: $black;
+}
+
+.menuHeaderTitle {
+  text-align: center;
+}
+
+.menuHeaderPrice {
+  text-align: right;
+  color: $black;
+  font-weight: 500;
+}
+
+.menuRow {
+  font-size: 14px;
+  color: $black;
+}
+
+.menuName {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menuQuantity {
+  text-align: center;
+}
+
+.menuPrice {
+  text-align: right;
+  color: $red-50;
+  font-weight: 600;
+}
+
+.qrSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.qrTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: $black;
+}
+
+.qrImage {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+}
+
+.qrPlaceholder {
+  width: 160px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed $gray-30;
+  color: $gray-50;
+  font-size: 12px;
+}
+
+.footer {
+  padding: 20px 36px 28px;
+}
+
+.footerButtons {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.footerButton {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .body {
+    padding: 24px;
+  }
+
+  .menuHeader,
+  .menuRow {
+    grid-template-columns: minmax(0, 1fr) 56px 90px;
+    column-gap: 10px;
+  }
+
+  .footer {
+    padding: 20px 24px 24px;
+  }
+
+  .footerButtons {
+    flex-direction: column;
+  }
+}
+
+.summary-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  color: $black;
+
+  &__text {
+    color: $red-50;
+    font-weight: 600;
+  }
+}
+
+.payment-group {
+  padding-left: 8px;
+}
+
+.payment {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__text {
+    color: $red-50;
+    font-weight: 600;
+  }
+}

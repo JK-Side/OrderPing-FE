@@ -1,4 +1,4 @@
-import type { ComponentType, SVGProps } from 'react';
+import type { ComponentType, MouseEventHandler, SVGProps } from 'react';
 import CheckIcon from '@/assets/icons/check.svg?react';
 import CookingIcon from '@/assets/icons/cooking.svg?react';
 import PaymentIcon from '@/assets/icons/payment.svg?react';
@@ -21,6 +21,7 @@ interface OrderCardProps {
   isEmpty?: boolean;
   isSelected?: boolean;
   onToggleSelect?: ClickHandler;
+  onOpenDetail?: ClickHandler;
 }
 
 const STATUS_CONFIG: Record<
@@ -60,6 +61,7 @@ export default function OrderCard({
   isEmpty,
   isSelected = false,
   onToggleSelect,
+  onOpenDetail,
 }: OrderCardProps) {
   const isEmptyState = isEmpty ?? items.length === 0;
   const displayItems = items.slice(0, 3);
@@ -69,8 +71,13 @@ export default function OrderCard({
   const cardClassName = !isEmptyState && statusConfig ? statusConfig.cardClassName : '';
   const selectBoxClassName = isSelected ? `${styles.selectBox} ${styles.selectBoxSelected}` : styles.selectBox;
 
+  const handleSelectClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+    event.stopPropagation();
+    onToggleSelect?.();
+  };
+
   return (
-    <article className={`${styles.card} ${cardClassName}`}>
+    <article className={`${styles.card} ${cardClassName}`} onClick={onOpenDetail}>
       <div className={styles.headerRow}>
         <h4 className={styles.tableName}>{tableName}</h4>
         <button
@@ -78,7 +85,7 @@ export default function OrderCard({
           className={selectBoxClassName}
           aria-label={`${tableName} 선택`}
           aria-pressed={isSelected}
-          onClick={onToggleSelect}
+          onClick={handleSelectClick}
         >
           {isSelected ? <CheckIcon className={styles.selectIcon} aria-hidden="true" /> : null}
         </button>
