@@ -1,18 +1,12 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import type { TableResponse } from '@/api/table/entity';
-import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
-import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
-import StoreSummaryCard from '@/components/StoreSummaryCard';
-import summaryStyles from '@/components/StoreSummaryCard/StoreSummaryCard.module.scss';
 import { useToast } from '@/components/Toast/useToast';
-import StoreSettingsModal from '@/pages/StoreOperate/components/StoreSettingsModal';
-import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
 import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
@@ -50,7 +44,6 @@ const resolvePriorityOrderStatus = (rawStatus: TableResponse['orderStatus']) => 
 };
 
 export default function TableOperate() {
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const { id } = useParams();
@@ -62,15 +55,9 @@ export default function TableOperate() {
       ? parseStoredLayout(localStorage.getItem(getLayoutStorageKey(storeId)))
       : null;
 
-  const { data: storeDetail } = useStoreById(storeId);
   const { data: tables = [] } = useTablesByStore(storeId);
   const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
   const { toast } = useToast();
-
-  const storeName = storeDetail?.name ?? '주점';
-  const storeImageUrl = storeDetail?.imageUrl ?? '';
-  const storeImage = storeImageUrl || StoreDefault;
-  const storeDescription = storeDetail?.description ?? '';
 
   const sortedTables = [...tables].sort((a, b) => a.tableNum - b.tableNum);
   const hasTables = tables.length > 0;
@@ -132,31 +119,7 @@ export default function TableOperate() {
     <section className={styles.tableOperate}>
       <div className={styles.panel}>
         <div className={styles.summaryRow}>
-          <StoreSummaryCard
-            storeName={storeName}
-            storeDescription={storeDescription}
-            imageUrl={storeImageUrl}
-            actions={
-              <>
-                <Button
-                  className={summaryStyles.actionButton}
-                  size="md"
-                  onClick={() => id && navigate(`/store/${id}/menu/create`)}
-                >
-                  <AddMenuIcon className={summaryStyles.actionIcon} aria-hidden="true" />
-                  메뉴 추가
-                </Button>
-                {storeId ? (
-                  <StoreSettingsModal
-                    storeId={storeId}
-                    storeName={storeName}
-                    storeDescription={storeDescription}
-                    storeImageUrl={storeImage}
-                  />
-                ) : null}
-              </>
-            }
-          />
+          <div className={styles.summaryRow__title}>테이블 배치</div>
           <div className={styles.sidePanel}>
             {isNoticeVisible ? (
               <div className={styles.noticeCard}>
@@ -191,6 +154,9 @@ export default function TableOperate() {
             </div>
           </div>
         </div>
+
+        <div className={styles.sectionDivider} />
+
         {hasTables ? (
           <div
             className={`${styles.orderPreview} ${useGridLayout ? styles.orderPreviewGrid : ''}`}

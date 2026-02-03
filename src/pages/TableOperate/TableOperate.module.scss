@@ -8,7 +8,6 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 60px;
 }
 
 .summaryRow {
@@ -17,6 +16,19 @@
   align-items: center;
   justify-content: space-between;
   gap: 40px;
+
+  &__title {
+    font-size: 22px;
+    font-weight: 500;
+  }
+}
+
+.sectionDivider {
+  width: 100%;
+  height: 1px;
+  background-color: $gray-20;
+  margin-top: 16px;
+  margin-bottom: 50px;
 }
 
 .sidePanel {
