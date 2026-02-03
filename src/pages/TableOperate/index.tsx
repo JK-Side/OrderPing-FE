@@ -11,13 +11,14 @@ import StoreSummaryCard from '@/components/StoreSummaryCard';
 import summaryStyles from '@/components/StoreSummaryCard/StoreSummaryCard.module.scss';
 import StoreSettingsModal from '@/pages/StoreOperate/components/StoreSettingsModal';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
-import { useTablesByStore } from '@/pages/StoreStart/hooks/useTablesByStore';
 import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
+import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
 
 type OrderStatus = 'served' | 'cooking' | 'payment';
-const DEFAULT_ORDER_STATUS: OrderStatus = 'cooking';
+
+const ORDER_STATUS_PRIORITY = ['PENDING', 'COOKING', 'COMPLETE'] as const;
 
 const formatTableName = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 const getLayoutStorageKey = (storeId: number) => `table-layout:${storeId}`;
@@ -39,7 +40,13 @@ const parseStoredLayout = (value: string | null) => {
   return null;
 };
 
-export default function StoreStart() {
+const resolvePriorityOrderStatus = (rawStatus: TableResponse['orderStatus']) => {
+  if (!rawStatus) return undefined;
+  const statuses = Array.isArray(rawStatus) ? rawStatus : [rawStatus];
+  return ORDER_STATUS_PRIORITY.find((status) => statuses.includes(status));
+};
+
+export default function TableOperate() {
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -78,7 +85,7 @@ export default function StoreStart() {
   };
 
   return (
-    <section className={styles.storeStart}>
+    <section className={styles.tableOperate}>
       <div className={styles.panel}>
         <div className={styles.summaryRow}>
           <StoreSummaryCard
@@ -140,9 +147,22 @@ export default function StoreStart() {
             style={tableGridStyle}
           >
             {tables.map((table: TableResponse) => {
-              const isOccupied = table.status === 'OCCUPIED';
-              const isEmpty = !isOccupied;
-              const status = isOccupied ? DEFAULT_ORDER_STATUS : undefined;
+              const hasOrders =
+                (table.orderMenus?.length ?? 0) > 0 ||
+                (table.totalOrderAmount ?? 0) > 0 ||
+                !!table.orderStatus;
+              const isEmpty = !hasOrders;
+              const statusMap: Record<NonNullable<TableResponse['orderStatus']>, OrderStatus> = {
+                PENDING: 'payment',
+                COOKING: 'cooking',
+                COMPLETE: 'served',
+              };
+              const resolvedOrderStatus = resolvePriorityOrderStatus(table.orderStatus);
+              const status = hasOrders && resolvedOrderStatus ? statusMap[resolvedOrderStatus] : undefined;
+              const items = table.orderMenus?.map((menu) => ({
+                name: menu.menuName,
+                quantity: menu.quantity,
+              }));
 
               return (
                 <OrderCard
@@ -150,6 +170,8 @@ export default function StoreStart() {
                   tableName={formatTableName(table.tableNum)}
                   isEmpty={isEmpty}
                   status={status}
+                  items={items}
+                  totalPrice={table.totalOrderAmount}
                 />
               );
             })}
