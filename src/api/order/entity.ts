@@ -6,6 +6,23 @@ export interface UpdateOrderStatusRequest {
   status: OrderStatus;
 }
 
+export interface CreateOrderMenuRequest {
+  menuId: number;
+  quantity: number;
+  price: number;
+  isService: boolean;
+}
+
+export interface CreateOrderRequest {
+  storeId: number;
+  tableId: number;
+  tableNum: number;
+  sessionId?: string;
+  depositorName?: string;
+  couponAmount?: number;
+  menus: CreateOrderMenuRequest[];
+}
+
 export interface OrderResponse {
   id: number;
   tableId: number;

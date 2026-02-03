@@ -28,6 +28,10 @@ export const getMenusByCategory = async (storeId: number, categoryId: number) =>
   }
 };
 
+export const getAvailableMenus = async (storeId: number) => {
+  return await apiClient.get<MenuListResponse>(`/api/menus/available/${storeId}`);
+};
+
 export const getMenuById = async (id: number) => {
   return await apiClient.get<MenuResponse>(`/api/menus/${id}`);
 };
