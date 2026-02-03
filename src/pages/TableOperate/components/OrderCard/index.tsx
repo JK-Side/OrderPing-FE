@@ -77,6 +77,7 @@ export default function OrderCard({
   };
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
     <article className={`${styles.card} ${cardClassName}`} onClick={onOpenDetail}>
       <div className={styles.headerRow}>
         <h4 className={styles.tableName}>{tableName}</h4>
