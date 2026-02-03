@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { TableResponse } from '@/api/table/entity';
@@ -9,10 +10,12 @@ import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
 import StoreSummaryCard from '@/components/StoreSummaryCard';
 import summaryStyles from '@/components/StoreSummaryCard/StoreSummaryCard.module.scss';
+import { useToast } from '@/components/Toast/useToast';
 import StoreSettingsModal from '@/pages/StoreOperate/components/StoreSettingsModal';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
+import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
 
@@ -48,6 +51,7 @@ const resolvePriorityOrderStatus = (rawStatus: TableResponse['orderStatus']) => 
 
 export default function TableOperate() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
@@ -60,6 +64,8 @@ export default function TableOperate() {
 
   const { data: storeDetail } = useStoreById(storeId);
   const { data: tables = [] } = useTablesByStore(storeId);
+  const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
+  const { toast } = useToast();
 
   const storeName = storeDetail?.name ?? '주점';
   const storeImageUrl = storeDetail?.imageUrl ?? '';
@@ -70,6 +76,7 @@ export default function TableOperate() {
   const hasActiveOrders = tables.some((table: TableResponse) => table.status === 'OCCUPIED');
   const tableButtonLabel = hasTables ? '테이블 수정' : '테이블 추가';
   const [isNoticeVisible, setIsNoticeVisible] = useState(true);
+  const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
 
   const useGridLayout = !!tableLayout && tableLayout.columns > 0 && tableLayout.rows > 0;
   const tableGridStyle = useGridLayout
@@ -82,6 +89,40 @@ export default function TableOperate() {
   const handleLayoutSave = (layout: { columns: number; rows: number }) => {
     if (!storeId || typeof window === 'undefined') return;
     localStorage.setItem(getLayoutStorageKey(storeId), JSON.stringify(layout));
+  };
+
+  const handleToggleSelect = (tableId: number) => {
+    setSelectedTableIds((prev) => (prev.includes(tableId) ? prev.filter((id) => id !== tableId) : [...prev, tableId]));
+  };
+
+  const handleClearTables = async () => {
+    if (!storeId || selectedTableIds.length === 0 || isClearing) return;
+
+    const selectedTables = tables.filter((table) => selectedTableIds.includes(table.id));
+    const hasOrderTables = selectedTables.some(
+      (table) => (table.orderMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0 || !!table.orderStatus,
+    );
+
+    if (hasOrderTables) {
+      toast({
+        message: '주문이 있는 테이블은 비울 수 없습니다.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    try {
+      await Promise.all(selectedTableIds.map((tableId) => clearTable(tableId)));
+      await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
+      setSelectedTableIds([]);
+    } catch (error) {
+      toast({
+        message: 'Failed to clear tables.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('Failed to clear tables', error);
+    }
   };
 
   return (
@@ -135,7 +176,13 @@ export default function TableOperate() {
                 hasActiveOrders={hasActiveOrders}
                 name={tableButtonLabel}
               />
-              <Button className={styles.clearButton} size="md" disabled>
+              <Button
+                className={styles.clearButton}
+                size="md"
+                onClick={handleClearTables}
+                disabled={selectedTableIds.length === 0 || isClearing}
+                isLoading={isClearing}
+              >
                 테이블 비우기
               </Button>
             </div>
@@ -148,9 +195,7 @@ export default function TableOperate() {
           >
             {tables.map((table: TableResponse) => {
               const hasOrders =
-                (table.orderMenus?.length ?? 0) > 0 ||
-                (table.totalOrderAmount ?? 0) > 0 ||
-                !!table.orderStatus;
+                (table.orderMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0 || !!table.orderStatus;
               const isEmpty = !hasOrders;
               const statusMap: Record<NonNullable<TableResponse['orderStatus']>, OrderStatus> = {
                 PENDING: 'payment',
@@ -172,6 +217,8 @@ export default function TableOperate() {
                   status={status}
                   items={items}
                   totalPrice={table.totalOrderAmount}
+                  isSelected={selectedTableIds.includes(table.id)}
+                  onToggleSelect={() => handleToggleSelect(table.id)}
                 />
               );
             })}

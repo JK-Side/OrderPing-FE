@@ -45,3 +45,8 @@ export const patchTableQrImage = async (tableId: number, body: UpdateTableQrImag
     body,
   });
 };
+
+// POST /api/tables/{id}/clear 테이블 비우기
+export const postClearTable = async (tableId: number) => {
+  return await apiClient.post<TableResponse>(`/api/tables/${tableId}/clear`);
+};
