@@ -5,7 +5,7 @@ import PaymentIcon from '@/assets/icons/payment.svg?react';
 import ServedIcon from '@/assets/icons/served.svg?react';
 import styles from './OrderCard.module.scss';
 
-type OrderStatus = 'served' | 'cooking' | 'payment';
+type OrderStatus = 'PENDING' | 'COOKING' | 'COMPLETE';
 type ClickHandler = () => void;
 
 interface OrderMenuItem {
@@ -32,19 +32,19 @@ const STATUS_CONFIG: Record<
     cardClassName: string;
   }
 > = {
-  served: {
+  COMPLETE: {
     label: '서빙 완료',
     Icon: ServedIcon,
     badgeClassName: styles.statusServed,
     cardClassName: styles.cardServed,
   },
-  cooking: {
+  COOKING: {
     label: '조리 중',
     Icon: CookingIcon,
     badgeClassName: styles.statusCooking,
     cardClassName: styles.cardCooking,
   },
-  payment: {
+  PENDING: {
     label: '결제 전',
     Icon: PaymentIcon,
     badgeClassName: styles.statusPayment,

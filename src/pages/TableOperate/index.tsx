@@ -13,8 +13,6 @@ import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
 
-type OrderStatus = 'served' | 'cooking' | 'payment';
-
 const ORDER_STATUS_PRIORITY = ['PENDING', 'COOKING', 'COMPLETE'] as const;
 
 const formatTableName = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
@@ -166,13 +164,8 @@ export default function TableOperate() {
               const hasOrders =
                 (table.orderMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0 || !!table.orderStatus;
               const isEmpty = !hasOrders;
-              const statusMap: Record<NonNullable<TableResponse['orderStatus']>, OrderStatus> = {
-                PENDING: 'payment',
-                COOKING: 'cooking',
-                COMPLETE: 'served',
-              };
               const resolvedOrderStatus = resolvePriorityOrderStatus(table.orderStatus);
-              const status = hasOrders && resolvedOrderStatus ? statusMap[resolvedOrderStatus] : undefined;
+              const status = hasOrders && resolvedOrderStatus ? resolvedOrderStatus : undefined;
               const items = table.orderMenus?.map((menu) => ({
                 name: menu.menuName,
                 quantity: menu.quantity,
