@@ -4,6 +4,8 @@ import type {
   OrderDetailResponse,
   OrderResponse,
   OrderStatusQuery,
+  ServiceOrderRequest,
+  ServiceOrderResponse,
   UpdateOrderStatusRequest,
 } from './entity';
 
@@ -31,4 +33,11 @@ export const getOrderById = async (id: number) => {
 
 export const deleteOrderById = async (id: number) => {
   return await apiClient.delete<void>(`/api/orders/${id}`);
+};
+
+
+export const postCreateService = async (body: ServiceOrderRequest) => {
+  return await apiClient.post<ServiceOrderResponse>('/api/order/service', {
+    body,
+  });
 };

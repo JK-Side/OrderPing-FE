@@ -18,10 +18,9 @@ export interface TableResponse {
   storeId: number;
   tableNum: number;
   status: TableStatus;
-  qrToken: string;
-  qrUrl: string | null;
   qrImageUrl: string;
   orderMenus?: TableOrderMenu[];
+  serviceMenus: TableOrderMenu[];
   totalOrderAmount?: number;
   orderStatus?: TableOrderStatus | null;
 }
