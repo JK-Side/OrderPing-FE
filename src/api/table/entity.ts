@@ -20,7 +20,7 @@ export interface TableResponse {
   status: TableStatus;
   qrImageUrl: string;
   orderMenus?: TableOrderMenu[];
-  serviceMenus: TableOrderMenu[];
+  serviceMenus?: TableOrderMenu[];
   totalOrderAmount?: number;
   orderStatus?: TableOrderStatus | null;
 }
