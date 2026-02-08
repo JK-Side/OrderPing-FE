@@ -60,3 +60,27 @@ export interface OrderLookupResponse {
   cashAmount: number;
   createdAt: string;
 }
+
+interface ServiceMenu {
+  menuId: number;
+  quantity: number;
+}
+export interface ServiceOrderRequest {
+  tableId: number;
+  tableNum: number;
+  storeId: number;
+  menus: ServiceMenu[];
+}
+
+export interface ServiceOrderResponse {
+  id: number;
+  tableId: number;
+  tableNum: number;
+  storeId: number;
+  depositorName: string
+  status: OrderStatus
+  totalPrice: number;
+  couponAmount: number;
+  cashAmount: number;
+  createdAt: string
+}

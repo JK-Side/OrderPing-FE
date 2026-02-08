@@ -33,7 +33,7 @@ const isTableClearable = (rawStatus: TableResponse['orderStatus']) => {
 };
 
 const resolveQrValue = (table: TableResponse) => {
-  if (table.qrUrl) return table.qrUrl;
+  if (table.qrImageUrl) return table.qrImageUrl;
   if (typeof window === 'undefined') return '';
   const url = new URL(`/customer/store/${table.storeId}`, window.location.origin);
   url.searchParams.set('tableId', String(table.tableNum));
@@ -47,7 +47,8 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
 
   if (!table) return null;
 
-  const menus = table.orderMenus ?? [];
+  const orderMenus = table.orderMenus ?? [];
+  const serviceMenus = table.serviceMenus ?? [];
   const canClearTable = isTableClearable(table.orderStatus);
 
   const handleClearTable = async () => {
@@ -105,21 +106,24 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
               <span className={styles.menuQuantity}>수량</span>
               <span className={styles.menuHeaderPrice}>가격</span>
             </div>
-            {menus.length > 0 ? (
-              menus.map((item) => (
-                <div key={`${item.menuId}-${item.menuName}`} className={styles.menuRow}>
+
+            {orderMenus.length > 0 &&
+              orderMenus.map((item) => (
+                <div key={`order-${item.menuId}-${item.menuName}`} className={styles.menuRow}>
                   <span className={styles.menuName}>{item.menuName}</span>
                   <span className={styles.menuQuantity}>{item.quantity}</span>
                   <span className={styles.menuPrice}>{formatCurrency(item.price)}</span>
                 </div>
-              ))
-            ) : (
-              <div className={styles.menuRow}>
-                <span className={styles.menuName}>메뉴가 없습니다!</span>
-                <span className={styles.menuQuantity}>-</span>
-                <span className={styles.menuPrice}>-</span>
-              </div>
-            )}
+              ))}
+
+            {serviceMenus.length > 0 &&
+              serviceMenus.map((item) => (
+                <div key={`service-${item.menuId}-${item.menuName}`} className={styles.menuRow}>
+                  <span className={styles.menuName}>{item.menuName}</span>
+                  <span className={styles.menuQuantity}>{item.quantity}</span>
+                  <span className={styles.menuPrice}>서비스</span>
+                </div>
+              ))}
           </div>
 
           <div className={styles.qrSection}>

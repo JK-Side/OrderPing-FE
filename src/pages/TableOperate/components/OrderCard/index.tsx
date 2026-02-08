@@ -16,6 +16,7 @@ interface OrderMenuItem {
 interface OrderCardProps {
   tableName: string;
   items?: OrderMenuItem[];
+  serviceMenus?: OrderMenuItem[];
   totalPrice?: number;
   status?: OrderStatus;
   isEmpty?: boolean;
@@ -56,6 +57,7 @@ const STATUS_CONFIG: Record<
 export default function OrderCard({
   tableName,
   items = [],
+  serviceMenus = [],
   totalPrice,
   status,
   isEmpty,
@@ -63,9 +65,10 @@ export default function OrderCard({
   onToggleSelect,
   onOpenDetail,
 }: OrderCardProps) {
-  const isEmptyState = isEmpty ?? items.length === 0;
-  const displayItems = items.slice(0, 3);
-  const extraCount = Math.max(items.length - 3, 0);
+  const combinedItems = [...items, ...serviceMenus];
+  const isEmptyState = isEmpty ?? combinedItems.length === 0;
+  const displayItems = combinedItems.slice(0, 3);
+  const extraCount = Math.max(combinedItems.length - displayItems.length, 0);
   const statusConfig = status ? STATUS_CONFIG[status] : null;
 
   const cardClassName = !isEmptyState && statusConfig ? statusConfig.cardClassName : '';
@@ -96,8 +99,8 @@ export default function OrderCard({
         <div className={styles.emptyMessage}>아직 주문이 들어오지 않았어요!</div>
       ) : (
         <ul className={styles.menuList}>
-          {displayItems.map((item) => (
-            <li key={item.name} className={styles.menuItem}>
+          {displayItems.map((item, index) => (
+            <li key={`${item.name}-${index}`} className={styles.menuItem}>
               <span className={styles.menuName}>{item.name}</span>
               <span className={styles.menuCount}>({item.quantity})</span>
             </li>

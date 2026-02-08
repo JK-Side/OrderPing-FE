@@ -44,7 +44,10 @@ const resolvePriorityOrderStatus = (rawStatus: TableResponse['orderStatus']) => 
 };
 
 const hasOrdersForTable = (table: TableResponse) =>
-  (table.orderMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0 || !!table.orderStatus;
+  (table.orderMenus?.length ?? 0) > 0 ||
+  (table.serviceMenus?.length ?? 0) > 0 ||
+  (table.totalOrderAmount ?? 0) > 0 ||
+  !!table.orderStatus;
 
 export default function TableOperate() {
   const queryClient = useQueryClient();
@@ -148,8 +151,8 @@ export default function TableOperate() {
     }
   };
 
-  const selectedTable = selectedTableId ? tables.find((table) => table.id === selectedTableId) ?? null : null;
-  const serviceTable = serviceTableId ? tables.find((table) => table.id === serviceTableId) ?? null : null;
+  const selectedTable = selectedTableId ? (tables.find((table) => table.id === selectedTableId) ?? null) : null;
+  const serviceTable = serviceTableId ? (tables.find((table) => table.id === serviceTableId) ?? null) : null;
 
   return (
     <section className={styles.tableOperate}>
@@ -207,6 +210,10 @@ export default function TableOperate() {
                 name: menu.menuName,
                 quantity: menu.quantity,
               }));
+              const serviceMenus = table.serviceMenus?.map((menu) => ({
+                name: menu.menuName,
+                quantity: menu.quantity,
+              }));
 
               return (
                 <OrderCard
@@ -215,6 +222,7 @@ export default function TableOperate() {
                   isEmpty={isEmpty}
                   status={status}
                   items={items}
+                  serviceMenus={serviceMenus}
                   totalPrice={table.totalOrderAmount}
                   isSelected={selectedTableIds.includes(table.id)}
                   onToggleSelect={() => handleToggleSelect(table.id)}
