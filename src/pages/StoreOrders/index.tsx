@@ -68,17 +68,14 @@ const createOrderSections = (orders: OrderLookupResponse[]): OrderSection[] =>
       .map((order) => ({
         id: `${config.key}-${order.id}`,
         orderId: order.id,
-        tableNumber: order.tableId,
+        tableNumber: order.tableNum,
         depositorName: order.depositorName,
         depositAmount: order.cashAmount,
         couponAmount: order.couponAmount,
         status: order.status,
       }));
 
-    const ordered =
-      config.key === 'served'
-        ? [...sectionOrders].reverse()
-        : sectionOrders;
+    const ordered = config.key === 'served' ? [...sectionOrders].reverse() : sectionOrders;
 
     return {
       key: config.key,
@@ -88,7 +85,6 @@ const createOrderSections = (orders: OrderLookupResponse[]): OrderSection[] =>
       orders: ordered,
     };
   });
-
 
 export default function StoreOrders() {
   const { id } = useParams();

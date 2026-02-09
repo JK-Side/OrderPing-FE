@@ -24,9 +24,13 @@ interface OrderLookupCardProps extends HTMLAttributes<HTMLElement> {
   isAcceptDisabled?: boolean;
 }
 
-const formatTableNumber = (value: number | string) => {
+const formatTableNumber = (value: number | string | null | undefined) => {
   if (typeof value === 'number') {
     return `테이블 ${String(value).padStart(2, '0')}`;
+  }
+
+  if (typeof value !== 'string') {
+    return '-';
   }
 
   if (value.startsWith('테이블')) {
