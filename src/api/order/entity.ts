@@ -17,7 +17,6 @@ export interface CreateOrderRequest {
   storeId: number;
   tableId: number;
   tableNum: number;
-  sessionId?: string;
   depositorName?: string;
   couponAmount?: number;
   menus: CreateOrderMenuRequest[];
@@ -28,7 +27,6 @@ export interface OrderResponse {
   tableId: number;
   tableNum: number;
   storeId: number;
-  sessionId: string;
   depositorName: string;
   status: OrderStatusResponse;
   totalPrice: number;

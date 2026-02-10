@@ -37,7 +37,7 @@ export const deleteOrderById = async (id: number) => {
 
 
 export const postCreateService = async (body: ServiceOrderRequest) => {
-  return await apiClient.post<ServiceOrderResponse>('/api/order/service', {
+  return await apiClient.post<ServiceOrderResponse>('/api/orders/service', {
     body,
   });
 };

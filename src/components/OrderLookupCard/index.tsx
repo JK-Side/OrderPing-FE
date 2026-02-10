@@ -104,7 +104,7 @@ export default function OrderLookupCard({
       </div>
 
       <div className={styles.body}>
-        <div className={styles.depositorName}>{depositorName}</div>
+        <div className={styles.depositorName}>{depositorName ?? '서비스'}</div>
         <div className={styles.amountList}>
           {!!depositAmount && (
             <div className={styles.amountRow}>
