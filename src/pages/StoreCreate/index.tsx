@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
 import { useCreateStore } from '@/pages/StoreCreate/hooks/useCreateStore';
@@ -28,18 +28,18 @@ export default function StoreCreate() {
     mode: 'onBlur',
   });
   const { mutateAsync: createStore } = useCreateStore();
+  const [storeImageFile, setStoreImageFile] = useState<File | null>(null);
   const { upload } = usePresignedUploader();
 
-  const uploadStoreImage = useCallback(async (storeImage?: FileList) => {
-    if (!storeImage?.length) {
+  const uploadStoreImage = useCallback(async (storeImage?: File | null) => {
+    if (!storeImage) {
       return '';
     }
 
-    const file = storeImage[0];
     return await upload({
       directory: 'stores',
-      fileName: file.name,
-      file,
+      fileName: storeImage.name,
+      file: storeImage,
       errorMessage: 'Failed to upload store image.',
     });
   }, [upload]);
@@ -66,7 +66,7 @@ export default function StoreCreate() {
   const handleAccountInfoSubmit = useCallback<SubmitHandler<StoreCreateForm>>(
     async (data) => {
       try {
-        const imageUrl = await uploadStoreImage(data.storeImage);
+        const imageUrl = await uploadStoreImage(storeImageFile ?? data.storeImage?.[0] ?? null);
         await createStore({
           name: data.storeName,
           description: data.storeDescription,
@@ -118,7 +118,14 @@ export default function StoreCreate() {
       </div>
 
       <div className={styles.content}>
-        {step === 1 && <StoreInfo register={register} errors={errors} onSubmit={handleSubmit(handleStoreInfoSubmit)} />}
+        {step === 1 && (
+          <StoreInfo
+            register={register}
+            errors={errors}
+            onSubmit={handleSubmit(handleStoreInfoSubmit)}
+            onStoreImageChange={setStoreImageFile}
+          />
+        )}
         {step === 2 && (
           <AccoutInfo
             register={register}

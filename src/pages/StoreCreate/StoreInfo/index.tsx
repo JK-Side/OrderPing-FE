@@ -11,9 +11,10 @@ interface StoreInfoProps {
   register: UseFormRegister<StoreCreateForm>;
   errors: FieldErrors<StoreCreateForm>;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
+  onStoreImageChange?: (file: File | null) => void;
 }
 
-export default function StoreInfo({ register, errors, onSubmit }: StoreInfoProps) {
+export default function StoreInfo({ register, errors, onSubmit, onStoreImageChange }: StoreInfoProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -28,6 +29,7 @@ export default function StoreInfo({ register, errors, onSubmit }: StoreInfoProps
         }
         return null;
       });
+      onStoreImageChange?.(null);
       return;
     }
     const nextUrl = URL.createObjectURL(files[0]);
@@ -37,7 +39,8 @@ export default function StoreInfo({ register, errors, onSubmit }: StoreInfoProps
       }
       return nextUrl;
     });
-  }, []);
+    onStoreImageChange?.(files[0]);
+  }, [onStoreImageChange]);
 
   useEffect(() => {
     return () => {
@@ -61,14 +64,16 @@ export default function StoreInfo({ register, errors, onSubmit }: StoreInfoProps
       if (inputRef.current) {
         inputRef.current.value = '';
         handleStoreImageChange({ target: inputRef.current } as ChangeEvent<HTMLInputElement>);
+        onStoreImageChange?.(null);
         return;
       }
 
       storeImageField.onChange({
         target: { files: null, name: storeImageField.name },
       } as unknown as ChangeEvent<HTMLInputElement>);
+      onStoreImageChange?.(null);
     },
-    [handleStoreImageChange, storeImageField],
+    [handleStoreImageChange, onStoreImageChange, storeImageField],
   );
 
   const handleDragEnter = useCallback((event: DragEvent<HTMLLabelElement>) => {
