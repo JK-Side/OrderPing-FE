@@ -31,18 +31,21 @@ export default function StoreCreate() {
   const [storeImageFile, setStoreImageFile] = useState<File | null>(null);
   const { upload } = usePresignedUploader();
 
-  const uploadStoreImage = useCallback(async (storeImage?: File | null) => {
-    if (!storeImage) {
-      return '';
-    }
+  const uploadStoreImage = useCallback(
+    async (storeImage?: File | null) => {
+      if (!storeImage) {
+        return '';
+      }
 
-    return await upload({
-      directory: 'stores',
-      fileName: storeImage.name,
-      file: storeImage,
-      errorMessage: 'Failed to upload store image.',
-    });
-  }, [upload]);
+      return await upload({
+        directory: 'stores',
+        fileName: storeImage.name,
+        file: storeImage,
+        errorMessage: 'Failed to upload store image.',
+      });
+    },
+    [upload],
+  );
 
   const updateStep = useCallback(
     (nextStep: number, options?: { replace?: boolean }) => {
@@ -80,13 +83,8 @@ export default function StoreCreate() {
         console.error('Failed to create store', error);
       }
     },
-    [createStore, updateStep, uploadStoreImage],
+    [createStore, storeImageFile, updateStep, uploadStoreImage],
   );
-
-  // 단계별 확인 콘솔
-  // useEffect(() => {
-  //   console.log('step', step, getValues());
-  // }, [step, getValues]);
 
   return (
     <section className={styles.storeCreate}>
