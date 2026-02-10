@@ -10,6 +10,8 @@ export default function Header() {
   const { pathname } = useLocation();
   const { isLoggedIn, clearAccessToken } = useAuth();
   const isHomePage = pathname === '/';
+  const isStoreCreatePage = pathname.startsWith('/store/create');
+  const isAuthHeaderPage = isHomePage || isStoreCreatePage;
   const storeId =
     pathname.match(/^\/store\/operate\/([^/]+)/)?.[1]
     ?? pathname.match(/^\/store\/([^/]+)\/(start|orders|menu)/)?.[1];
@@ -42,7 +44,7 @@ export default function Header() {
       </Link>
 
       <nav className={styles.nav}>
-        {!isHomePage ? (
+        {!isAuthHeaderPage ? (
           <>
             <Link to={menuManagePath} className={styles.navItem}>
               메뉴 관리
