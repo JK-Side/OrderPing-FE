@@ -49,6 +49,9 @@ const hasOrdersForTable = (table: TableResponse) =>
   (table.totalOrderAmount ?? 0) > 0 ||
   !!table.orderStatus;
 
+const isOrderableTable = (table?: TableResponse | null) =>
+  table?.status === 'OCCUPIED' || table?.status === 'EMPTY';
+
 export default function TableOperate() {
   const queryClient = useQueryClient();
 
@@ -97,7 +100,9 @@ export default function TableOperate() {
     if (!storeId || selectedTableIds.length === 0 || isClearing) return;
 
     const selectedTables = tables.filter((table) => selectedTableIds.includes(table.id));
-    const hasOrderTables = selectedTables.some((table) => table.orderStatus && table.orderStatus !== 'COMPLETE');
+    const eligibleTables = selectedTables.filter((table) => table.status !== 'CLOSED');
+    if (eligibleTables.length === 0) return;
+    const hasOrderTables = eligibleTables.some((table) => table.orderStatus && table.orderStatus !== 'COMPLETE');
 
     if (hasOrderTables) {
       toast({
@@ -108,7 +113,7 @@ export default function TableOperate() {
     }
 
     try {
-      await Promise.all(selectedTableIds.map((tableId) => clearTable(tableId)));
+      await Promise.all(eligibleTables.map((table) => clearTable(table.id)));
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
       toast({
@@ -139,6 +144,7 @@ export default function TableOperate() {
   };
 
   const handleServiceOpen = (table: TableResponse) => {
+    if (!isOrderableTable(table)) return;
     setServiceTableId(table.id);
     setIsServiceOpen(true);
     handleDetailOpenChange(false);
@@ -153,6 +159,7 @@ export default function TableOperate() {
 
   const selectedTable = selectedTableId ? (tables.find((table) => table.id === selectedTableId) ?? null) : null;
   const serviceTable = serviceTableId ? (tables.find((table) => table.id === serviceTableId) ?? null) : null;
+  const canServiceAdd = isOrderableTable(selectedTable);
 
   return (
     <section className={styles.tableOperate}>
@@ -242,7 +249,7 @@ export default function TableOperate() {
       <TableOrderModal
         open={isDetailOpen}
         onOpenChange={handleDetailOpenChange}
-        onServiceAdd={selectedTable ? () => handleServiceOpen(selectedTable) : undefined}
+        onServiceAdd={canServiceAdd && selectedTable ? () => handleServiceOpen(selectedTable) : undefined}
         table={selectedTable}
       />
 

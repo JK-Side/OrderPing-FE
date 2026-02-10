@@ -50,6 +50,7 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
   const orderMenus = table.orderMenus ?? [];
   const serviceMenus = table.serviceMenus ?? [];
   const canClearTable = isTableClearable(table.orderStatus);
+  const isClosedTable = table.status === 'CLOSED';
 
   const handleClearTable = async () => {
     if (!canClearTable) {
@@ -159,7 +160,7 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
               variant="danger"
               className={styles.footerButton}
               onClick={handleClearTable}
-              disabled={isClearing || !canClearTable}
+              disabled={isClearing || !canClearTable || isClosedTable}
               isLoading={isClearing}
             >
               테이블 비우기

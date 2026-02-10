@@ -11,6 +11,7 @@ import { useDeleteOrder } from '@/pages/StoreOrders/hooks/useDeleteOrder';
 import { useOrderById } from '@/pages/StoreOrders/hooks/useOrderById';
 import { useOrdersByStore } from '@/pages/StoreOrders/hooks/useOrdersByStore';
 import { useUpdateOrderStatus } from '@/pages/StoreOrders/hooks/useUpdateOrderStatus';
+import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './StoreOrders.module.scss';
 
 type OrderCardData = {
@@ -92,7 +93,10 @@ export default function StoreOrders() {
   const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
   const queryClient = useQueryClient();
   const { data: orders = [] } = useOrdersByStore(storeId);
-  const orderSections = createOrderSections(orders);
+  const { data: closedTables = [] } = useTablesByStore(storeId, 'CLOSED');
+  const closedTableIds = new Set(closedTables.map((table) => table.id));
+  const visibleOrders = orders.filter((order) => !closedTableIds.has(order.tableId));
+  const orderSections = createOrderSections(visibleOrders);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const { data: orderDetail } = useOrderById(selectedOrderId ?? undefined);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -249,7 +253,9 @@ export default function StoreOrders() {
     }
   };
 
-  const selectedOrder = selectedOrderId ? (orders.find((order) => order.id === selectedOrderId) ?? null) : null;
+  const selectedOrder = selectedOrderId
+    ? (visibleOrders.find((order) => order.id === selectedOrderId) ?? null)
+    : null;
 
   return (
     <section className={styles.storeOrders}>
