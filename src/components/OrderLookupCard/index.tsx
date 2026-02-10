@@ -19,6 +19,7 @@ interface OrderLookupCardProps extends HTMLAttributes<HTMLElement> {
   onAccept?: ClickHandler;
   onPrev?: ClickHandler;
   onReject?: ClickHandler;
+  onCancel?: ClickHandler;
   isAccepting?: boolean;
   isReverting?: boolean;
   isAcceptDisabled?: boolean;
@@ -48,7 +49,7 @@ const formatCurrency = (value?: number) => {
 type StatusActionConfig = {
   prevLabel: string;
   prevIcon: 'close' | 'back';
-  prevAction: 'reject' | 'prev';
+  prevAction: 'reject' | 'prev' | 'cancel';
   nextLabel?: string;
 };
 
@@ -82,6 +83,7 @@ export default function OrderLookupCard({
   onAccept,
   onPrev,
   onReject,
+  onCancel,
   isAccepting = false,
   isReverting = false,
   isAcceptDisabled = false,
@@ -90,8 +92,17 @@ export default function OrderLookupCard({
 }: OrderLookupCardProps) {
   const cardClassName = className ? `${styles.card} ${className}` : styles.card;
 
-  const actionConfig = STATUS_ACTION_CONFIG[stat];
-  const handlePrevClick = actionConfig.prevAction === 'reject' ? onReject : onPrev;
+  const isServiceOrder = depositorName === '서비스';
+  const actionConfig: StatusActionConfig = isServiceOrder
+    ? {
+        prevLabel: '취소',
+        prevIcon: 'close',
+        prevAction: 'cancel',
+        nextLabel: undefined,
+      }
+    : STATUS_ACTION_CONFIG[stat];
+  const handlePrevClick =
+    actionConfig.prevAction === 'reject' ? onReject : actionConfig.prevAction === 'cancel' ? onCancel : onPrev;
 
   return (
     <article className={cardClassName} data-status={stat} {...rest}>

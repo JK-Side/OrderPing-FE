@@ -7,7 +7,7 @@ import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import { useAvailableMenus } from '@/pages/TableOperate/hooks/useAvailableMenus';
-import { useCreateOrder } from '@/pages/TableOperate/hooks/useCreateOrder';
+import { useCreateServiceOrder } from '@/pages/TableOperate/hooks/useCreateServiceOrder';
 import { REGEX } from '@/static/validation';
 import styles from './TableServiceModal.module.scss';
 
@@ -29,7 +29,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
   const { toast } = useToast();
 
   const { data: menus = [], isLoading } = useAvailableMenus(table?.storeId);
-  const { mutateAsync: createOrder, isPending } = useCreateOrder();
+  const { mutateAsync: createServiceOrder, isPending } = useCreateServiceOrder();
   const isOrderableTable = table?.status === 'OCCUPIED' || table?.status === 'EMPTY';
 
   const {
@@ -105,19 +105,14 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
     }
 
     try {
-      await createOrder({
+      await createServiceOrder({
         storeId: table.storeId,
         tableId: table.id,
         tableNum: table.tableNum,
-        sessionId: '1',
-        depositorName: '서비스',
-        couponAmount: 0,
         menus: [
           {
             menuId,
             quantity,
-            price: selectedMenu.price,
-            isService: true,
           },
         ],
       });

@@ -104,6 +104,7 @@ export default function StoreOrders() {
   const [pendingRejectOrder, setPendingRejectOrder] = useState<OrderCardData | null>(null);
   const [acceptingOrderId, setAcceptingOrderId] = useState<number | null>(null);
   const [revertingOrderId, setRevertingOrderId] = useState<number | null>(null);
+  const [cancelingOrderId, setCancelingOrderId] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { mutateAsync: updateOrderStatus } = useUpdateOrderStatus();
   const { mutateAsync: deleteOrder } = useDeleteOrder();
@@ -180,6 +181,35 @@ export default function StoreOrders() {
       setPendingRejectOrder(null);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleCancelService = async (order: OrderCardData) => {
+    if (cancelingOrderId === order.orderId) return;
+
+    try {
+      setCancelingOrderId(order.orderId);
+      await deleteOrder(order.orderId);
+
+      if (storeId) {
+        queryClient.setQueryData<OrderLookupResponse[]>(['orders', storeId], (prev) =>
+          prev ? prev.filter((item) => item.id !== order.orderId) : prev,
+        );
+      }
+
+      toast({
+        message: '주문이 취소되었습니다.',
+        variant: 'success',
+      });
+    } catch (error) {
+      toast({
+        message: '주문 취소에 실패했습니다.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('주문 취소에 실패했습니다.', error);
+    } finally {
+      setCancelingOrderId(null);
     }
   };
 
@@ -278,23 +308,29 @@ export default function StoreOrders() {
               {section.orders.length === 0 ? (
                 <div className={styles.emptyState}>No {section.emptyLabel} orders.</div>
               ) : (
-                section.orders.map((order) => (
-                  <OrderLookupCard
-                    key={order.id}
-                    tableNumber={order.tableNumber}
-                    depositorName={order.depositorName}
-                    depositAmount={order.depositAmount}
-                    couponAmount={order.couponAmount}
-                    onDetailClick={() => handleOpenDetail(order.orderId)}
-                    onPrev={() => handlePrev(order)}
-                    onReject={() => handleOpenReject(order)}
-                    onAccept={() => handleAccept(order)}
-                    isAccepting={acceptingOrderId === order.orderId}
-                    isReverting={revertingOrderId === order.orderId}
-                    isAcceptDisabled={!storeId || order.status === 'COMPLETE'}
-                    stat={order.status}
-                  />
-                ))
+                section.orders.map((order) => {
+                  const isServiceOrder = order.depositorName === '서비스';
+                  return (
+                    <OrderLookupCard
+                      key={order.id}
+                      tableNumber={order.tableNumber}
+                      depositorName={order.depositorName}
+                      depositAmount={order.depositAmount}
+                      couponAmount={order.couponAmount}
+                      onDetailClick={() => handleOpenDetail(order.orderId)}
+                      onPrev={() => handlePrev(order)}
+                      onReject={() => handleOpenReject(order)}
+                      onCancel={isServiceOrder ? () => handleCancelService(order) : undefined}
+                      onAccept={() => handleAccept(order)}
+                      isAccepting={acceptingOrderId === order.orderId}
+                      isReverting={
+                        isServiceOrder ? cancelingOrderId === order.orderId : revertingOrderId === order.orderId
+                      }
+                      isAcceptDisabled={!storeId || order.status === 'COMPLETE'}
+                      stat={order.status}
+                    />
+                  );
+                })
               )}
             </div>
           </div>
