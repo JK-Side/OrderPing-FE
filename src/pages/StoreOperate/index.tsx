@@ -68,8 +68,10 @@ export default function StoreOperate() {
           <MenuList menus={menuItems} />
         ) : (
           <div className={styles.emptyState}>
-            <AddMenuIcon className={styles.emptyIcon} aria-hidden="true" />
-            <p className={styles.emptyText}>메뉴를 추가해 보세요!</p>
+            <button className={styles.emptyState__title} onClick={() => id && navigate(`/store/${id}/menu/create`)}>
+              <AddMenuIcon className={styles.emptyIcon} aria-hidden="true" />
+              <p className={styles.emptyText}>메뉴를 추가해 보세요!</p>
+            </button>
           </div>
         )}
       </div>
