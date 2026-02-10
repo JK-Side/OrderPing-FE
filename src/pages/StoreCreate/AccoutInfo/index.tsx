@@ -81,27 +81,15 @@ export default function AccoutInfo({ register, control, errors, onSubmit }: Acco
             />
           </Input>
 
-          <Input
-            label="계좌번호"
-            required
-            message="입력한 계좌 정보는 주점 정산 용도로만 사용돼요"
-            messageState="info"
-            // message={errors.accountNumber?.message}
-            // messageState={errors.accountNumber ? 'error' : undefined}
-          >
+          <Input label="계좌번호" required message="입력한 계좌 정보는 주점 정산 용도로만 사용돼요" messageState="info">
             <Input.Text
-              placeholder="계좌번호를 입력해 주세요."
+              placeholder="계좌번호를 숫자만 입력해 주세요."
               inputMode="numeric"
               {...register('accountNumber', {
                 required: '계좌번호를 입력해 주세요.',
               })}
             />
           </Input>
-
-          {/* <div className={styles.infoRow}>
-            <InfoIcon className={styles.infoIcon} aria-hidden="true" />
-            <span>입력한 계좌 정보는 주점 정산 용도로만 사용돼요</span>
-          </div> */}
 
           <div className={styles.qrSection}>
             <h3 className={styles.qrTitle}>토스 QR 코드 등록</h3>
@@ -116,7 +104,7 @@ export default function AccoutInfo({ register, control, errors, onSubmit }: Acco
                 </>
               )}
             </label>
-            <button type="button" className={styles.qrHelp}>
+            <button type="button" className={styles.qrHelp} onClick={() => {}}>
               <InfoIcon className={styles.qrHelpIcon} aria-hidden="true" />
               토스 QR 코드 추가하는 법
             </button>
