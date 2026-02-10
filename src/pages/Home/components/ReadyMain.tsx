@@ -34,7 +34,7 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
         <div className={styles.cardColumn}>
           <div className={styles.storeCard}>
             <h3 className={styles.storeTitle}>
-              <span className={styles.storeName}>{storeName}</span> 주점
+              <span className={styles.storeName}>{storeName}</span>
             </h3>
             <div className={styles.storeImageWrap}>
               <img className={styles.storeImage} src={storeImage} alt={`${storeName} 주점`} />

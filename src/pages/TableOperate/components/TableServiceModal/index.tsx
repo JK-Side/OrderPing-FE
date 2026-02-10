@@ -30,6 +30,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
 
   const { data: menus = [], isLoading } = useAvailableMenus(table?.storeId);
   const { mutateAsync: createOrder, isPending } = useCreateOrder();
+  const isOrderableTable = table?.status === 'OCCUPIED' || table?.status === 'EMPTY';
 
   const {
     control,
@@ -73,7 +74,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
   };
 
   const handleSubmitForm: SubmitHandler<ServiceAddForm> = async (data) => {
-    if (!table) return;
+    if (!table || !isOrderableTable) return;
 
     const menuId = Number(data.menuId);
     const quantity = Number(data.quantity);
@@ -167,7 +168,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
                       onValueChange={field.onChange}
                       options={menuOptions}
                       placeholder={selectPlaceholder}
-                      disabled={isLoading || !hasSelectableMenu}
+                      disabled={isLoading || !hasSelectableMenu || !isOrderableTable}
                       required
                     />
                   )}
@@ -184,6 +185,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
                   type="text"
                   inputMode="numeric"
                   placeholder="수량을 숫자로 입력해 주세요. ex) 1"
+                  disabled={!isOrderableTable}
                   {...register('quantity', {
                     required: '수량을 입력해 주세요.',
                     pattern: {
@@ -200,7 +202,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
               <Button
                 type="submit"
                 className={styles.footerButton}
-                disabled={!isValid || isSubmitting || isPending || !hasSelectableMenu}
+                disabled={!isValid || isSubmitting || isPending || !hasSelectableMenu || !isOrderableTable}
                 isLoading={isSubmitting || isPending}
               >
                 서비스 추가

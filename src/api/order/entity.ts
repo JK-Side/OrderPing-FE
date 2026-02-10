@@ -52,6 +52,7 @@ export interface OrderDetailResponse extends OrderResponse {
 export interface OrderLookupResponse {
   id: number;
   tableId: number;
+  tableNum: number;
   storeId: number;
   depositorName: string;
   status: OrderStatus;

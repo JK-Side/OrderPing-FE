@@ -17,16 +17,12 @@ export default function EmptyMain() {
         <p className={styles.subtitle}>주점을 클릭해 운영을 시작해 보세요!</p>
       </div>
 
-      <button
-        type="button"
-        className={styles.panel}
-        onClick={() => navigate('/store/create')}
-      >
-        <div className={styles.createBox}>
+      <div className={styles.panel}>
+        <button className={styles.createBox} onClick={() => navigate('/store/create')}>
           <PlusIcon width={32} height={32} fill="#8e8e93" />
-        </div>
+        </button>
         <p className={styles.panelText}>주점을 생성해 보세요!</p>
-      </button>
+      </div>
     </section>
   );
 }
