@@ -1,0 +1,78 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.storeOperate {
+  width: 100%;
+  padding: 80px 80px 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.emptyState {
+  width: 100%;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+
+  &__title {
+    border: none;
+    cursor: pointer;
+  }
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  color: $primary-50;
+}
+
+.emptyIcon path {
+  fill: currentColor;
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $gray-70;
+}
+
+.errorIcon {
+  width: 48px;
+  height: 48px;
+  color: $primary-50;
+}
+
+.errorIcon path {
+  fill: currentColor;
+}
+
+.errorText {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $gray-70;
+}
+
+@media (max-width: 900px) {
+  .storeOperate {
+    padding: 56px 24px 80px;
+  }
+
+  .panel {
+    gap: 72px;
+  }
+
+  .emptyState {
+    min-height: 240px;
+  }
+}

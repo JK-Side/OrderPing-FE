@@ -1,0 +1,131 @@
+﻿@use '@order-ping/shared/styles/colors' as *;
+
+.card {
+  min-width: 200px;
+  max-width: 250px;
+  min-height: 180px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid $primary-50;
+  background-color: $white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tableNumber {
+  font-size: 14px;
+  font-weight: 400;
+  color: $black;
+}
+
+.detailButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  font-size: 14px;
+  font-weight: 400;
+  color: $black;
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.detailIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.depositorName {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: $black;
+}
+
+.amountList {
+  display: flex;
+  flex-direction: column;
+}
+
+.amountRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.amountLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: $gray-60;
+}
+
+.amountValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: $red-50;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.actionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 12px;
+}
+
+.rejectButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $gray-20;
+  color: $grayscale-80;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 8px;
+  gap: 6px;
+  font-weight: 600;
+
+  &:hover:not(:disabled) {
+    background-color: $gray-30;
+  }
+}
+
+.actionIcon {
+  width: 14px;
+  height: 14px;
+}
+
+.actionIcon path {
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+.rejectIcon {
+  width: 17px;
+  height: 17px;
+  color: $grayscale-80;
+}

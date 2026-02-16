@@ -1,0 +1,167 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+
+  &:focus-visible {
+    outline-offset: 2px;
+  }
+}
+
+/* =========================
+    Sizes
+========================= */
+.sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 14px;
+}
+
+.md {
+  height: 40px;
+  padding: 0 16px;
+  font-size: 15px;
+}
+
+.lg {
+  height: 48px;
+  padding: 0 20px;
+  font-size: 16px;
+}
+
+/* =========================
+    Variants
+========================= */
+.primary {
+  background: $primary-50;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $primary-60;
+  }
+
+  &:active:not(:disabled) {
+    background: $primary-70;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $primary-20;
+  }
+
+  &:disabled {
+    background: $gray-20;
+    color: $grayscale-50;
+  }
+}
+
+.ghost {
+  background: $white;
+  color: $primary-50;
+  border: 1px solid $primary-50;
+
+  &:hover:not(:disabled) {
+    background: $primary-10;
+  }
+
+  &:active:not(:disabled) {
+    background: $primary-20;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $primary-20;
+  }
+
+  &:disabled {
+    background: $white;
+    border-color: $gray-20;
+    color: $grayscale-50;
+  }
+}
+
+.danger {
+  background: $red-50;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $red-60;
+  }
+
+  &:active:not(:disabled) {
+    background: $red-70;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $red-20;
+  }
+
+  &:disabled {
+    background: $gray-20;
+    color: $grayscale-50;
+  }
+}
+
+.secondary {
+  background: $grayscale-80;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $grayscale-60;
+  }
+
+  &:active:not(:disabled) {
+    background: $grayscale-90;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $primary-20;
+  }
+
+  &:disabled {
+    background: $gray-20;
+    color: $grayscale-50;
+  }
+}
+
+/* =========================
+    Utils
+========================= */
+.fullWidth {
+  width: 100%;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
+.loadingContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: button-spin 0.8s linear infinite;
+}
+
+@keyframes button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

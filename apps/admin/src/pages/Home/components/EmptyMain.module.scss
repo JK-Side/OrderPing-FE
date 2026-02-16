@@ -1,0 +1,75 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.emptyMain {
+  padding: 60px 80px 120px;
+  display: flex;
+  flex-direction: column;
+}
+
+.greeting {
+  max-width: 520px;
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: 26px;
+  line-height: 1.35;
+  font-weight: 700;
+  color: $gray-90;
+}
+
+.highlight {
+  color: $primary-50;
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.8;
+  color: $gray-60;
+}
+
+.panel {
+  margin-top: 120px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.panel:focus-visible {
+  outline: 3px solid $primary-20;
+  outline-offset: 6px;
+  border-radius: 18px;
+}
+
+.createBox {
+  width: 250px;
+  height: 250px;
+  border: 2px dashed $gray-20;
+  border-radius: 16px;
+  background-color: $grayscale-10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.panelText {
+  margin: 0;
+  font-size: 18px;
+  color: $black;
+}
+
+@media (max-width: 900px) {
+  .emptyMain {
+    padding: 56px 24px 80px;
+  }
+
+  .panel {
+    margin-top: 72px;
+  }
+}
