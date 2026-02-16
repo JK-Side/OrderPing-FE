@@ -1,0 +1,42 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.triggerButton.triggerButton {
+  gap: 8px;
+}
+
+.triggerIcon {
+  width: 18px;
+  height: 18px;
+  color: inherit;
+}
+
+.triggerIcon path {
+  fill: currentColor;
+}
+
+.retryNotice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: $gray-10;
+  color: $primary-50;
+}
+
+.retryText {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.retryButton {
+  flex-shrink: 0;
+}

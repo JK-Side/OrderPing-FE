@@ -1,0 +1,174 @@
+﻿@use '@order-ping/shared/styles/colors' as *;
+
+.modalContent {
+  width: 460px;
+  background-color: $white;
+  border-radius: 20px;
+}
+
+.headerContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.orderBadge {
+  padding: 5px 8px;
+  border-radius: 4px;
+  background-color: $primary-50;
+  color: $white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tableTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: $black;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  padding: 30px 24px;
+}
+
+.menuTable {
+  width: 100%;
+  display: grid;
+  gap: 12px;
+}
+
+.menuHeader,
+.menuRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 50px 90px;
+  align-items: center;
+  column-gap: 16px;
+
+  &__title {
+    text-align: center;
+  }
+}
+
+.menuHeader {
+  font-size: 18px;
+  font-weight: 500;
+  color: $black;
+}
+
+.menuRow {
+  font-size: 14px;
+  color: $black;
+}
+
+.menuName {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.menuQuantity {
+  text-align: right;
+}
+
+.menuPrice {
+  text-align: right;
+  color: $red-50;
+  font-weight: 600;
+}
+
+.menuHeaderPrice {
+  text-align: right;
+  color: $black;
+  font-weight: 500;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-group {
+  display: flex;
+  flex-direction: column;
+
+  &__value {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__detail {
+    display: flex;
+    flex-direction: column;
+    padding-left: 8px;
+  }
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: $gray-50;
+
+  &__strong {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: $black;
+  }
+}
+
+.summaryValue {
+  font-weight: 600;
+  color: $black;
+}
+
+.summaryValueAccent {
+  color: $red-50;
+  font-weight: 600;
+}
+
+.footer {
+  padding: 20px 36px 28px;
+}
+
+.footerButtons {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.footerButton {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .body {
+    padding: 24px;
+  }
+
+  .menuHeader,
+  .menuRow {
+    grid-template-columns: minmax(0, 1fr) 56px 90px;
+    column-gap: 10px;
+  }
+
+  .footer {
+    padding: 20px 24px 24px;
+  }
+
+  .footerButtons {
+    flex-direction: column;
+  }
+}

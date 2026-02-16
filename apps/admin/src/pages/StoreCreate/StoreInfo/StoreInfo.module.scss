@@ -1,0 +1,158 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.header {
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mainTitle {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  color: $gray-90;
+}
+
+.mainSubtitle {
+  margin: 0;
+  font-size: 14px;
+  color: $gray-60;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: $gray-90;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.imageField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: $gray-80;
+}
+
+.imageUpload {
+  height: 200px;
+  border-radius: 8px;
+  border: 2px dashed $gray-20;
+  background: $grayscale-10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: $gray-50;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.imageUploadDragging {
+  border-color: $primary-40;
+  background: $primary-10;
+  color: $primary-60;
+}
+
+.uploadIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.uploadIcon path {
+  fill: $gray-40;
+}
+
+.imageUploadDragging .uploadIcon path {
+  fill: $primary-60;
+}
+
+.previewImage {
+  width: 200px;
+  height: 200px;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+.previewOverlay {
+  position: relative;
+  z-index: 1;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: $white;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.previewRemove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: $white;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.previewRemoveIcon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.previewRemoveIcon path {
+  fill: $white;
+}
+
+.previewRemove:focus-visible {
+  outline: 2px solid $white;
+  outline-offset: 2px;
+}
+
+.buttonContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.nextButton {
+  width: 320px;
+  margin-top: 30px;
+}
+
+@media (max-width: 900px) {
+  .nextButton {
+    width: 100%;
+  }
+}
