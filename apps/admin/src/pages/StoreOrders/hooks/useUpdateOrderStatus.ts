@@ -1,6 +1,6 @@
-import { patchOrderStatus } from '@order-ping/shared/api/order';
 import { useMutation } from '@tanstack/react-query';
-import type { OrderResponse, UpdateOrderStatusRequest } from '@order-ping/shared/api/order/entity';
+import { patchOrderStatus } from '@/api/order';
+import type { OrderResponse, UpdateOrderStatusRequest } from '@/api/order/entity';
 
 interface UpdateOrderStatusVariables {
   id: number;

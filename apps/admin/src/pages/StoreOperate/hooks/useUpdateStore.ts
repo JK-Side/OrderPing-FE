@@ -1,6 +1,6 @@
-import { putStoreById } from '@order-ping/shared/api/store';
 import { useMutation } from '@tanstack/react-query';
-import type { StoreDetailResponse, UpdateStoreRequest } from '@order-ping/shared/api/store/entity';
+import { putStoreById } from '@/api/store';
+import type { StoreDetailResponse, UpdateStoreRequest } from '@/api/store/entity';
 
 interface UpdateStoreVariables {
   storeId: number;

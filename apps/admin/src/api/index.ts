@@ -1,6 +1,6 @@
-import { RefreshResponse } from '@order-ping/shared/api/auth/entity';
-import { useAuthStore } from '@order-ping/shared/stores/auth';
-import { redirectToLogin } from '@order-ping/shared/utils/ts/auth';
+import { useAuthStore } from '@/stores/auth';
+import { redirectToLogin } from '@/utils/ts/auth';
+import { RefreshResponse } from './auth/entity';
 
 const BASE_URL = import.meta.env.VITE_API_PATH;
 

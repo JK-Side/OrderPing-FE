@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { useForm, type SubmitHandler } from 'react-hook-form';
+import type { AllTableListResponse } from '@/api/table/entity';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -13,7 +14,6 @@ import { useUpdateTableQrImages } from '@/pages/TableOperate/hooks/useUpdateTabl
 import { MESSAGES, REGEX } from '@/static/validation';
 import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
 import styles from './TableCreateModal.module.scss';
-import type { AllTableListResponse } from '@order-ping/shared/api/table/entity';
 
 const QR_IMAGE_SIZE = 256;
 const QR_S3_DIRECTORY = 'tables';

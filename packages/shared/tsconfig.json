@@ -15,5 +15,11 @@
     "noEmit": true,
     "types": ["vite/client"] // 'import.meta.env' 자동완성을 위해 추가
   },
-  "include": ["src"]
+  "include": [
+    "src",
+    "../../apps/admin/src/utils/hooks/useAuth.ts",
+    "../../apps/admin/src/utils/hooks/useAuthInit.ts",
+    "../../apps/admin/src/utils/ts/auth.ts",
+    "../../apps/admin/src/stores"
+  ]
 }

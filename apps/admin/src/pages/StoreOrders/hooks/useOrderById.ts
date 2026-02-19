@@ -1,6 +1,6 @@
-import { getOrderById } from '@order-ping/shared/api/order';
-import { useAuth } from '@order-ping/shared/utils/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
+import { getOrderById } from '@/api/order';
+import { useAuth } from '@/utils/hooks/useAuth';
 
 export const useOrderById = (orderId?: number) => {
   const { token } = useAuth();

@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import type { TableResponse } from '@/api/table/entity';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
@@ -13,7 +14,6 @@ import TableServiceModal from '@/pages/TableOperate/components/TableServiceModal
 import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
-import type { TableResponse } from '@order-ping/shared/api/table/entity';
 
 const ORDER_STATUS_PRIORITY = ['PENDING', 'COOKING', 'COMPLETE'] as const;
 

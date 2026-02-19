@@ -1,6 +1,6 @@
-import { postCreatedMenu } from '@order-ping/shared/api/menu';
 import { useMutation } from '@tanstack/react-query';
-import type { CreateMenuRequest, CreateMenuResponse } from '@order-ping/shared/api/menu/entity';
+import { postCreatedMenu } from '@/api/menu';
+import type { CreateMenuRequest, CreateMenuResponse } from '@/api/menu/entity';
 
 export const useCreateMenu = () => {
   return useMutation<CreateMenuResponse, Error, CreateMenuRequest>({

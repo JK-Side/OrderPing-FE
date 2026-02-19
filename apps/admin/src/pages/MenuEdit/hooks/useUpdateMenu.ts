@@ -1,6 +1,6 @@
-import { putMenuById } from '@order-ping/shared/api/menu';
 import { useMutation } from '@tanstack/react-query';
-import type { UpdateMenuRequest, UpdateMenuResponse } from '@order-ping/shared/api/menu/entity';
+import { putMenuById } from '@/api/menu';
+import type { UpdateMenuRequest, UpdateMenuResponse } from '@/api/menu/entity';
 
 interface UpdateMenuVariables {
   menuId: number;

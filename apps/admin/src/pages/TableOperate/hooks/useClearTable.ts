@@ -1,6 +1,6 @@
-import { postClearTable } from '@order-ping/shared/api/table';
 import { useMutation } from '@tanstack/react-query';
-import type { TableResponse } from '@order-ping/shared/api/table/entity';
+import { postClearTable } from '@/api/table';
+import type { TableResponse } from '@/api/table/entity';
 
 export const useClearTable = () => {
   return useMutation<TableResponse, Error, number>({

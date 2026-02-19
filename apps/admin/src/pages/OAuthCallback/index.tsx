@@ -1,6 +1,6 @@
-import { useAuthStore } from '@order-ping/shared/stores/auth';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/stores/auth';
 
 export default function OAuthCallback() {
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-import { useAuthStore } from '@order-ping/shared/stores/auth';
+import { useAuthStore } from '@/stores/auth';
 
 const LOGIN_URL = import.meta.env.VITE_KAKAO_LOGIN;
 

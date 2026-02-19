@@ -1,5 +1,5 @@
-import { deleteOrderById } from '@order-ping/shared/api/order';
 import { useMutation } from '@tanstack/react-query';
+import { deleteOrderById } from '@/api/order';
 
 export const useDeleteOrder = () => {
   return useMutation<void, Error, number>({

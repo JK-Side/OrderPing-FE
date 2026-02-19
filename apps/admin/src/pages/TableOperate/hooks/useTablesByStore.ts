@@ -1,7 +1,7 @@
-import { getTablesByStore } from '@order-ping/shared/api/table';
-import { useAuth } from '@order-ping/shared/utils/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
-import type { TableStatus } from '@order-ping/shared/api/table/entity';
+import { getTablesByStore } from '@/api/table';
+import type { TableStatus } from '@/api/table/entity';
+import { useAuth } from '@/utils/hooks/useAuth';
 
 export const useTablesByStore = (storeId?: number, status?: TableStatus) => {
   const { token } = useAuth();

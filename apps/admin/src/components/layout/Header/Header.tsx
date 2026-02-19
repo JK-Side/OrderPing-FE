@@ -1,7 +1,7 @@
-﻿import { postLogout } from '@order-ping/shared';
-import { useAuth } from '@order-ping/shared/utils/hooks/useAuth';
-import { Link, useLocation } from 'react-router-dom';
+﻿import { Link, useLocation } from 'react-router-dom';
+import { postLogout } from '@/api/auth/';
 import OrderPingLogo from '@/assets/logo/ORDERPING_LOGO_TEXT.png';
+import { useAuth } from '@/utils/hooks/useAuth';
 import styles from './Header.module.scss';
 
 const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;

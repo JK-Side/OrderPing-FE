@@ -1,6 +1,6 @@
-import { getMenusByCategory } from '@order-ping/shared/api/menu';
-import { useAuth } from '@order-ping/shared/utils/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
+import { getMenusByCategory } from '@/api/menu';
+import { useAuth } from '@/utils/hooks/useAuth';
 
 export const useMenusByCategory = (storeId?: number, categoryId?: number) => {
   const { token } = useAuth();

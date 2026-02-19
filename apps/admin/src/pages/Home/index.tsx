@@ -1,4 +1,4 @@
-import { useAuth } from '@order-ping/shared/utils/hooks/useAuth';
+import { useAuth } from '@/utils/hooks/useAuth';
 import AuthedHome from './components/AuthedHome';
 import GuestHome from './components/GuestHome';
 

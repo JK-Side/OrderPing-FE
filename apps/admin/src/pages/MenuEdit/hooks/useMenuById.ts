@@ -1,6 +1,6 @@
-import { getMenuById } from '@order-ping/shared/api/menu';
-import { useAuth } from '@order-ping/shared/utils/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
+import { getMenuById } from '@/api/menu';
+import { useAuth } from '@/utils/hooks/useAuth';
 
 export const useMenuById = (menuId?: number) => {
   const { token } = useAuth();

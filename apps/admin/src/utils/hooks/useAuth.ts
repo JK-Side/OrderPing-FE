@@ -1,4 +1,4 @@
-import { useAuthStore } from '@order-ping/shared/stores/auth';
+import { useAuthStore } from '@/stores/auth';
 
 export const useAuth = () => {
   const accessToken = useAuthStore((state) => state.accessToken);

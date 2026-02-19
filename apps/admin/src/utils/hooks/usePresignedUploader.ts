@@ -1,5 +1,5 @@
-import { postPresignedUrl } from '@order-ping/shared/api/store';
 import { useCallback } from 'react';
+import { postPresignedUrl } from '@/api/store';
 
 interface UploadOptions {
   directory: string;
