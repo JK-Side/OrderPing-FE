@@ -16,16 +16,12 @@ interface OrderMenu {
 }
 
 export interface CreateCustomerOrderResponse {
-  id: number;
   tableId: number;
   tableNum: number;
   storeId: number;
   depositorName: string;
-  status: OrderStatus;
-  totalPrice: number;
   couponAmount: number;
-  cashAmount: number;
-  createdAt: string;
+  menus: OrderMenu[];
 }
 
 export interface CustomerStoreOrderMenu {
@@ -73,4 +69,27 @@ export interface CustomerMenuDetailResponse {
   description: string;
   imageUrl: string;
   isSoldOut: boolean;
+}
+
+export interface CustomerOrderLookupMenu {
+  menuId: number;
+  menuName: string;
+  quantity: number;
+  price: number;
+  isService: boolean;
+}
+
+// GET /api/customer/orders/table/{tableId}
+export interface CustomerOrderLookup {
+  id: number;
+  tableId: number;
+  tableNum: number;
+  storeId: number;
+  depositorName: string;
+  status: OrderStatus;
+  totalPrice: number;
+  couponAmount: number;
+  cashAmount: number;
+  createdAt: string;
+  menus: CustomerOrderLookupMenu[];
 }

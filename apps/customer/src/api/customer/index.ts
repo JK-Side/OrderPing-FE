@@ -3,6 +3,7 @@ import type {
   CreateCustomerOrderRequest,
   CreateCustomerOrderResponse,
   CustomerMenuDetailResponse,
+  CustomerOrderLookup,
   CustomerTableMenuResponse,
 } from './entity';
 
@@ -23,5 +24,11 @@ export const getTableMenusByTableId = async (tableId: number) => {
 export const getMenuDetailByMenuId = async (menuId: number) => {
   return await apiClient.get<CustomerMenuDetailResponse>(
     `/api/customer/menus/details/${menuId}`,
+  );
+};
+
+export const getCustomerOrdersByTableId = async (tableId: number) => {
+  return await apiClient.get<CustomerOrderLookup[]>(
+    `/api/customer/orders/table/${tableId}`,
   );
 };

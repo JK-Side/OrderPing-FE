@@ -1,15 +1,19 @@
-import { getMenuDetailByMenuId } from "../../api/customer";
-import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import BackIcon from "@/assets/icons/back.svg?react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "./MenuDetail.module.scss";
+﻿import BackIcon from '@/assets/icons/back.svg?react';
+import { getMenuDetailByMenuId } from '../../api/customer';
+import { useToast } from '../../components/Toast/useToast';
+import { useCart } from '../../stores/cart';
+import { useQuery } from '@tanstack/react-query';
+import { useMemo, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styles from './MenuDetail.module.scss';
 
-const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
+const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
 export default function MenuDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { addMenu } = useCart();
   const { menuId: menuIdParam } = useParams<{ menuId: string }>();
   const [searchParams] = useSearchParams();
 
@@ -18,19 +22,18 @@ export default function MenuDetailPage() {
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }, [menuIdParam]);
 
-  const tableId = searchParams.get("tableId");
+  const tableId = searchParams.get('tableId');
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["customer", "menu-detail", menuId],
+    queryKey: ['customer', 'menu-detail', menuId],
     queryFn: () => getMenuDetailByMenuId(menuId as number),
     enabled: menuId !== null,
   });
 
-  const hasNotFoundError =
-    (error as { status?: number } | null)?.status === 404;
+  const hasNotFoundError = (error as { status?: number } | null)?.status === 404;
 
-  const goBack = () => {
-    navigate(tableId ? `/?tableId=${tableId}` : "/");
+  const backToMenu = () => {
+    navigate(tableId ? `/?tableId=${tableId}` : '/');
   };
 
   const increaseQuantity = () => {
@@ -41,16 +44,34 @@ export default function MenuDetailPage() {
     setQuantity((prev) => Math.max(prev - 1, 1));
   };
 
+  const handleAddToCart = () => {
+    if (!data || data.isSoldOut) return;
+
+    addMenu(
+      {
+        menuId: data.id,
+        name: data.name,
+        price: data.price,
+        imageUrl: data.imageUrl,
+      },
+      quantity,
+    );
+
+    toast({
+      message: '장바구니에 메뉴를 추가했어요',
+      variant: 'success',
+      duration: 3000,
+    });
+
+    navigate(tableId ? `/?tableId=${tableId}` : '/');
+  };
+
   const totalPrice = (data?.price ?? 0) * quantity;
 
   return (
     <main className={styles.menuDetail}>
       <header className={styles.menuDetail__header}>
-        <button
-          type="button"
-          className={styles.menuDetail__backButton}
-          onClick={goBack}
-        >
+        <button type="button" className={styles.menuDetail__backButton} onClick={backToMenu}>
           <BackIcon />
         </button>
         <button type="button" className={styles.menuDetail__historyButton}>
@@ -58,51 +79,33 @@ export default function MenuDetailPage() {
         </button>
       </header>
 
-      {!menuId ? (
-        <div className={styles.menuDetail__status}>
-          유효하지 않은 메뉴 ID예요.
-        </div>
-      ) : null}
+      {!menuId ? <div className={styles.menuDetail__status}>유효하지 않은 메뉴예요.</div> : null}
       {menuId && isLoading ? (
-        <div className={styles.menuDetail__status}>
-          메뉴 정보를 불러오는 중입니다.
-        </div>
+        <div className={styles.menuDetail__status}>메뉴 정보를 불러오는 중...</div>
       ) : null}
       {menuId && !isLoading && hasNotFoundError ? (
         <div className={styles.menuDetail__status}>메뉴를 찾을 수 없어요.</div>
       ) : null}
       {menuId && !isLoading && !hasNotFoundError && error ? (
-        <div className={styles.menuDetail__status}>
-          메뉴 정보를 불러오지 못했어요.
-        </div>
+        <div className={styles.menuDetail__status}>메뉴 정보를 불러오지 못했어요.</div>
       ) : null}
 
       {menuId && !isLoading && !error && data ? (
         <>
           <section className={styles.menuDetail__imageWrap}>
             {data.imageUrl ? (
-              <img
-                src={data.imageUrl}
-                alt={data.name}
-                className={styles.menuDetail__image}
-              />
+              <img src={data.imageUrl} alt={data.name} className={styles.menuDetail__image} />
             ) : (
-              <div className={styles.menuDetail__imageFallback}>
-                이미지 준비 중
-              </div>
+              <div className={styles.menuDetail__imageFallback}>이미지가 없어요.</div>
             )}
           </section>
 
           <section className={styles.menuDetail__content}>
             <div className={styles.menuDetail__name}>{data.name}</div>
-            <div className={styles.menuDetail__description}>
-              {data.description}
-            </div>
+            <div className={styles.menuDetail__description}>{data.description}</div>
 
             <div className={styles.menuDetail__priceRow}>
-              <span className={styles.menuDetail__price}>
-                {formatPrice(data.price)}
-              </span>
+              <span className={styles.menuDetail__price}>{formatPrice(data.price)}</span>
               <div className={styles.menuDetail__quantityControl}>
                 <button
                   type="button"
@@ -112,9 +115,7 @@ export default function MenuDetailPage() {
                 >
                   -
                 </button>
-                <span className={styles.menuDetail__quantityValue}>
-                  {quantity}
-                </span>
+                <span className={styles.menuDetail__quantityValue}>{quantity}</span>
                 <button
                   type="button"
                   className={styles.menuDetail__quantityButton}
@@ -131,15 +132,14 @@ export default function MenuDetailPage() {
             <button
               type="button"
               className={styles.menuDetail__addButton}
+              onClick={handleAddToCart}
               disabled={data.isSoldOut}
             >
               {data.isSoldOut ? (
-                "품절된 메뉴입니다"
+                '품절'
               ) : (
                 <>
-                  <span className={styles.menuDetail__quantity}>
-                    {quantity}
-                  </span>
+                  <span className={styles.menuDetail__quantity}>{quantity}</span>
                   {`${formatPrice(totalPrice)} 담기`}
                 </>
               )}
