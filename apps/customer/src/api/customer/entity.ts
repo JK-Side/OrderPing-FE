@@ -62,3 +62,15 @@ export interface CustomerTableMenuResponse {
   categories: CustomerStoreOrderCategory[];
   account: CustomerTableMenuAccount;
 }
+
+// GET /api/customer/menus/details/{menuId}
+export interface CustomerMenuDetailResponse {
+  id: number;
+  storeId: number;
+  categoryId: number;
+  name: string;
+  price: number;
+  description: string;
+  imageUrl: string;
+  isSoldOut: boolean;
+}
