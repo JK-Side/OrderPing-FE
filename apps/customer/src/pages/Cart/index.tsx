@@ -1,23 +1,35 @@
-﻿import BackIcon from '@/assets/icons/back.svg?react';
-import { useEffect, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useCart } from '../../stores/cart';
-import styles from './Cart.module.scss';
+﻿import BackIcon from "@/assets/icons/back.svg?react";
+import QuantityControl from "../../components/QuantityControl";
+import { useEffect, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import CloseIcon from "@/assets/icons/close.svg?react";
+import { useCart } from "../../stores/cart";
+import styles from "./Cart.module.scss";
 
-const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
+const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
 
 export default function CartPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const tableId = searchParams.get('tableId');
+  const tableId = searchParams.get("tableId");
   const tableIdNumber = useMemo(() => {
     const parsed = Number(tableId);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }, [tableId]);
 
-  const { items, totalPrice, totalQuantity, removeMenu, setMenuQuantity, setActiveTable } = useCart();
+  const {
+    items,
+    totalPrice,
+    totalQuantity,
+    removeMenu,
+    setMenuQuantity,
+    setActiveTable,
+  } = useCart();
 
-  const backToMenuUrl = useMemo(() => (tableId ? `/?tableId=${tableId}` : '/'), [tableId]);
+  const backToMenuUrl = useMemo(
+    () => (tableId ? `/?tableId=${tableId}` : "/"),
+    [tableId],
+  );
 
   useEffect(() => {
     setActiveTable(tableIdNumber);
@@ -26,10 +38,14 @@ export default function CartPage() {
   return (
     <main className={styles.cart}>
       <header className={styles.cart__header}>
-        <button type="button" className={styles.cart__backButton} onClick={() => navigate(backToMenuUrl)}>
+        <button
+          type="button"
+          className={styles.cart__backButton}
+          onClick={() => navigate(backToMenuUrl)}
+        >
           <BackIcon />
         </button>
-        <h1 className={styles.cart__title}>장바구니</h1>
+        <div className={styles.cart__title}>장바구니</div>
         <div className={styles.cart__spacer} />
       </header>
 
@@ -40,39 +56,45 @@ export default function CartPage() {
           <>
             {items.map((item) => (
               <article key={item.menuId} className={styles.cart__item}>
-                <button
-                  type="button"
-                  className={styles.cart__removeButton}
-                  onClick={() => removeMenu(item.menuId)}
-                  aria-label={`${item.name} 삭제`}
-                >
-                  x
-                </button>
+                <div className={styles.cart__infoContainer}>
+                  <div className={styles.cart__itemContainer}>
+                    <div className={styles.cart__itemName}>{item.name}</div>
+                    <div className={styles.cart__itemPrice}>
+                      {formatPrice(item.price)}
+                    </div>
+                  </div>
 
-                <h2 className={styles.cart__itemName}>{item.name}</h2>
-                <p className={styles.cart__itemPrice}>{formatPrice(item.price)}</p>
-
-                <div className={styles.cart__quantityControl}>
                   <button
                     type="button"
-                    className={styles.cart__quantityButton}
-                    onClick={() => setMenuQuantity(item.menuId, Math.max(item.quantity - 1, 1))}
+                    className={styles.cart__removeButton}
+                    onClick={() => removeMenu(item.menuId)}
+                    aria-label={`${item.name} 삭제`}
                   >
-                    -
-                  </button>
-                  <span className={styles.cart__quantityValue}>{item.quantity}</span>
-                  <button
-                    type="button"
-                    className={styles.cart__quantityButton}
-                    onClick={() => setMenuQuantity(item.menuId, Math.min(item.quantity + 1, 99))}
-                  >
-                    +
+                    <CloseIcon fill="#fff" width={16} height={16} />
                   </button>
                 </div>
+
+                <QuantityControl
+                  className={styles.cart__quantityControl}
+                  value={item.quantity}
+                  onDecrease={() =>
+                    setMenuQuantity(item.menuId, Math.max(item.quantity - 1, 1))
+                  }
+                  onIncrease={() =>
+                    setMenuQuantity(
+                      item.menuId,
+                      Math.min(item.quantity + 1, 99),
+                    )
+                  }
+                />
               </article>
             ))}
 
-            <button type="button" className={styles.cart__addMoreButton} onClick={() => navigate(backToMenuUrl)}>
+            <button
+              type="button"
+              className={styles.cart__addMoreButton}
+              onClick={() => navigate(backToMenuUrl)}
+            >
               메뉴 더 추가 +
             </button>
           </>
@@ -80,7 +102,11 @@ export default function CartPage() {
       </section>
 
       <footer className={styles.cart__bottom}>
-        <button type="button" className={styles.cart__orderButton} disabled={items.length === 0}>
+        <button
+          type="button"
+          className={styles.cart__orderButton}
+          disabled={items.length === 0}
+        >
           <span className={styles.cart__orderCount}>{totalQuantity}</span>
           <span>{`${formatPrice(totalPrice)} 주문하기`}</span>
         </button>

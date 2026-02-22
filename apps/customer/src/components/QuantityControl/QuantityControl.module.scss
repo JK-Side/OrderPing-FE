@@ -1,0 +1,62 @@
+﻿@use "@order-ping/shared/styles/colors" as *;
+
+.quantityControl {
+  max-width: 146px;
+  height: 56px;
+  padding: 0 8px;
+  border-radius: 16px;
+  background-color: $gray-10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  user-select: none;
+
+  &__button {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    color: $gray-80;
+    background-color: transparent;
+    font-size: 24px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+      background-color 120ms ease,
+      color 120ms ease,
+      transform 80ms ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    &--pressed {
+      background-color: $gray-20;
+      transform: scale(0.97);
+    }
+
+    &--blocked {
+      color: $gray-40;
+      background-color: transparent;
+    }
+  }
+
+  &__value {
+    width: 52px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid $gray-20;
+    color: $gray-90;
+    background-color: $white;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

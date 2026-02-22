@@ -1,4 +1,4 @@
-@use "../../../../../packages/shared/src/styles/colors" as *;
+@use "@order-ping/shared/styles/colors" as *;
 
 .cart {
   width: 100%;
@@ -36,7 +36,7 @@
     margin: 0;
     color: $black;
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 600;
   }
 
   &__spacer {
@@ -61,85 +61,52 @@
     border-top: 1px solid $gray-10;
   }
 
+  &__infoContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+
   &__removeButton {
-    position: absolute;
-    top: 14px;
-    right: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 26px;
     height: 26px;
     border-radius: 13px;
     color: $white;
-    background-color: $gray-30;
+    background-color: $gray-20;
     font-size: 16px;
-    line-height: 1;
     cursor: pointer;
   }
 
   &__itemName {
-    margin: 0;
     color: $black;
-    font-size: 17px;
-    font-weight: 700;
-    word-break: keep-all;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__itemPrice {
-    margin: 6px 0 0;
     color: $black;
-    font-size: 34px;
+    font-size: 16px;
     font-weight: 700;
   }
 
   &__quantityControl {
     margin-top: 10px;
     margin-left: auto;
-    width: 148px;
-    height: 52px;
-    padding: 0 8px;
-    border-radius: 16px;
-    background-color: $gray-10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  &__quantityButton {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    color: $gray-80;
-    background-color: transparent;
-    font-size: 24px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-
-  &__quantityValue {
-    width: 52px;
-    height: 36px;
-    border-radius: 10px;
-    border: 1px solid $gray-20;
-    color: $gray-90;
-    background-color: $white;
-    font-size: 22px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   &__addMoreButton {
     width: 100%;
-    height: 56px;
-    border-top: 1px solid $gray-10;
+    padding: 16px 0;
+    border-top: 1.6px solid $gray-10;
     color: $primary-50;
     background-color: $white;
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
   }
 

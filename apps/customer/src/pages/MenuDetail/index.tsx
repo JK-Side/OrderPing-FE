@@ -1,5 +1,6 @@
 ﻿import BackIcon from '@/assets/icons/back.svg?react';
 import { getMenuDetailByMenuId } from '../../api/customer';
+import QuantityControl from '../../components/QuantityControl';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
 import { useQuery } from '@tanstack/react-query';
@@ -114,25 +115,13 @@ export default function MenuDetailPage() {
 
             <div className={styles.menuDetail__priceRow}>
               <span className={styles.menuDetail__price}>{formatPrice(data.price)}</span>
-              <div className={styles.menuDetail__quantityControl}>
-                <button
-                  type="button"
-                  className={styles.menuDetail__quantityButton}
-                  onClick={decreaseQuantity}
-                  disabled={data.isSoldOut}
-                >
-                  -
-                </button>
-                <span className={styles.menuDetail__quantityValue}>{quantity}</span>
-                <button
-                  type="button"
-                  className={styles.menuDetail__quantityButton}
-                  onClick={increaseQuantity}
-                  disabled={data.isSoldOut}
-                >
-                  +
-                </button>
-              </div>
+              <QuantityControl
+                value={quantity}
+                onDecrease={decreaseQuantity}
+                onIncrease={increaseQuantity}
+                decreaseDisabled={data.isSoldOut}
+                increaseDisabled={data.isSoldOut}
+              />
             </div>
           </section>
 
