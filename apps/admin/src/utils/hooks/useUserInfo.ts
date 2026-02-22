@@ -1,6 +1,6 @@
-import { getUserInfo } from '@order-ping/shared/api/auth';
-import { useAuth } from '@order-ping/shared/utils/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
+import { getUserInfo } from '@/api/auth';
+import { useAuth } from '@/utils/hooks/useAuth';
 
 export const useUserInfo = () => {
   const { token } = useAuth();

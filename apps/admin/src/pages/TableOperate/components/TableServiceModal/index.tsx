@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
+import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
@@ -9,7 +10,6 @@ import { useAvailableMenus } from '@/pages/TableOperate/hooks/useAvailableMenus'
 import { useCreateServiceOrder } from '@/pages/TableOperate/hooks/useCreateServiceOrder';
 import { REGEX } from '@/static/validation';
 import styles from './TableServiceModal.module.scss';
-import type { TableResponse } from '@order-ping/shared/api/table/entity';
 
 interface TableServiceModalProps {
   open: boolean;

@@ -1,11 +1,7 @@
-import { RefreshResponse } from '@order-ping/shared/api/auth/entity';
-import { useAuthStore } from '@order-ping/shared/stores/auth';
-import { redirectToLogin } from '@order-ping/shared/utils/ts/auth';
-
 const BASE_URL = import.meta.env.VITE_API_PATH;
 
 if (!BASE_URL) {
-  throw new Error('API 경로 환경변수가 설정되지 않았습니다.');
+  throw new Error('VITE_API_PATH is required.');
 }
 
 type QueryAtom = string | number | boolean;
@@ -15,11 +11,7 @@ interface FetchOptions<P extends object = Record<string, QueryParamValue>> exten
   headers?: Record<string, string>;
   body?: unknown;
   params?: P;
-  skipAuth?: boolean;
-  skipRefresh?: boolean;
 }
-
-let refreshPromise: Promise<string | null> | null = null;
 
 export const apiClient = {
   get: <T = unknown, P extends object = Record<string, QueryParamValue>>(
@@ -52,8 +44,10 @@ function joinUrl(baseUrl: string, path: string) {
 
 function buildQuery(params: Record<string, QueryParamValue>) {
   const usp = new URLSearchParams();
+
   for (const [key, value] of Object.entries(params)) {
     if (value == null) continue;
+
     if (Array.isArray(value)) {
       if (value.length === 0) continue;
       for (const v of value) {
@@ -64,23 +58,20 @@ function buildQuery(params: Record<string, QueryParamValue>) {
       usp.append(key, String(value));
     }
   }
+
   return usp.toString();
 }
 
 async function sendRequest<T = unknown, P extends object = Record<string, QueryParamValue>>(
   endPoint: string,
   options: FetchOptions<P> = {},
-  timeout: number = 10000,
+  timeout = 10000,
 ): Promise<T> {
-  const { headers, body, method, params, skipAuth, skipRefresh, ...restOptions } = options;
+  const { headers, body, method, params, ...restOptions } = options;
 
   if (!method) {
-    throw new Error('HTTP method가 설정되지 않았습니다.');
+    throw new Error('HTTP method is required.');
   }
-
-  const token = !skipAuth
-    ? useAuthStore.getState().accessToken
-    : null;
 
   let url = joinUrl(BASE_URL, endPoint);
   if (params && Object.keys(params).length > 0) {
@@ -97,12 +88,12 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
     const fetchOptions: RequestInit = {
       headers: {
         ...(isJsonBody ? { 'Content-Type': 'application/json' } : {}),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...headers,
       },
       method,
       signal: abortController.signal,
-      credentials: restOptions.credentials ?? 'include',
+      // Customer APIs are public; never send browser credentials/cookies by default.
+      credentials: restOptions.credentials ?? 'omit',
       ...restOptions,
     };
 
@@ -115,16 +106,9 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
 
     const response = await fetch(url, fetchOptions);
 
-    if (response.status === 401 && !skipAuth && !skipRefresh) {
-      const refreshedToken = await refreshAccessToken();
-      if (refreshedToken) {
-        return sendRequest<T, P>(endPoint, { ...options, skipRefresh: true }, timeout);
-      }
-    }
-
     if (!response.ok) {
       const errorMessage = await parseResponseText(response);
-      const error = new Error(errorMessage || 'API 요청 실패');
+      const error = new Error(errorMessage || 'API request failed.');
       Object.assign(error, {
         status: response.status,
         statusText: response.statusText,
@@ -136,14 +120,7 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
     return parseResponse<T>(response);
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('요청 시간이 초과되었습니다.');
-    }
-    if (error instanceof TypeError && !skipAuth && !skipRefresh) {
-      const { accessToken } = useAuthStore.getState();
-      if (accessToken) {
-        useAuthStore.getState().clearAccessToken();
-        redirectToLogin();
-      }
+      throw new Error('Request timeout.');
     }
     throw error;
   } finally {
@@ -151,54 +128,28 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
   }
 }
 
-async function refreshAccessToken() {
-  if (refreshPromise) return refreshPromise;
-
-  refreshPromise = (async () => {
-    try {
-      const response = await sendRequest<RefreshResponse>('/api/auth/refresh', {
-        method: 'POST',
-        skipAuth: true,
-        skipRefresh: true,
-      });
-
-      if (!response?.accessToken) {
-        throw new Error('Missing access token in refresh response.');
-      }
-
-      useAuthStore.getState().setAccessToken(response.accessToken);
-      return response.accessToken;
-    } catch {
-      useAuthStore.getState().clearAccessToken();
-      redirectToLogin();
-      return null;
-    } finally {
-      refreshPromise = null;
-    }
-  })();
-
-  return refreshPromise;
-}
-
 async function parseResponse<T = unknown>(response: Response): Promise<T> {
   const contentType = response.headers.get('Content-Type') || '';
+
   if (contentType.includes('application/json')) {
     try {
       return await response.json();
     } catch {
       return {} as T;
     }
-  } else if (contentType.includes('text')) {
-    return (await response.text()) as unknown as T;
-  } else {
-    return null as unknown as T;
   }
+
+  if (contentType.includes('text')) {
+    return (await response.text()) as unknown as T;
+  }
+
+  return null as unknown as T;
 }
 
 async function parseResponseText(response: Response): Promise<string> {
   try {
     return await response.text();
   } catch {
-    return '서버로부터 응답을 받지 못했습니다.';
+    return 'Failed to read error response.';
   }
 }

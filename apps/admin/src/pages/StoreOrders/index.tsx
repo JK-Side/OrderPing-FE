@@ -1,6 +1,7 @@
 ﻿import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import type { OrderLookupResponse, OrderStatus } from '@/api/order/entity';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import OrderLookupCard from '@/components/OrderLookupCard';
 import { useToast } from '@/components/Toast/useToast';
@@ -12,7 +13,6 @@ import { useOrdersByStore } from '@/pages/StoreOrders/hooks/useOrdersByStore';
 import { useUpdateOrderStatus } from '@/pages/StoreOrders/hooks/useUpdateOrderStatus';
 import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './StoreOrders.module.scss';
-import type { OrderLookupResponse, OrderStatus } from '@order-ping/shared/api/order/entity';
 
 type OrderCardData = {
   id: string;

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { postRefresh } from '@order-ping/shared/api/auth';
-import { useAuthStore } from '@order-ping/shared/stores/auth';
+import { postRefresh } from '@/api/auth';
+import { useAuthStore } from '@/stores/auth';
 
 let hasInitialized = false;
 let initPromise: Promise<void> | null = null;

@@ -44,3 +44,15 @@ export interface StoreDetailResponse {
   imageUrl: string;
   createdAt: string;
 }
+
+export interface MyStore {
+  id: number;
+  userId: number;
+  name: string;
+  description: string;
+  isOpen: boolean;
+  imageUrl: string;
+  createdAt: string;
+}
+
+export type MyStoreListResponse = MyStore[];

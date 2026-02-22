@@ -1,0 +1,361 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.home {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: $white;
+  padding-bottom: 20px;
+
+  &__hero {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.5;
+    overflow: hidden;
+    background-color: $gray-10;
+  }
+
+  &__heroImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__heroFallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $gray-60;
+    font-size: 16px;
+    font-weight: 500;
+    background:
+      radial-gradient(
+        circle at 20% 20%,
+        #ffe8f3 0%,
+        #ffd0e7 22%,
+        transparent 45%
+      ),
+      linear-gradient(135deg, #bde9ff 0%, #ffd3ec 55%, #ffe2f2 100%);
+  }
+
+  &__historyFloatingButton {
+    position: absolute;
+    top: max(24px, env(safe-area-inset-top));
+    right: 24px;
+    padding: 8px 16px;
+    border-radius: 24px;
+    color: $white;
+    background-color: $primary-50;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  &__storeMeta {
+    padding: 24px 24px 18px;
+    border-bottom: 1px solid $gray-10;
+  }
+
+  &__titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__storeName {
+    font-size: 22px;
+    font-weight: 700;
+    color: $black;
+  }
+
+  &__tableText {
+    color: $gray-80;
+    font-size: 16px;
+  }
+
+  &__descriptionBox {
+    margin-top: 16px;
+    width: 100%;
+    border-radius: 8px;
+    background-color: $gray-10;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+  }
+
+  &__descriptionIcon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: $yellow-50;
+    color: $white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  &__descriptionText {
+    margin: 0;
+    color: $gray-70;
+    font-size: 14px;
+    word-break: keep-all;
+  }
+
+  &__tabStickyWrap {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: $white;
+    border-bottom: 1px solid $gray-10;
+
+    &--stuck {
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+    }
+  }
+
+  &__tabHeader {
+    min-height: 66px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 24px;
+  }
+
+  &__tabList {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__tabButton {
+    height: 40px;
+    padding: 0 10px;
+    color: $gray-60;
+    border-bottom: 2px solid transparent;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &--active {
+      color: $black;
+      border-bottom-color: $black;
+    }
+  }
+
+  &__historyTabButton {
+    flex-shrink: 0;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 22px;
+    color: $white;
+    background-color: $primary-50;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &__statusBox {
+    padding: 22px 24px;
+    color: $gray-70;
+    font-size: 16px;
+  }
+
+  &__menuSection {
+    scroll-margin-top: 70px;
+    padding: 24px 0 0;
+  }
+
+  &__sectionTitle {
+    margin: 0 24px 8px;
+    color: $black;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  &__sectionDivider {
+    height: 8px;
+    margin-top: 18px;
+    background-color: $gray-10;
+  }
+
+  &__menuList {
+    width: 100%;
+  }
+
+  &__menuCard {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 24px;
+    border-top: 1px solid $gray-10;
+    cursor: pointer;
+
+    &--soldOut {
+      opacity: 0.7;
+    }
+  }
+
+  &__menuInfo {
+    min-width: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__menuTitleRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__menuName {
+    margin: 0;
+    color: $black;
+    font-size: 16px;
+    font-weight: 600;
+    word-break: keep-all;
+  }
+
+  &__soldOutBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    height: 24px;
+    border-radius: 12px;
+    padding: 0 8px;
+    color: $white;
+    background-color: $red-50;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  &__menuPrice {
+    color: $black;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  &__menuDescription {
+    color: $gray-60;
+    font-size: 14px;
+    word-break: keep-all;
+  }
+
+  &__menuImage {
+    width: 124px;
+    height: 124px;
+    border-radius: 18px;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+
+  &__menuImageFallback {
+    width: 124px;
+    height: 124px;
+    border-radius: 18px;
+    color: $gray-50;
+    background-color: $gray-10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 16px;
+    padding: 8px;
+    flex-shrink: 0;
+  }
+
+  &__emptyMessage {
+    margin: 0;
+    padding: 0 24px 22px;
+    color: $gray-60;
+    font-size: 16px;
+  }
+
+  &__emptySpace {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 40px;
+    color: $gray-50;
+  }
+
+  &__cartToast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(100px + env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 240px;
+    justify-content: center;
+    padding: 8px 12px;
+    border-radius: 32px;
+    color: $white;
+    background-color: #8f99aa;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  }
+
+  &__cartToastIcon {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  &__cartBottom {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 560px;
+    background-color: $gray-10;
+    padding: 10px 24px calc(16px + env(safe-area-inset-bottom));
+    z-index: 25;
+  }
+
+  &__cartButton {
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    color: $white;
+    background-color: $primary-50;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  &__cartCount {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 9px;
+    background-color: $white;
+    color: $primary-50;
+    font-size: 16px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+  }
+}

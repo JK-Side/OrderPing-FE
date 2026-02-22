@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import type { MenuResponse } from '@/api/menu/entity';
 import SettingIcon from '@/assets/icons/setting-3.svg?react';
 import MenuDefault from '@/assets/imgs/menu_default.svg?url';
 import styles from './MenuList.module.scss';
-import type { MenuResponse } from '@order-ping/shared/api/menu/entity';
 
 interface MenuListProps {
   menus: MenuResponse[];

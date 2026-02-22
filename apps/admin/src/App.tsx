@@ -1,4 +1,3 @@
-import { useAuthInit } from '@order-ping/shared/utils/hooks/useAuthInit';
 import { Route, Routes } from 'react-router-dom';
 import AppLayout from '@/components/layout';
 import Home from '@/pages/Home';
@@ -9,6 +8,7 @@ import StoreCreate from '@/pages/StoreCreate';
 import StoreOperate from '@/pages/StoreOperate';
 import StoreOrders from '@/pages/StoreOrders';
 import TableStart from '@/pages/TableOperate';
+import { useAuthInit } from '@/utils/hooks/useAuthInit';
 import './App.css';
 
 function App() {

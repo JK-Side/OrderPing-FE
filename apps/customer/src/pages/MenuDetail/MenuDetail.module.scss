@@ -1,0 +1,145 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.menuDetail {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: $gray-10;
+  padding-bottom: 96px;
+
+  &__header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: 74px;
+    padding: max(20px, env(safe-area-inset-top)) 16px 12px;
+    background-color: $white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__backButton {
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background-color: transparent;
+    color: $gray-90;
+    font-size: 26px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  &__historyButton {
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 20px;
+    color: $white;
+    background-color: $primary-50;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  &__status {
+    padding: 22px 24px;
+    color: $gray-70;
+    font-size: 16px;
+  }
+
+  &__imageWrap {
+    width: 100%;
+    aspect-ratio: 1.5;
+    overflow: hidden;
+    background-color: $gray-20;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &__imageFallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $gray-60;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  &__content {
+    background-color: $white;
+    padding: 18px 24px 30px;
+  }
+
+  &__name {
+    color: $black;
+    font-size: 22px;
+    font-weight: 700;
+    word-break: keep-all;
+  }
+
+  &__description {
+    color: $gray-60;
+    font-size: 16px;
+    word-break: keep-all;
+  }
+
+  &__priceRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  &__price {
+    color: $black;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  &__bottom {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 560px;
+    background-color: $gray-10;
+    padding: 10px 24px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  &__addButton {
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    color: $white;
+    background-color: $primary-50;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+
+    &:disabled {
+      background-color: $gray-40;
+      cursor: not-allowed;
+    }
+  }
+
+  &__quantity {
+    background-color: $white;
+    color: $primary-50;
+    padding: 0 8px;
+    border-radius: 4px;
+    margin-right: 12px;
+    align-items: center;
+  }
+}

@@ -1,11 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { QRCodeSVG } from 'qrcode.react';
+import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import styles from './TableOrderModal.module.scss';
-import type { TableResponse } from '@order-ping/shared/api/table/entity';
 
 interface TableOrderModalProps {
   open: boolean;

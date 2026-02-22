@@ -1,11 +1,11 @@
 ﻿import type { HTMLAttributes } from 'react';
+import type { OrderStatus } from '@/api/order/entity';
 import ArrowRightIcon from '@/assets/icons/arrow-right.svg?react';
 import BackIcon from '@/assets/icons/back.svg?react';
 import CheckIcon from '@/assets/icons/check.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import Button from '@/components/Button';
 import styles from './OrderLookupCard.module.scss';
-import type { OrderStatus } from '@order-ping/shared/api/order/entity';
 
 type ClickHandler = () => void;
 

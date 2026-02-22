@@ -1,7 +1,7 @@
-﻿import Button from '@/components/Button';
+﻿import type { OrderDetailResponse, OrderLookupResponse, OrderMenuItem } from '@/api/order/entity';
+import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import styles from './OrderDetailModal.module.scss';
-import type { OrderDetailResponse, OrderLookupResponse, OrderMenuItem } from '@order-ping/shared/api/order/entity';
 
 interface OrderDetailModalProps {
   open: boolean;
