@@ -6,7 +6,7 @@
   min-height: 100vh;
   margin: 0 auto;
   background-color: $white;
-  padding-bottom: 110px;
+  padding-bottom: 20px;
 
   &__hero {
     position: relative;
@@ -285,7 +285,11 @@
   }
 
   &__emptySpace {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
     height: 40px;
+    color: $gray-50;
   }
 
   &__cartToast {
