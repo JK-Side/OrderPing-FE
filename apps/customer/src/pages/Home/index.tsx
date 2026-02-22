@@ -81,7 +81,7 @@ export default function HomePage() {
   const tabContainerRef = useRef<HTMLDivElement | null>(null);
 
   const navigate = useNavigate();
-  const { totalPrice, totalQuantity } = useCart();
+  const { totalPrice, totalQuantity, setActiveTable } = useCart();
 
   const { data, isLoading, error } = useStoreOrder(tableId);
   const categories = useMemo(() => data?.categories ?? [], [data]);
@@ -107,6 +107,10 @@ export default function HomePage() {
   const sideSectionLabel = sideCategory?.name ?? '사이드 메뉴';
   const hasSideSection = sideCategory !== null;
   const hasNotFoundError = (error as { status?: number } | null)?.status === 404;
+
+  useEffect(() => {
+    setActiveTable(tableId);
+  }, [setActiveTable, tableId]);
 
   useEffect(() => {
     const handleScroll = () => {

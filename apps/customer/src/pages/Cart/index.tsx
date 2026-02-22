@@ -1,5 +1,5 @@
 ﻿import BackIcon from '@/assets/icons/back.svg?react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCart } from '../../stores/cart';
 import styles from './Cart.module.scss';
@@ -10,9 +10,18 @@ export default function CartPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const tableId = searchParams.get('tableId');
-  const { items, totalPrice, totalQuantity, removeMenu, setMenuQuantity } = useCart();
+  const tableIdNumber = useMemo(() => {
+    const parsed = Number(tableId);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }, [tableId]);
+
+  const { items, totalPrice, totalQuantity, removeMenu, setMenuQuantity, setActiveTable } = useCart();
 
   const backToMenuUrl = useMemo(() => (tableId ? `/?tableId=${tableId}` : '/'), [tableId]);
+
+  useEffect(() => {
+    setActiveTable(tableIdNumber);
+  }, [setActiveTable, tableIdNumber]);
 
   return (
     <main className={styles.cart}>

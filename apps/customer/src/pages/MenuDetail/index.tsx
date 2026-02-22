@@ -3,7 +3,7 @@ import { getMenuDetailByMenuId } from '../../api/customer';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styles from './MenuDetail.module.scss';
 
@@ -13,7 +13,7 @@ export default function MenuDetailPage() {
   const [quantity, setQuantity] = useState(1);
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { addMenu } = useCart();
+  const { addMenu, setActiveTable } = useCart();
   const { menuId: menuIdParam } = useParams<{ menuId: string }>();
   const [searchParams] = useSearchParams();
 
@@ -23,6 +23,10 @@ export default function MenuDetailPage() {
   }, [menuIdParam]);
 
   const tableId = searchParams.get('tableId');
+  const tableIdNumber = useMemo(() => {
+    const parsed = Number(tableId);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }, [tableId]);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['customer', 'menu-detail', menuId],
@@ -31,6 +35,10 @@ export default function MenuDetailPage() {
   });
 
   const hasNotFoundError = (error as { status?: number } | null)?.status === 404;
+
+  useEffect(() => {
+    setActiveTable(tableIdNumber);
+  }, [setActiveTable, tableIdNumber]);
 
   const backToMenu = () => {
     navigate(tableId ? `/?tableId=${tableId}` : '/');
