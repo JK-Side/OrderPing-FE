@@ -1,7 +1,7 @@
 ﻿import type { CustomerStoreOrderMenu } from '../../api/customer/entity';
 import { useCart } from '../../stores/cart';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useStoreOrder } from './hooks/useStoreOrder';
 import styles from './Home.module.scss';
 
@@ -74,7 +74,21 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabKey>('main');
   const [isTabSticky, setIsTabSticky] = useState(false);
-  const tableId = useMemo(() => getTableIdFromUrl(), []);
+  const { tableId: tableIdParam } = useParams<{ tableId: string }>();
+  const [searchParams] = useSearchParams();
+  const tableId = useMemo(() => {
+    const fromParams = Number(tableIdParam);
+    if (Number.isInteger(fromParams) && fromParams > 0) {
+      return fromParams;
+    }
+
+    const fromQuery = Number(searchParams.get('tableId'));
+    if (Number.isInteger(fromQuery) && fromQuery > 0) {
+      return fromQuery;
+    }
+
+    return getTableIdFromUrl();
+  }, [searchParams, tableIdParam]);
 
   const mainSectionRef = useRef<HTMLElement | null>(null);
   const sideSectionRef = useRef<HTMLElement | null>(null);
@@ -155,11 +169,11 @@ export default function HomePage() {
   };
 
   const handleMenuCardClick = (menuId: number) => {
-    navigate(tableId ? `/menus/${menuId}?tableId=${tableId}` : `/menus/${menuId}`);
+    navigate(tableId ? `/tables/${tableId}/menus/${menuId}` : `/menus/${menuId}`);
   };
 
   const openCartPage = () => {
-    navigate(`/cart${tableId ? `?tableId=${tableId}` : ''}`);
+    navigate(tableId ? `/tables/${tableId}/cart` : '/cart');
   };
 
   return (

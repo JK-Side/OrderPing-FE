@@ -15,7 +15,10 @@ export default function MenuDetailPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { addMenu, setActiveTable } = useCart();
-  const { menuId: menuIdParam } = useParams<{ menuId: string }>();
+  const { menuId: menuIdParam, tableId: tableIdParam } = useParams<{
+    menuId: string;
+    tableId?: string;
+  }>();
   const [searchParams] = useSearchParams();
 
   const menuId = useMemo(() => {
@@ -23,7 +26,7 @@ export default function MenuDetailPage() {
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }, [menuIdParam]);
 
-  const tableId = searchParams.get('tableId');
+  const tableId = tableIdParam ?? searchParams.get('tableId');
   const tableIdNumber = useMemo(() => {
     const parsed = Number(tableId);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
@@ -42,7 +45,7 @@ export default function MenuDetailPage() {
   }, [setActiveTable, tableIdNumber]);
 
   const backToMenu = () => {
-    navigate(tableId ? `/?tableId=${tableId}` : '/');
+    navigate(tableId ? `/tables/${tableId}` : '/');
   };
 
   const increaseQuantity = () => {
@@ -72,7 +75,7 @@ export default function MenuDetailPage() {
       duration: 3000,
     });
 
-    navigate(tableId ? `/?tableId=${tableId}` : '/');
+    navigate(tableId ? `/tables/${tableId}` : '/');
   };
 
   const totalPrice = (data?.price ?? 0) * quantity;

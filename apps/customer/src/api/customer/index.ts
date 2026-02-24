@@ -1,5 +1,6 @@
 import { apiClient } from '..';
 import type {
+  CustomerPaymentDeeplinkResponse,
   CreateCustomerOrderRequest,
   CreateCustomerOrderResponse,
   CustomerMenuDetailResponse,
@@ -31,4 +32,13 @@ export const getCustomerOrdersByTableId = async (tableId: number) => {
   return await apiClient.get<CustomerOrderLookup[]>(
     `/api/customer/orders/table/${tableId}`,
   );
+};
+
+export const getPaymentTossDeeplink = async (params: {
+  storeId: number;
+  amount: number;
+}) => {
+  return await apiClient.get<CustomerPaymentDeeplinkResponse>('/api/payments/deeplink', {
+    params,
+  });
 };
