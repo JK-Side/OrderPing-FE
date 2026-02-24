@@ -38,9 +38,10 @@ const createQrSvgMarkup = (value: string) => {
   )}`;
 };
 
-const createQrValue = (storeId: number, tableNum: number) => {
-  const url = new URL(`/customer/store/${storeId}`, window.location.origin);
-  url.searchParams.set('tableId', String(tableNum));
+const createQrValue = (tableNum: number) => {
+  const baseUrl = import.meta.env.VITE_CUSTOMER_URL || 'http://localhost:5173';
+  const url = new URL(`/tables/${tableNum}`, baseUrl);
+
   return url.toString();
 };
 
@@ -135,7 +136,7 @@ export default function TableCreateModal({
   const uploadQrImages = async (targets: QrUploadTarget[]) => {
     const results = await Promise.allSettled(
       targets.map(async (table) => {
-        const qrValue = createQrValue(table.storeId, table.tableNum);
+        const qrValue = createQrValue(table.tableNum);
         const svgMarkup = createQrSvgMarkup(qrValue);
         const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml' });
         const imageUrl = await upload({
