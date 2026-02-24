@@ -93,3 +93,17 @@ export interface CustomerOrderLookup {
   createdAt: string;
   menus: CustomerOrderLookupMenu[];
 }
+
+export interface CustomerPaymentDeeplinkAccount {
+  bankCode: string;
+  bankName: string;
+  accountHolder: string;
+  accountNumber: string;
+}
+
+// GET /api/payments/deeplink
+export interface CustomerPaymentDeeplinkResponse {
+  amount: number;
+  tossDeeplink: string;
+  account: CustomerPaymentDeeplinkAccount;
+}
