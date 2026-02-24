@@ -136,7 +136,7 @@ export default function TableCreateModal({
   const uploadQrImages = async (targets: QrUploadTarget[]) => {
     const results = await Promise.allSettled(
       targets.map(async (table) => {
-        const qrValue = createQrValue(table.tableNum);
+        const qrValue = createQrValue(table.id);
         const svgMarkup = createQrSvgMarkup(qrValue);
         const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml' });
         const imageUrl = await upload({
