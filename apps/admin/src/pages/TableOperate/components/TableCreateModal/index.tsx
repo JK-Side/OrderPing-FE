@@ -2,14 +2,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { useForm, type SubmitHandler } from 'react-hook-form';
-import type { AllTableListResponse } from '@/api/table/entity';
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form';
+import type { AllTableListResponse, TableResponse } from '@/api/table/entity';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, ModalTrigger } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import { useCreateAllTable } from '@/pages/TableOperate/hooks/useCreateAllTable';
+import { useUpdateTableQrImage } from '@/pages/TableOperate/hooks/useUpdateTableQrImage';
 import { useUpdateTableQrImages } from '@/pages/TableOperate/hooks/useUpdateTableQrImages';
 import { MESSAGES, REGEX } from '@/static/validation';
 import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
@@ -77,9 +78,17 @@ const resolveErrorMessage = (error: unknown) => {
 interface TableCreateModalProps {
   storeId?: number;
   onCreated?: (tables: AllTableListResponse, layout: { columns: number; rows: number }) => void;
+  onLayoutSaved?: (layout: { columns: number; rows: number }) => void;
   name: string;
   hasActiveOrders?: boolean;
   onReset?: () => void;
+  mode?: 'create' | 'edit';
+  tables?: TableResponse[];
+  initialValues?: {
+    tableCount: number;
+    tableColumns: number;
+    tableRows: number;
+  } | null;
 }
 
 interface TableCreateForm {
@@ -91,9 +100,13 @@ interface TableCreateForm {
 export default function TableCreateModal({
   storeId,
   onCreated,
+  onLayoutSaved,
   name,
   hasActiveOrders = false,
   onReset,
+  mode = 'create',
+  tables: existingTables = [],
+  initialValues = null,
 }: TableCreateModalProps) {
   const [open, setOpen] = useState(false);
   const [isUploadingQr, setIsUploadingQr] = useState(false);
@@ -102,12 +115,14 @@ export default function TableCreateModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { mutateAsync: createAllTables, isPending } = useCreateAllTable();
+  const { mutateAsync: updateTableQrImage, isPending: isUpdatingTableQrImage } = useUpdateTableQrImage();
   const { mutateAsync: updateTableQrImages } = useUpdateTableQrImages(storeId ?? 0);
   const { upload } = usePresignedUploader();
 
   const {
     register,
     reset,
+    control,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
   } = useForm<TableCreateForm>({
@@ -119,14 +134,34 @@ export default function TableCreateModal({
     },
   });
 
-  const handleOpenChange = (nextOpen: boolean) => {
-    setOpen(nextOpen);
-    if (nextOpen) {
-      reset({
+  const getInitialFormValues = (): TableCreateForm => {
+    if (!initialValues) {
+      return {
         tableCount: '',
         tableColumns: '',
         tableRows: '',
-      });
+      };
+    }
+
+    return {
+      tableCount: String(initialValues.tableCount),
+      tableColumns: String(initialValues.tableColumns),
+      tableRows: String(initialValues.tableRows),
+    };
+  };
+
+  const watchedTableColumns = useWatch({ control, name: 'tableColumns' });
+  const watchedTableRows = useWatch({ control, name: 'tableRows' });
+  const isLayoutUnchanged =
+    mode === 'edit' &&
+    !!initialValues &&
+    Number(watchedTableColumns) === initialValues.tableColumns &&
+    Number(watchedTableRows) === initialValues.tableRows;
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (nextOpen) {
+      reset(getInitialFormValues());
       setRetryEntries([]);
       setRetryMessage(null);
       setIsUploadingQr(false);
@@ -136,7 +171,7 @@ export default function TableCreateModal({
   const uploadQrImages = async (targets: QrUploadTarget[]) => {
     const results = await Promise.allSettled(
       targets.map(async (table) => {
-        const qrValue = createQrValue(table.id);
+        const qrValue = createQrValue(table.tableNum);
         const svgMarkup = createQrSvgMarkup(qrValue);
         const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml' });
         const imageUrl = await upload({
@@ -144,7 +179,7 @@ export default function TableCreateModal({
           fileName: createQrFileName(table.storeId, table.tableNum),
           file: svgBlob,
           contentType: 'image/svg+xml',
-          errorMessage: 'Failed to upload QR image.',
+          errorMessage: 'QR 이미지 업데이트에 실패했습니다.',
         });
 
         return {
@@ -181,9 +216,33 @@ export default function TableCreateModal({
       });
       return [] as QrUploadEntryWithImage[];
     } catch (error) {
-      console.error('Failed to update table QR images', error);
+      console.error('QR 이미지 업데이트에 실패했습니다.', error);
       return entries;
     }
+  };
+
+  const updateQrImagesByTable = async (entries: QrUploadEntryWithImage[]) => {
+    if (entries.length === 0) return [] as QrUploadEntryWithImage[];
+
+    const results = await Promise.allSettled(
+      entries.map((table) =>
+        updateTableQrImage({
+          tableId: table.id,
+          body: {
+            qrImageUrl: table.qrImageUrl,
+          },
+        }),
+      ),
+    );
+
+    const failed: QrUploadEntryWithImage[] = [];
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        failed.push(entries[index]);
+      }
+    });
+
+    return failed;
   };
 
   const handleSubmitForm: SubmitHandler<TableCreateForm> = async (data) => {
@@ -203,13 +262,66 @@ export default function TableCreateModal({
         return;
       }
 
+      if (mode === 'edit') {
+        const sortedTables = [...existingTables].sort((a, b) => a.tableNum - b.tableNum);
+
+        if (sortedTables.length === 0) {
+          toast({
+            message: '업데이트할 테이블이 없습니다.',
+            variant: 'error',
+          });
+          return;
+        }
+
+        if (sortedTables.length !== tableCount) {
+          toast({
+            message: '테이블 전체 수는 변경할 수 없습니다.',
+            variant: 'error',
+          });
+          return;
+        }
+
+        setIsUploadingQr(true);
+        const targets = sortedTables.map((table) => ({
+          id: table.id,
+          storeId: table.storeId,
+          tableNum: table.tableNum,
+        }));
+
+        const { succeeded, failed } = await uploadQrImages(targets);
+        const updateFailures = await updateQrImagesByTable(succeeded);
+        const pendingRetries = [...failed, ...updateFailures];
+
+        await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
+        onLayoutSaved?.({ columns: tableColumns, rows: tableRows });
+
+        if (pendingRetries.length > 0) {
+          const message = buildRetryMessage(failed.length, updateFailures.length);
+          setRetryEntries(pendingRetries);
+          setRetryMessage(message);
+          toast({
+            message,
+            variant: 'error',
+          });
+        } else {
+          setRetryEntries([]);
+          setRetryMessage(null);
+          toast({
+            message: '테이블이 업데이트 되었습니다.',
+            variant: 'info',
+          });
+          setOpen(false);
+        }
+        return;
+      }
+
       setIsUploadingQr(true);
-      const tables = await createAllTables({
+      const createdTables = await createAllTables({
         storeId,
         count: tableCount,
       });
 
-      const targets = tables.map((table) => ({
+      const targets = createdTables.map((table) => ({
         id: table.id,
         storeId: table.storeId,
         tableNum: table.tableNum,
@@ -220,7 +332,8 @@ export default function TableCreateModal({
       const pendingRetries = [...failed, ...updateFailures];
 
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
-      onCreated?.(tables, { columns: tableColumns, rows: tableRows });
+      onCreated?.(createdTables, { columns: tableColumns, rows: tableRows });
+      onLayoutSaved?.({ columns: tableColumns, rows: tableRows });
 
       if (pendingRetries.length > 0) {
         const message = buildRetryMessage(failed.length, updateFailures.length);
@@ -262,7 +375,9 @@ export default function TableCreateModal({
         needsUpload.length > 0 ? await uploadQrImages(needsUpload) : { succeeded: [], failed: [] };
 
       const updateTargets = [...alreadyUploaded, ...succeeded];
-      const updateFailures = await updateQrImages(updateTargets);
+      const updateFailures = await (mode === 'edit'
+        ? updateQrImagesByTable(updateTargets)
+        : updateQrImages(updateTargets));
       const pendingRetries = [...failed, ...updateFailures];
 
       if (updateTargets.length > 0) {
@@ -417,8 +532,8 @@ export default function TableCreateModal({
               type="submit"
               size="md"
               fullWidth
-              disabled={!isValid || isSubmitting || isUploadingQr || retryEntries.length > 0}
-              isLoading={isPending || isUploadingQr}
+              disabled={!isValid || isSubmitting || isUploadingQr || retryEntries.length > 0 || isLayoutUnchanged}
+              isLoading={isPending || isUploadingQr || isUpdatingTableQrImage}
             >
               {name}
             </Button>
@@ -427,7 +542,7 @@ export default function TableCreateModal({
               size="md"
               variant="danger"
               fullWidth
-              disabled={isSubmitting || isPending || isUploadingQr}
+              disabled={isSubmitting || isPending || isUploadingQr || isUpdatingTableQrImage}
               onClick={handleResetTables}
             >
               초기화

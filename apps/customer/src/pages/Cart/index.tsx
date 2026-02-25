@@ -1,34 +1,40 @@
-﻿import BackIcon from '@/assets/icons/back.svg?react';
-import CloseIcon from '@/assets/icons/close.svg?react';
-import { useQuery } from '@tanstack/react-query';
-import { getPaymentTossDeeplink, getTableMenusByTableId } from '../../api/customer';
-import QuantityControl from '../../components/QuantityControl';
-import { useToast } from '../../components/Toast/useToast';
-import { useCart } from '../../stores/cart';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import styles from './Cart.module.scss';
+﻿import BackIcon from "@/assets/icons/back.svg?react";
+import CloseIcon from "@/assets/icons/close.svg?react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getPaymentTossDeeplink,
+  getTableMenusByTableId,
+} from "../../api/customer";
+import QuantityControl from "../../components/QuantityControl";
+import { useToast } from "../../components/Toast/useToast";
+import { useCart } from "../../stores/cart";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import styles from "./Cart.module.scss";
 
-const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
-const TOSS_ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=viva.republica.toss';
-const TOSS_IOS_STORE_URL = 'https://apps.apple.com/us/app/%ED%86%A0%EC%8A%A4/id839333328?l=ko';
+const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
+const TOSS_ANDROID_STORE_URL =
+  "https://play.google.com/store/apps/details?id=viva.republica.toss";
+const TOSS_IOS_STORE_URL =
+  "https://apps.apple.com/us/app/%ED%86%A0%EC%8A%A4/id839333328?l=ko";
 const APP_OPEN_FALLBACK_DELAY_MS = 1200;
 
-type MobilePlatform = 'android' | 'ios' | 'other';
+type MobilePlatform = "android" | "ios" | "other";
 
 const isTossAppDeeplink = (url: string) => /^supertoss:\/\//i.test(url);
 
-const isExternalPaymentUrl = (url: string) => /^(https?:\/\/|supertoss:\/\/)/i.test(url);
+const isExternalPaymentUrl = (url: string) =>
+  /^(https?:\/\/|supertoss:\/\/)/i.test(url);
 
 const getMobilePlatform = (): MobilePlatform => {
   const ua = navigator.userAgent.toLowerCase();
   const isIOS =
     /iphone|ipad|ipod/.test(ua) ||
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-  if (/android/.test(ua)) return 'android';
-  if (isIOS) return 'ios';
-  return 'other';
+  if (/android/.test(ua)) return "android";
+  if (isIOS) return "ios";
+  return "other";
 };
 
 export default function CartPage() {
@@ -37,7 +43,7 @@ export default function CartPage() {
   const [isOpeningToss, setIsOpeningToss] = useState(false);
   const { tableId: tableIdParam } = useParams<{ tableId?: string }>();
   const [searchParams] = useSearchParams();
-  const tableId = tableIdParam ?? searchParams.get('tableId');
+  const tableId = tableIdParam ?? searchParams.get("tableId");
   const tableIdNumber = useMemo(() => {
     const parsed = Number(tableId);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
@@ -52,13 +58,13 @@ export default function CartPage() {
     setActiveTable,
   } = useCart();
   const { data: tableMenuData } = useQuery({
-    queryKey: ['customer', 'table-menus', tableIdNumber],
+    queryKey: ["customer", "table-menus", tableIdNumber],
     queryFn: () => getTableMenusByTableId(tableIdNumber as number),
     enabled: tableIdNumber !== null,
   });
 
   const backToMenuUrl = useMemo(
-    () => (tableId ? `/tables/${tableId}` : '/'),
+    () => (tableId ? `/tables/${tableId}` : "/"),
     [tableId],
   );
 
@@ -68,7 +74,7 @@ export default function CartPage() {
 
   const openTossWithStoreFallback = async (tossDeeplink: string) => {
     if (!isExternalPaymentUrl(tossDeeplink)) {
-      throw new Error('Invalid toss deeplink');
+      throw new Error("Invalid toss deeplink");
     }
 
     if (!isTossAppDeeplink(tossDeeplink)) {
@@ -82,7 +88,10 @@ export default function CartPage() {
       let finished = false;
 
       const cleanup = () => {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange,
+        );
         clearTimeout(fallbackTimer);
       };
 
@@ -94,38 +103,38 @@ export default function CartPage() {
       };
 
       const handleVisibilityChange = () => {
-        if (document.visibilityState === 'hidden') {
+        if (document.visibilityState === "hidden") {
           finish();
         }
       };
 
       const fallbackTimer = window.setTimeout(() => {
-        if (document.visibilityState === 'hidden') {
+        if (document.visibilityState === "hidden") {
           finish();
           return;
         }
 
-        if (platform === 'android') {
+        if (platform === "android") {
           window.location.href = TOSS_ANDROID_STORE_URL;
           finish();
           return;
         }
 
-        if (platform === 'ios') {
+        if (platform === "ios") {
           window.location.href = TOSS_IOS_STORE_URL;
           finish();
           return;
         }
 
         toast({
-          message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
-          variant: 'info',
+          message: "모바일 기기에서 토스 앱으로 결제해 주세요.",
+          variant: "info",
           duration: 3000,
         });
         finish();
       }, APP_OPEN_FALLBACK_DELAY_MS);
 
-      document.addEventListener('visibilitychange', handleVisibilityChange);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
       window.location.href = tossDeeplink;
     });
   };
@@ -135,8 +144,8 @@ export default function CartPage() {
 
     if (tableIdNumber === null) {
       toast({
-        message: '테이블 정보를 확인할 수 없어요.',
-        variant: 'warning',
+        message: "테이블 정보를 확인할 수 없어요.",
+        variant: "warning",
         duration: 3000,
       });
       return;
@@ -144,8 +153,8 @@ export default function CartPage() {
 
     if (totalPrice <= 0) {
       toast({
-        message: '결제 금액이 올바르지 않아요.',
-        variant: 'warning',
+        message: "결제 금액이 올바르지 않아요.",
+        variant: "warning",
         duration: 3000,
       });
       return;
@@ -153,8 +162,8 @@ export default function CartPage() {
 
     if (!tableMenuData?.storeId) {
       toast({
-        message: '매장 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.',
-        variant: 'info',
+        message: "매장 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.",
+        variant: "info",
         duration: 3000,
       });
       return;
@@ -169,8 +178,10 @@ export default function CartPage() {
       });
 
       if (!tossDeeplink) {
-        throw new Error('Empty toss deeplink');
+        throw new Error("Empty toss deeplink");
       }
+
+      console.log("tossDeeplink:", tossDeeplink);
 
       await openTossWithStoreFallback(tossDeeplink);
     } catch (error) {
@@ -179,9 +190,9 @@ export default function CartPage() {
       toast({
         message:
           status === 404
-            ? '입금 계좌 정보를 찾을 수 없어요.'
-            : '토스 결제 링크를 불러오지 못했어요.',
-        variant: 'error',
+            ? "입금 계좌 정보를 찾을 수 없어요."
+            : "토스 결제 링크를 불러오지 못했어요.",
+        variant: "error",
         duration: 3000,
       });
     } finally {
@@ -213,7 +224,9 @@ export default function CartPage() {
                 <div className={styles.cart__infoContainer}>
                   <div className={styles.cart__itemContainer}>
                     <div className={styles.cart__itemName}>{item.name}</div>
-                    <div className={styles.cart__itemPrice}>{formatPrice(item.price)}</div>
+                    <div className={styles.cart__itemPrice}>
+                      {formatPrice(item.price)}
+                    </div>
                   </div>
 
                   <button
@@ -229,9 +242,14 @@ export default function CartPage() {
                 <QuantityControl
                   className={styles.cart__quantityControl}
                   value={item.quantity}
-                  onDecrease={() => setMenuQuantity(item.menuId, Math.max(item.quantity - 1, 1))}
+                  onDecrease={() =>
+                    setMenuQuantity(item.menuId, Math.max(item.quantity - 1, 1))
+                  }
                   onIncrease={() =>
-                    setMenuQuantity(item.menuId, Math.min(item.quantity + 1, 99))
+                    setMenuQuantity(
+                      item.menuId,
+                      Math.min(item.quantity + 1, 99),
+                    )
                   }
                 />
               </article>
@@ -256,7 +274,11 @@ export default function CartPage() {
           onClick={handleOrderButtonClick}
         >
           <span className={styles.cart__orderCount}>{totalQuantity}</span>
-          <span>{isOpeningToss ? '토스 여는 중...' : `${formatPrice(totalPrice)} 주문하기`}</span>
+          <span>
+            {isOpeningToss
+              ? "토스 여는 중..."
+              : `${formatPrice(totalPrice)} 주문하기`}
+          </span>
         </button>
       </footer>
     </main>
