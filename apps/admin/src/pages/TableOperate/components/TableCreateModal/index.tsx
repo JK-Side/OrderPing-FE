@@ -545,7 +545,7 @@ export default function TableCreateModal({
               disabled={isSubmitting || isPending || isUploadingQr || isUpdatingTableQrImage}
               onClick={handleResetTables}
             >
-              초기화
+              전체 테이블 비우기
             </Button>
           </ModalFooter>
         </form>
