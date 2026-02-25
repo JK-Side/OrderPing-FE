@@ -50,3 +50,11 @@ export const patchTableQrImage = async (tableId: number, body: UpdateTableQrImag
 export const postClearTable = async (tableId: number) => {
   return await apiClient.post<TableResponse>(`/api/tables/${tableId}/clear`);
 };
+
+// PATCH /api/tables/{id} 테이블 수정
+export const deleteTableById = async (tableId: number) => {
+  return await apiClient.delete<void>(`/api/tables/${tableId}`);
+};
+
+// PATCH /api/tables/bulk/clear 테이블 일괄 수정
+// 예정
