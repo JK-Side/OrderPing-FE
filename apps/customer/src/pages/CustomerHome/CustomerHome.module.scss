@@ -1,0 +1,226 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.landing {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: max(18px, env(safe-area-inset-top)) 18px
+    calc(20px + env(safe-area-inset-bottom));
+  background: linear-gradient(
+    180deg,
+    #f4fbff 0%,
+    #f8fbff 28%,
+    #fdfdfd 60%,
+    #ffffff 100%
+  );
+  overflow: hidden;
+
+  &__backgroundGlow {
+    position: absolute;
+    top: -120px;
+    right: -80px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(28, 149, 255, 0.2) 0%,
+      rgba(28, 149, 255, 0.04) 55%,
+      transparent 72%
+    );
+    pointer-events: none;
+  }
+
+  &__hero {
+    position: relative;
+    padding: 18px;
+    border-radius: 28px;
+    background: linear-gradient(
+      150deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(255, 255, 255, 0.85) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      0 20px 40px rgba(28, 149, 255, 0.08),
+      0 4px 14px rgba(0, 0, 0, 0.04);
+    backdrop-filter: blur(8px);
+  }
+
+  &__brandBadge {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    padding: 0 12px;
+    border-radius: 14px;
+    background-color: rgba(28, 149, 255, 0.1);
+    color: $primary-70;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  &__title {
+    margin-top: 12px;
+    color: $gray-90;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  &__subtitle {
+    margin: 12px 0 0;
+    color: $gray-70;
+    font-size: 14px;
+    line-height: 1.5;
+    word-break: keep-all;
+  }
+
+  &__phoneQrPreview {
+    margin-top: 16px;
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 14px;
+    border: 1px dashed rgba(28, 149, 255, 0.22);
+    background-color: rgba(28, 149, 255, 0.02);
+  }
+
+  &__phoneQrBox {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid rgba(28, 149, 255, 0.16);
+    background:
+      linear-gradient(90deg, rgba(28, 149, 255, 0.08) 50%, transparent 50%) 0
+        0 / 8px 8px,
+      linear-gradient(rgba(28, 149, 255, 0.08) 50%, transparent 50%) 0 0 / 8px
+        8px,
+      #fff;
+    position: relative;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 2px solid $primary-50;
+    }
+
+    &::before {
+      top: 5px;
+      left: 5px;
+      border-right: 0;
+      border-bottom: 0;
+      border-radius: 4px 0 0 0;
+    }
+
+    &::after {
+      right: 5px;
+      bottom: 5px;
+      border-left: 0;
+      border-top: 0;
+      border-radius: 0 0 4px 0;
+    }
+  }
+
+  &__phoneQrText {
+    display: grid;
+    gap: 2px;
+
+    strong {
+      color: $gray-90;
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    span {
+      color: $gray-60;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+  }
+
+  &__guide {
+    margin-top: 40px;
+    padding: 16px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+  }
+
+  &__guideTitle {
+    margin: 0;
+    color: $gray-90;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  &__guideList {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    display: grid;
+    gap: 10px;
+  }
+
+  &__guideItem {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 10px;
+    align-items: start;
+    padding: 10px 10px 10px 0;
+    border-radius: 14px;
+    background-color: #f8fbff;
+
+    strong {
+      display: block;
+      color: $gray-90;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    p {
+      margin: 3px 0 0;
+      color: $gray-60;
+      font-size: 12px;
+      line-height: 1.45;
+      word-break: keep-all;
+    }
+  }
+
+  &__guideNumber {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(28, 149, 255, 0.12);
+    color: $primary-70;
+    font-size: 13px;
+    font-weight: 800;
+  }
+}
+
+@media (max-width: 360px) {
+  .landing {
+    padding-left: 14px;
+    padding-right: 14px;
+
+    &__title {
+      font-size: 26px;
+    }
+
+    &__quickInfoList {
+      grid-template-columns: 1fr;
+    }
+  }
+}
