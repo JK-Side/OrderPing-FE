@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import CartPage from "./pages/Cart";
+import CustomerHomePage from "./pages/CustomerHome";
 import HomePage from "./pages/Home";
 import MenuDetailPage from "./pages/MenuDetail";
 // import OrderCompletePage from './pages/OrderComplete';
@@ -7,7 +8,7 @@ import MenuDetailPage from "./pages/MenuDetail";
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<CustomerHomePage />} />
       <Route path="/tables/:tableId" element={<HomePage />} />
       <Route path="/menus/:menuId" element={<MenuDetailPage />} />
       <Route
