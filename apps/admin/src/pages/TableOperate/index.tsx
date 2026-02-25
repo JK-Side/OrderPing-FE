@@ -16,6 +16,7 @@ import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
 
 const ORDER_STATUS_PRIORITY = ['PENDING', 'COOKING', 'COMPLETE'] as const;
+type TableLayout = { columns: number; rows: number };
 
 const formatTableName = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 const getLayoutStorageKey = (storeId: number) => `table-layout:${storeId}`;
@@ -36,6 +37,16 @@ const parseStoredLayout = (value: string | null) => {
   }
   return null;
 };
+
+const createFallbackLayout = (tableCount: number): TableLayout | null => {
+  if (tableCount <= 0) return null;
+  const columns = Math.ceil(Math.sqrt(tableCount));
+  const rows = Math.ceil(tableCount / columns);
+  return { columns, rows };
+};
+
+const isLayoutMatchedToTableCount = (layout: TableLayout | null, tableCount: number) =>
+  !!layout && layout.columns > 0 && layout.rows > 0 && layout.columns * layout.rows === tableCount;
 
 const resolvePriorityOrderStatus = (rawStatus: TableResponse['orderStatus']) => {
   if (!rawStatus) return undefined;
@@ -58,10 +69,7 @@ export default function TableOperate() {
   const parsedId = id ? Number(id) : undefined;
   const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
 
-  const tableLayout =
-    storeId && typeof window !== 'undefined'
-      ? parseStoredLayout(localStorage.getItem(getLayoutStorageKey(storeId)))
-      : null;
+  const [layoutOverride, setLayoutOverride] = useState<{ storeId?: number; layout: TableLayout | null } | null>(null);
 
   const { data: tables = [] } = useTablesByStore(storeId);
   const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
@@ -78,16 +86,26 @@ export default function TableOperate() {
   const [serviceTableId, setServiceTableId] = useState<number | null>(null);
   const [isServiceOpen, setIsServiceOpen] = useState(false);
 
-  const useGridLayout = !!tableLayout && tableLayout.columns > 0 && tableLayout.rows > 0;
+  const storedTableLayout =
+    storeId && typeof window !== 'undefined' ? parseStoredLayout(localStorage.getItem(getLayoutStorageKey(storeId))) : null;
+  const hasLayoutOverrideForStore = layoutOverride !== null && layoutOverride.storeId === storeId;
+  const tableLayout = hasLayoutOverrideForStore ? layoutOverride.layout : storedTableLayout;
+
+  const fallbackLayout = createFallbackLayout(tables.length);
+  const resolvedTableLayout = isLayoutMatchedToTableCount(tableLayout, tables.length) ? tableLayout : fallbackLayout;
+
+  const useGridLayout =
+    !!resolvedTableLayout && resolvedTableLayout.columns > 0 && resolvedTableLayout.rows > 0 && tables.length > 0;
   const tableGridStyle = useGridLayout
     ? {
-        gridTemplateColumns: `repeat(${tableLayout.columns}, minmax(220px, 300px))`,
-        gridTemplateRows: `repeat(${tableLayout.rows}, 222px)`,
+        gridTemplateColumns: `repeat(${resolvedTableLayout.columns}, minmax(220px, 300px))`,
+        gridTemplateRows: `repeat(${resolvedTableLayout.rows}, 222px)`,
       }
     : undefined;
 
   const handleLayoutSave = (layout: { columns: number; rows: number }) => {
     if (!storeId || typeof window === 'undefined') return;
+    setLayoutOverride({ storeId, layout });
     localStorage.setItem(getLayoutStorageKey(storeId), JSON.stringify(layout));
   };
 
@@ -181,12 +199,6 @@ export default function TableOperate() {
               </div>
             ) : null}
             <div className={styles.actionButtons}>
-              <TableCreateModal
-                storeId={storeId}
-                onCreated={(_, layout) => handleLayoutSave(layout)}
-                hasActiveOrders={hasActiveOrders}
-                name={tableButtonLabel}
-              />
               <Button
                 className={styles.clearButton}
                 size="md"
@@ -196,6 +208,23 @@ export default function TableOperate() {
               >
                 테이블 비우기
               </Button>
+              <TableCreateModal
+                storeId={storeId}
+                onLayoutSaved={handleLayoutSave}
+                hasActiveOrders={hasActiveOrders}
+                name={tableButtonLabel}
+                mode={hasTables ? 'edit' : 'create'}
+                tables={sortedTables}
+                initialValues={
+                  hasTables && resolvedTableLayout
+                    ? {
+                        tableCount: tables.length,
+                        tableColumns: resolvedTableLayout.columns,
+                        tableRows: resolvedTableLayout.rows,
+                      }
+                    : null
+                }
+              />
             </div>
           </div>
         </div>
