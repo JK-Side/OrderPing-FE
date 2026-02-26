@@ -15,9 +15,9 @@ export default function MenuDetailPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { addMenu, setActiveTable } = useCart();
-  const { menuId: menuIdParam, tableId: tableIdParam } = useParams<{
+  const { menuId: menuIdParam, storeId: storeIdParam } = useParams<{
     menuId: string;
-    tableId?: string;
+    storeId?: string;
   }>();
   const [searchParams] = useSearchParams();
 
@@ -26,11 +26,15 @@ export default function MenuDetailPage() {
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }, [menuIdParam]);
 
-  const tableId = tableIdParam ?? searchParams.get('tableId');
-  const tableIdNumber = useMemo(() => {
-    const parsed = Number(tableId);
+  const storeId = useMemo(() => {
+    const parsed = Number(storeIdParam);
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-  }, [tableId]);
+  }, [storeIdParam]);
+  const tableNum = useMemo(() => {
+    const parsed = Number(searchParams.get('tableNum'));
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }, [searchParams]);
+  const hasTableContext = storeId !== null && tableNum !== null;
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['customer', 'menu-detail', menuId],
@@ -41,11 +45,15 @@ export default function MenuDetailPage() {
   const hasNotFoundError = (error as { status?: number } | null)?.status === 404;
 
   useEffect(() => {
-    setActiveTable(tableIdNumber);
-  }, [setActiveTable, tableIdNumber]);
+    setActiveTable(tableNum);
+  }, [setActiveTable, tableNum]);
 
   const backToMenu = () => {
-    navigate(tableId ? `/tables/${tableId}` : '/');
+    navigate(hasTableContext ? `/stores/${storeId}?tableNum=${tableNum}` : '/');
+  };
+
+  const openOrderHistoryPage = () => {
+    navigate(hasTableContext ? `/orders/completed?storeId=${storeId}&tableNum=${tableNum}` : '/orders/completed');
   };
 
   const increaseQuantity = () => {
@@ -75,7 +83,7 @@ export default function MenuDetailPage() {
       duration: 3000,
     });
 
-    navigate(tableId ? `/tables/${tableId}` : '/');
+    navigate(hasTableContext ? `/stores/${storeId}?tableNum=${tableNum}` : '/');
   };
 
   const totalPrice = (data?.price ?? 0) * quantity;
@@ -86,7 +94,7 @@ export default function MenuDetailPage() {
         <button type="button" className={styles.menuDetail__backButton} onClick={backToMenu}>
           <BackIcon />
         </button>
-        <button type="button" className={styles.menuDetail__historyButton}>
+        <button type="button" className={styles.menuDetail__historyButton} onClick={openOrderHistoryPage}>
           주문 내역
         </button>
       </header>

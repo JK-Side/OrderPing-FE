@@ -65,7 +65,6 @@ interface ServiceMenu {
   quantity: number;
 }
 export interface ServiceOrderRequest {
-  tableId: number;
   tableNum: number;
   storeId: number;
   menus: ServiceMenu[];

@@ -107,7 +107,6 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
     try {
       await createServiceOrder({
         storeId: table.storeId,
-        tableId: table.id,
         tableNum: table.tableNum,
         menus: [
           {

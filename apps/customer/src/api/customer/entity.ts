@@ -2,7 +2,6 @@ type OrderStatus = 'PENDING' | 'COOKING' | 'COMPLETE';
 
 // POST /api/customer/orders
 export interface CreateCustomerOrderRequest {
-  tableId: number;
   tableNum: number;
   storeId: number;
   depositorName: string;
@@ -71,7 +70,7 @@ export interface CustomerMenuDetailResponse {
   isSoldOut: boolean;
 }
 
-export interface CustomerOrderLookupMenu {
+interface CustomerOrderLookupMenu {
   menuId: number;
   menuName: string;
   quantity: number;
@@ -79,8 +78,8 @@ export interface CustomerOrderLookupMenu {
   isService: boolean;
 }
 
-// GET /api/customer/orders/table/{tableId}
-export interface CustomerOrderLookup {
+// GET /api/customer/stores/{storeId}?tableNum={tableNum}
+export interface CustomerOrderLookupResponse {
   id: number;
   tableId: number;
   tableNum: number;

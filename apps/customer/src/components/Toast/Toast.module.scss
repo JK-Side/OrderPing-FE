@@ -3,10 +3,10 @@
 .viewport {
   position: fixed;
   left: 50%;
-  bottom: calc(100px + env(safe-area-inset-bottom));
+  bottom: calc(130px + env(safe-area-inset-bottom));
   transform: translateX(-50%);
   z-index: 30;
-  width: 240px;
+  width: 260px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -19,11 +19,11 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  width: 240px;
-  padding: 8px 12px;
+  width: 100%;
+  padding: 10px 12px;
   border-radius: 32px;
   color: $white;
-  background-color: #8f99aa;
+  background-color: $gray-40;
   font-size: 14px;
   font-weight: 600;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
@@ -45,7 +45,7 @@
 .toast--success,
 .toast--warning,
 .toast--error {
-  background-color: #8f99aa;
+  background-color: $gray-40;
 }
 
 .toast[data-state="open"] {

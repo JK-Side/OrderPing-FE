@@ -41,13 +41,17 @@ export default function CartPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isOpeningToss, setIsOpeningToss] = useState(false);
-  const { tableId: tableIdParam } = useParams<{ tableId?: string }>();
+  const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
-  const tableId = tableIdParam ?? searchParams.get("tableId");
-  const tableIdNumber = useMemo(() => {
-    const parsed = Number(tableId);
+  const storeId = useMemo(() => {
+    const parsed = Number(storeIdParam ?? searchParams.get("storeId"));
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-  }, [tableId]);
+  }, [searchParams, storeIdParam]);
+  const tableNum = useMemo(() => {
+    const parsed = Number(searchParams.get("tableNum"));
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }, [searchParams]);
+  const hasTableContext = storeId !== null && tableNum !== null;
 
   const {
     items,
@@ -58,19 +62,19 @@ export default function CartPage() {
     setActiveTable,
   } = useCart();
   const { data: tableMenuData } = useQuery({
-    queryKey: ["customer", "table-menus", tableIdNumber],
-    queryFn: () => getTableMenusByTableId(tableIdNumber as number),
-    enabled: tableIdNumber !== null,
+    queryKey: ["customer", "table-menus", storeId, tableNum],
+    queryFn: () => getTableMenusByTableId(storeId as number, tableNum as number),
+    enabled: hasTableContext,
   });
 
   const backToMenuUrl = useMemo(
-    () => (tableId ? `/tables/${tableId}` : "/"),
-    [tableId],
+    () => (hasTableContext ? `/stores/${storeId}?tableNum=${tableNum}` : "/"),
+    [hasTableContext, storeId, tableNum],
   );
 
   useEffect(() => {
-    setActiveTable(tableIdNumber);
-  }, [setActiveTable, tableIdNumber]);
+    setActiveTable(tableNum);
+  }, [setActiveTable, tableNum]);
 
   const openTossWithStoreFallback = async (tossDeeplink: string) => {
     if (!isExternalPaymentUrl(tossDeeplink)) {
@@ -142,7 +146,7 @@ export default function CartPage() {
   const handleOrderButtonClick = async () => {
     if (items.length === 0 || isOpeningToss) return;
 
-    if (tableIdNumber === null) {
+    if (!hasTableContext) {
       toast({
         message: "테이블 정보를 확인할 수 없어요.",
         variant: "warning",
