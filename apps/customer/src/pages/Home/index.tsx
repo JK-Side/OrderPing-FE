@@ -9,26 +9,6 @@ type TabKey = 'main' | 'side';
 
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
-const getTableIdFromUrl = () => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const tableIdFromQuery = Number(searchParams.get('tableId'));
-  if (Number.isInteger(tableIdFromQuery) && tableIdFromQuery > 0) {
-    return tableIdFromQuery;
-  }
-
-  const pathSegments = window.location.pathname.split('/').filter(Boolean);
-  if (pathSegments.length === 0) {
-    return null;
-  }
-
-  const tableIdFromPath = Number(decodeURIComponent(pathSegments[pathSegments.length - 1]));
-  if (Number.isInteger(tableIdFromPath) && tableIdFromPath > 0) {
-    return tableIdFromPath;
-  }
-
-  return null;
-};
-
 interface MenuCardProps {
   menu: CustomerStoreOrderMenu;
   onClick: (menuId: number) => void;
@@ -74,21 +54,16 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabKey>('main');
   const [isTabSticky, setIsTabSticky] = useState(false);
-  const { tableId: tableIdParam } = useParams<{ tableId: string }>();
+  const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
-  const tableId = useMemo(() => {
-    const fromParams = Number(tableIdParam);
-    if (Number.isInteger(fromParams) && fromParams > 0) {
-      return fromParams;
-    }
-
-    const fromQuery = Number(searchParams.get('tableId'));
-    if (Number.isInteger(fromQuery) && fromQuery > 0) {
-      return fromQuery;
-    }
-
-    return getTableIdFromUrl();
-  }, [searchParams, tableIdParam]);
+  const storeId = useMemo(() => {
+    const parsed = Number(storeIdParam);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }, [storeIdParam]);
+  const tableNum = useMemo(() => {
+    const parsed = Number(searchParams.get('tableNum'));
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }, [searchParams]);
 
   const mainSectionRef = useRef<HTMLElement | null>(null);
   const sideSectionRef = useRef<HTMLElement | null>(null);
@@ -97,7 +72,7 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { totalPrice, totalQuantity, setActiveTable } = useCart();
 
-  const { data, isLoading, error } = useStoreOrder(tableId);
+  const { data, isLoading, error } = useStoreOrder(storeId, tableNum);
   const categories = useMemo(() => data?.categories ?? [], [data]);
 
   const mainCategory = useMemo(() => {
@@ -121,10 +96,11 @@ export default function HomePage() {
   const sideSectionLabel = sideCategory?.name ?? '사이드 메뉴';
   const hasSideSection = sideCategory !== null;
   const hasNotFoundError = (error as { status?: number } | null)?.status === 404;
+  const hasTableContext = storeId !== null && tableNum !== null;
 
   useEffect(() => {
-    setActiveTable(tableId);
-  }, [setActiveTable, tableId]);
+    setActiveTable(tableNum);
+  }, [setActiveTable, tableNum]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -169,11 +145,19 @@ export default function HomePage() {
   };
 
   const handleMenuCardClick = (menuId: number) => {
-    navigate(tableId ? `/tables/${tableId}/menus/${menuId}` : `/menus/${menuId}`);
+    navigate(
+      hasTableContext
+        ? `/stores/${storeId}/menus/${menuId}?tableNum=${tableNum}`
+        : `/menus/${menuId}`,
+    );
   };
 
   const openCartPage = () => {
-    navigate(tableId ? `/tables/${tableId}/cart` : '/cart');
+    navigate(hasTableContext ? `/cart?storeId=${storeId}&tableNum=${tableNum}` : '/cart');
+  };
+
+  const openOrderHistoryPage = () => {
+    navigate(hasTableContext ? `/orders/completed?storeId=${storeId}&tableNum=${tableNum}` : '/orders/completed');
   };
 
   return (
@@ -185,7 +169,7 @@ export default function HomePage() {
           <div className={styles.home__heroFallback}>이미지가 없어요.</div>
         )}
 
-        <button type="button" className={styles.home__historyFloatingButton}>
+        <button type="button" className={styles.home__historyFloatingButton} onClick={openOrderHistoryPage}>
           주문 내역
         </button>
       </section>
@@ -237,23 +221,23 @@ export default function HomePage() {
           </div>
 
           {isTabSticky ? (
-            <button type="button" className={styles.home__historyTabButton}>
+            <button type="button" className={styles.home__historyTabButton} onClick={openOrderHistoryPage}>
               주문 내역
             </button>
           ) : null}
         </div>
       </div>
 
-      {!tableId ? <div className={styles.home__statusBox}>테이블 정보가 없어요.</div> : null}
-      {tableId && isLoading ? <div className={styles.home__statusBox}>메뉴를 불러오는 중...</div> : null}
-      {tableId && !isLoading && hasNotFoundError ? (
+      {!hasTableContext ? <div className={styles.home__statusBox}>테이블 정보가 없어요.</div> : null}
+      {hasTableContext && isLoading ? <div className={styles.home__statusBox}>메뉴를 불러오는 중...</div> : null}
+      {hasTableContext && !isLoading && hasNotFoundError ? (
         <div className={styles.home__statusBox}>테이블 또는 매장을 찾을 수 없어요.</div>
       ) : null}
-      {tableId && !isLoading && !hasNotFoundError && error ? (
+      {hasTableContext && !isLoading && !hasNotFoundError && error ? (
         <div className={styles.home__statusBox}>메뉴를 불러오지 못했어요.</div>
       ) : null}
 
-      {tableId && !isLoading && !error ? (
+      {hasTableContext && !isLoading && !error ? (
         <>
           <section ref={mainSectionRef} data-tab="main" className={styles.home__menuSection}>
             <div className={styles.home__sectionTitle}>{mainSectionLabel}</div>

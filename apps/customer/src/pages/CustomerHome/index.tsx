@@ -1,33 +1,6 @@
-﻿import { useEffect, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./CustomerHome.module.scss";
 
-const getValidTableId = (value: string | null) => {
-  const tableId = Number(value);
-
-  if (!Number.isInteger(tableId) || tableId <= 0) {
-    return null;
-  }
-
-  return tableId;
-};
-
 export default function CustomerHomePage() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-
-  const legacyTableId = useMemo(
-    () => getValidTableId(searchParams.get("tableId")),
-    [searchParams],
-  );
-
-  useEffect(() => {
-    if (!legacyTableId) return;
-
-    // Backward compatibility for old QR format: /?tableId=1
-    navigate(`/tables/${legacyTableId}`, { replace: true });
-  }, [legacyTableId, navigate]);
-
   return (
     <main className={styles.landing}>
       <div className={styles.landing__backgroundGlow} aria-hidden="true" />

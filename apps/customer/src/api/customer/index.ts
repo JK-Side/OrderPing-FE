@@ -4,7 +4,7 @@ import type {
   CreateCustomerOrderRequest,
   CreateCustomerOrderResponse,
   CustomerMenuDetailResponse,
-  CustomerOrderLookup,
+  CustomerOrderLookupResponse,
   CustomerTableMenuResponse,
 } from './entity';
 
@@ -16,21 +16,24 @@ export const postCreatedCustomerOrder = async (body: CreateCustomerOrderRequest)
 
 export const postCreatedMenu = postCreatedCustomerOrder;
 
-export const getTableMenusByTableId = async (tableId: number) => {
+export const getTableMenusByTableId = async (storeId: number, tableNum: number) => {
   return await apiClient.get<CustomerTableMenuResponse>(
-    `/api/customer/menus/tables/${tableId}`,
+    `/api/customer/stores/${storeId}?tableNum=${tableNum}`,
   );
 };
 
 export const getMenuDetailByMenuId = async (menuId: number) => {
   return await apiClient.get<CustomerMenuDetailResponse>(
-    `/api/customer/menus/details/${menuId}`,
+    `/api/customer/stores/details/${menuId}`,
   );
 };
 
-export const getCustomerOrdersByTableId = async (tableId: number) => {
-  return await apiClient.get<CustomerOrderLookup[]>(
-    `/api/customer/orders/table/${tableId}`,
+export const getCustomerOrdersByTableId = async (storeId: number, tableNum: number) => {
+  return await apiClient.get<CustomerOrderLookupResponse[]>(
+    '/api/customer/orders/table',
+    {
+      params: { storeId, tableNum },
+    },
   );
 };
 

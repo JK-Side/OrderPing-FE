@@ -1,0 +1,112 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.orderComplete {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: $white;
+  padding-bottom: 124px;
+
+  &__content {
+    padding: max(28px, env(safe-area-inset-top)) 24px 24px;
+  }
+
+  &__hero {
+    padding: 52px 4px 24px;
+  }
+
+  &__title {
+    margin: 0;
+    color: $black;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1.3;
+    word-break: keep-all;
+  }
+
+  &__summary {
+    margin: 16px 0 0;
+    color: $black;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  &__status {
+    padding: 16px 4px;
+    color: $gray-70;
+    font-size: 15px;
+  }
+
+  &__list {
+    margin-top: 8px;
+  }
+
+  &__orderCard {
+    padding: 22px 4px 18px;
+    border-top: 1px solid $gray-10;
+  }
+
+  &__orderHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__orderNumber {
+    color: $black;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  &__orderTime {
+    color: $gray-60;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  &__menuList {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__menuLine {
+    color: $black;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+    word-break: keep-all;
+  }
+
+  &__orderPrice {
+    margin-top: 10px;
+    color: $gray-70;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  &__bottom {
+    position: fixed;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 560px;
+    background-color: $gray-10;
+    padding: 10px 20px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  &__menuButton {
+    width: 100%;
+    height: 58px;
+    border-radius: 16px;
+    background-color: $primary-50;
+    color: $white;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
