@@ -1,5 +1,5 @@
-import BackIcon from '@/assets/icons/back.svg?react';
-import { getPaymentTossDeeplink } from '../../api/customer';
+﻿import BackIcon from '@/assets/icons/back.svg?react';
+import { getPaymentTossDeeplink, postCreatedCustomerOrder } from '../../api/customer';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
 import {
@@ -18,7 +18,7 @@ const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 export default function OrderConfirmPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { setActiveTable, items, totalQuantity, totalPrice } = useCart();
+  const { clearCart, setActiveTable, items, totalQuantity, totalPrice } = useCart();
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
@@ -79,12 +79,21 @@ export default function OrderConfirmPage() {
 
     try {
       setIsPreparingPayment(true);
-      const paymentInfo = await getPaymentTossDeeplink({
+
+      const createdOrder = await postCreatedCustomerOrder({
+        tableId: data.tableId,
+        tableNum: data.tableNum,
         storeId: data.storeId,
-        amount: paymentAmount,
+        depositorName: depositorName.trim(),
+        couponAmount,
+        menus: items.map((item) => ({
+          menuId: item.menuId,
+          quantity: item.quantity,
+        })),
       });
 
-      savePendingOrderDraft({
+      const baseDraft = {
+        orderId: createdOrder.id,
         storeId: data.storeId,
         tableId: data.tableId,
         tableNum: data.tableNum,
@@ -92,20 +101,51 @@ export default function OrderConfirmPage() {
         couponAmount,
         totalPrice,
         paymentAmount,
-        tossDeeplink: paymentInfo.tossDeeplink,
-        account: paymentInfo.account,
+        tossDeeplink: '',
+        account: {
+          bankCode: '',
+          bankName: '',
+          accountHolder: '',
+          accountNumber: '',
+        },
         items,
         createdAt: new Date().toISOString(),
-      });
+      };
+
+      savePendingOrderDraft(baseDraft);
+      clearCart();
+
+      try {
+        const paymentInfo = await getPaymentTossDeeplink({
+          storeId: data.storeId,
+          amount: paymentAmount,
+        });
+
+        savePendingOrderDraft({
+          ...baseDraft,
+          tossDeeplink: paymentInfo.tossDeeplink,
+          account: paymentInfo.account,
+        });
+      } catch (error) {
+        const status = (error as { status?: number } | null)?.status;
+        toast({
+          message:
+            status === 404
+              ? '입금 계좌 정보를 찾을 수 없어요. 다음 화면에서 다시 시도해 주세요.'
+              : '토스 결제 링크를 불러오지 못했어요. 다음 화면에서 다시 시도해 주세요.',
+          variant: 'error',
+          duration: 3000,
+        });
+      }
 
       navigate(buildOrderPaymentWaitPath(storeId, tableNum));
     } catch (error) {
       const status = (error as { status?: number } | null)?.status;
       toast({
         message:
-          status === 404
-            ? '입금 계좌 정보를 찾을 수 없어요.'
-            : '토스 결제 링크를 불러오지 못했어요.',
+          status === 409
+            ? '품절된 메뉴가 있어 주문할 수 없어요.'
+            : '주문 생성에 실패했어요. 다시 시도해 주세요.',
         variant: 'error',
         duration: 3000,
       });
@@ -209,7 +249,7 @@ export default function OrderConfirmPage() {
         >
           <span className={styles.orderConfirm__submitCount}>{totalQuantity}</span>
           <span>
-            {isPreparingPayment ? '결제 준비 중...' : `${formatPrice(paymentAmount)} 주문하기`}
+            {isPreparingPayment ? '주문 준비 중...' : `${formatPrice(paymentAmount)} 주문하기`}
           </span>
         </button>
       </footer>

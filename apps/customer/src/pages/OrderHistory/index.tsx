@@ -1,4 +1,5 @@
 import { getCustomerOrdersByTableId } from '../../api/customer';
+import PageHeader from '../../components/PageHeader';
 import type { CustomerOrderLookupResponse } from '../../api/customer/entity';
 import { useCart } from '../../stores/cart';
 import { buildStoreHomePath, parsePositiveInt } from '../../utils/orderFlow';
@@ -66,6 +67,11 @@ export default function OrderHistoryPage() {
 
   return (
     <main className={styles.orderHistory}>
+      <PageHeader
+        title="주문 내역"
+        onBack={() => navigate(hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/')}
+      />
+
       <section className={styles.orderHistory__content}>
         <header className={styles.orderHistory__hero}>
           <h1 className={styles.orderHistory__title}>주문 내역</h1>

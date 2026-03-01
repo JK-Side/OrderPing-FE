@@ -1,3 +1,4 @@
+import PageHeader from '../../components/PageHeader';
 import { useCart } from '../../stores/cart';
 import {
   buildStoreHomePath,
@@ -32,6 +33,11 @@ export default function OrderIssuePage() {
 
   return (
     <main className={styles.orderIssue}>
+      <PageHeader
+        title="문의 안내"
+        onBack={() => navigate(hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/')}
+      />
+
       <section className={styles.orderIssue__content}>
         <h1 className={styles.orderIssue__title}>주점장에게 문의하세요</h1>
         <p className={styles.orderIssue__description}>

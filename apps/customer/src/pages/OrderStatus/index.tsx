@@ -1,4 +1,5 @@
 import { getCustomerOrdersByTableId } from "../../api/customer";
+import PageHeader from "../../components/PageHeader";
 import type { CustomerOrderLookupResponse } from "../../api/customer/entity";
 import { useCart } from "../../stores/cart";
 import {
@@ -83,6 +84,13 @@ export default function OrderStatusPage() {
 
   return (
     <main className={styles.orderStatus}>
+      <PageHeader
+        title="주문 상태"
+        onBack={() =>
+          navigate(hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/")
+        }
+      />
+
       <section className={styles.orderStatus__content}>
         <header className={styles.orderStatus__hero}>
           <h1 className={styles.orderStatus__title}>{title}</h1>

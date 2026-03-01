@@ -1,4 +1,5 @@
 import type { CustomerStoreOrderMenu } from "../../api/customer/entity";
+import PageHeader from "../../components/PageHeader";
 import { useCart } from "../../stores/cart";
 import { buildOrderHistoryPath, parsePositiveInt } from "../../utils/orderFlow";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -179,6 +180,11 @@ export default function HomePage() {
 
   return (
     <main className={styles.home}>
+      <PageHeader
+        title={data?.storeName ?? "메뉴판"}
+        onBack={() => navigate("/")}
+      />
+
       <section className={styles.home__hero}>
         {data?.storeImageUrl ? (
           <img

@@ -9,6 +9,7 @@ const ORDER_DRAFT_STORAGE_KEY = 'order-ping:customer-order-draft:v1';
 type MobilePlatform = 'android' | 'ios' | 'other';
 
 export interface PendingOrderDraft {
+  orderId: number;
   storeId: number;
   tableId: number;
   tableNum: number;
@@ -75,6 +76,7 @@ const isValidDraft = (value: unknown): value is PendingOrderDraft => {
 
   const draft = value as PendingOrderDraft;
   return (
+    typeof draft.orderId === 'number' &&
     typeof draft.storeId === 'number' &&
     typeof draft.tableId === 'number' &&
     typeof draft.tableNum === 'number' &&
