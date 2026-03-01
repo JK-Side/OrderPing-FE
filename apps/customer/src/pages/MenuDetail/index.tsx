@@ -1,8 +1,9 @@
-﻿import BackIcon from '@/assets/icons/back.svg?react';
+import BackIcon from '@/assets/icons/back.svg?react';
 import { getMenuDetailByMenuId } from '../../api/customer';
 import QuantityControl from '../../components/QuantityControl';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
+import { buildOrderStatusPath, parsePositiveInt } from '../../utils/orderFlow';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -26,14 +27,8 @@ export default function MenuDetailPage() {
     return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }, [menuIdParam]);
 
-  const storeId = useMemo(() => {
-    const parsed = Number(storeIdParam);
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-  }, [storeIdParam]);
-  const tableNum = useMemo(() => {
-    const parsed = Number(searchParams.get('tableNum'));
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-  }, [searchParams]);
+  const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
+  const tableNum = useMemo(() => parsePositiveInt(searchParams.get('tableNum')), [searchParams]);
   const hasTableContext = storeId !== null && tableNum !== null;
 
   const { data, isLoading, error } = useQuery({
@@ -53,7 +48,7 @@ export default function MenuDetailPage() {
   };
 
   const openOrderHistoryPage = () => {
-    navigate(hasTableContext ? `/orders/completed?storeId=${storeId}&tableNum=${tableNum}` : '/orders/completed');
+    navigate(hasTableContext ? buildOrderStatusPath(storeId, tableNum) : '/');
   };
 
   const increaseQuantity = () => {
@@ -94,7 +89,11 @@ export default function MenuDetailPage() {
         <button type="button" className={styles.menuDetail__backButton} onClick={backToMenu}>
           <BackIcon />
         </button>
-        <button type="button" className={styles.menuDetail__historyButton} onClick={openOrderHistoryPage}>
+        <button
+          type="button"
+          className={styles.menuDetail__historyButton}
+          onClick={openOrderHistoryPage}
+        >
           주문 내역
         </button>
       </header>

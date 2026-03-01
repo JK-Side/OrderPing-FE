@@ -3,7 +3,10 @@ import CartPage from "./pages/Cart";
 import CustomerHomePage from "./pages/CustomerHome";
 import HomePage from "./pages/Home";
 import MenuDetailPage from "./pages/MenuDetail";
-// import OrderCompletePage from "./pages/OrderComplete";
+import OrderConfirmPage from "./pages/OrderConfirm";
+import OrderIssuePage from "./pages/OrderIssue";
+import OrderStatusPage from "./pages/OrderStatus";
+import PaymentWaitPage from "./pages/PaymentWait";
 
 function App() {
   return (
@@ -17,7 +20,10 @@ function App() {
       />
       <Route path="/cart" element={<CartPage />} />
       <Route path="/stores/:storeId/cart" element={<CartPage />} />
-      {/* <Route path="/orders/completed" element={<OrderCompletePage />} /> */}
+      <Route path="/stores/:storeId/orders/confirm" element={<OrderConfirmPage />} />
+      <Route path="/stores/:storeId/orders/payment" element={<PaymentWaitPage />} />
+      <Route path="/stores/:storeId/orders/status" element={<OrderStatusPage />} />
+      <Route path="/stores/:storeId/orders/issue" element={<OrderIssuePage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
