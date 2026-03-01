@@ -1,0 +1,47 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.pageHeader {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: max(10px, env(safe-area-inset-top)) 16px 10px;
+  background-color: $white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid $gray-10;
+}
+
+.pageHeader__backButton {
+  width: 24px;
+  height: 24px;
+  border-radius: 18px;
+  background-color: transparent;
+  color: $gray-90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.pageHeader__title {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  color: $black;
+  font-size: 20px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pageHeader__right {
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
