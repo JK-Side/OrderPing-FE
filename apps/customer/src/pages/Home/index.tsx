@@ -1,6 +1,6 @@
 import type { CustomerStoreOrderMenu } from "../../api/customer/entity";
 import { useCart } from "../../stores/cart";
-import { buildOrderStatusPath, parsePositiveInt } from "../../utils/orderFlow";
+import { buildOrderHistoryPath, parsePositiveInt } from "../../utils/orderFlow";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useStoreOrder } from "./hooks/useStoreOrder";
@@ -174,7 +174,7 @@ export default function HomePage() {
   };
 
   const openOrderHistoryPage = () => {
-    navigate(hasTableContext ? buildOrderStatusPath(storeId, tableNum) : "/");
+    navigate(hasTableContext ? buildOrderHistoryPath(storeId, tableNum) : "/");
   };
 
   return (

@@ -51,6 +51,9 @@ export const buildOrderStatusPath = (
   return `/stores/${storeId}/orders/status?${params.toString()}`;
 };
 
+export const buildOrderHistoryPath = (storeId: number, tableNum: number) =>
+  `/stores/${storeId}/orders/history?tableNum=${tableNum}`;
+
 export const buildOrderIssuePath = (storeId: number, tableNum: number) =>
   `/stores/${storeId}/orders/issue?tableNum=${tableNum}`;
 

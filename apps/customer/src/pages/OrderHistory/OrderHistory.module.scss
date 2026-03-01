@@ -1,6 +1,6 @@
 @use "@order-ping/shared/styles/colors" as *;
 
-.orderStatus {
+.orderHistory {
   width: 100%;
   max-width: 560px;
   min-height: 100vh;
@@ -24,10 +24,10 @@
   }
 
   &__summary {
-    margin: 8px 0 0;
+    margin: 16px 0 0;
     color: $black;
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 700;
   }
 
   &__status {
@@ -43,10 +43,6 @@
   &__orderCard {
     padding: 22px 4px 18px;
     border-top: 1px solid $gray-10;
-
-    // &--active {
-    //   background-color: rgba(0, 142, 255, 0.04);
-    // }
   }
 
   &__orderHeader {
@@ -100,30 +96,14 @@
     padding: 10px 20px calc(16px + env(safe-area-inset-bottom));
   }
 
-  &__buttonGroup {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-
-  &__secondaryButton,
   &__menuButton {
     width: 100%;
     height: 58px;
     border-radius: 16px;
+    background-color: $primary-50;
+    color: $white;
     font-size: 18px;
     font-weight: 700;
     cursor: pointer;
-  }
-
-  &__secondaryButton {
-    background-color: $white;
-    color: $primary-50;
-    border: 1px solid rgba(0, 142, 255, 0.25);
-  }
-
-  &__menuButton {
-    background-color: $primary-50;
-    color: $white;
   }
 }

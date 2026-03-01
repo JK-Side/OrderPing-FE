@@ -3,7 +3,7 @@ import { getMenuDetailByMenuId } from '../../api/customer';
 import QuantityControl from '../../components/QuantityControl';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
-import { buildOrderStatusPath, parsePositiveInt } from '../../utils/orderFlow';
+import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -48,7 +48,7 @@ export default function MenuDetailPage() {
   };
 
   const openOrderHistoryPage = () => {
-    navigate(hasTableContext ? buildOrderStatusPath(storeId, tableNum) : '/');
+    navigate(hasTableContext ? buildOrderHistoryPath(storeId, tableNum) : '/');
   };
 
   const increaseQuantity = () => {
