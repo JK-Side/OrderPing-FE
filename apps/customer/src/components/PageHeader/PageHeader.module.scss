@@ -8,7 +8,7 @@
   z-index: 30;
   box-sizing: border-box;
   min-height: var(--page-header-height);
-  padding: max(10px, env(safe-area-inset-top)) 16px 10px;
+  padding: max(10px, env(safe-area-inset-top)) 24px 10px;
   background-color: var(--page-header-background, #{$white});
   color: var(--page-header-color, #{$black});
   display: flex;

@@ -191,7 +191,7 @@ export default function OrderConfirmPage() {
         ) : null}
 
         {hasTableContext && !isLoading && items.length > 0 ? (
-          <>
+          <div className={styles.orderConfirm__sections}>
             <section className={styles.orderConfirm__section}>
               {items.map((item) => (
                 <article
@@ -201,9 +201,14 @@ export default function OrderConfirmPage() {
                   <div className={styles.orderConfirm__itemName}>
                     {item.name}
                   </div>
-                  <div className={styles.orderConfirm__itemMeta}>
-                    <span>{formatPrice(item.price)}</span>
-                    <span>{`x ${item.quantity}`}</span>
+
+                  <div className={styles.orderConfirm__itemPrice}>
+                    {formatPrice(item.price)}
+                  </div>
+                  <div className={styles.orderConfirm__itemQuantity}>
+                    <div
+                      className={styles["orderConfirm__itemQuantity--text"]}
+                    >{`${item.quantity}개`}</div>
                   </div>
                 </article>
               ))}
@@ -238,18 +243,18 @@ export default function OrderConfirmPage() {
             <section className={styles.orderConfirm__summary}>
               <div className={styles.orderConfirm__summaryRow}>
                 <span>메뉴 합계</span>
-                <strong>{formatPrice(totalPrice)}</strong>
+                <div>{formatPrice(totalPrice)}</div>
               </div>
               <div className={styles.orderConfirm__summaryRow}>
                 <span>쿠폰 사용</span>
-                <strong>{formatPrice(couponAmount)}</strong>
+                <div>{formatPrice(couponAmount)}</div>
               </div>
-              <div className={styles.orderConfirm__summaryRow}>
+              <div className={styles.orderConfirm__summaryFinal}>
                 <span>최종 결제 금액</span>
-                <strong>{formatPrice(paymentAmount)}</strong>
+                <div>{formatPrice(paymentAmount)}</div>
               </div>
             </section>
-          </>
+          </div>
         ) : null}
       </section>
 
