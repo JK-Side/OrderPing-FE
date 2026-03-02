@@ -1,5 +1,5 @@
-import BackIcon from '@/assets/icons/back.svg?react';
-import { getMenuDetailByMenuId } from '../../api/customer';
+﻿import { getMenuDetailByMenuId } from '../../api/customer';
+import PageHeader from '../../components/PageHeader';
 import QuantityControl from '../../components/QuantityControl';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
@@ -28,7 +28,10 @@ export default function MenuDetailPage() {
   }, [menuIdParam]);
 
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
-  const tableNum = useMemo(() => parsePositiveInt(searchParams.get('tableNum')), [searchParams]);
+  const tableNum = useMemo(
+    () => parsePositiveInt(searchParams.get('tableNum')),
+    [searchParams],
+  );
   const hasTableContext = storeId !== null && tableNum !== null;
 
   const { data, isLoading, error } = useQuery({
@@ -73,7 +76,7 @@ export default function MenuDetailPage() {
     );
 
     toast({
-      message: '장바구니에 메뉴를 추가했어요',
+      message: '장바구니에 메뉴를 추가했어요.',
       variant: 'success',
       duration: 3000,
     });
@@ -85,18 +88,21 @@ export default function MenuDetailPage() {
 
   return (
     <main className={styles.menuDetail}>
-      <header className={styles.menuDetail__header}>
-        <button type="button" className={styles.menuDetail__backButton} onClick={backToMenu}>
-          <BackIcon />
-        </button>
-        <button
-          type="button"
-          className={styles.menuDetail__historyButton}
-          onClick={openOrderHistoryPage}
-        >
-          주문 내역
-        </button>
-      </header>
+      <PageHeader
+        title={data?.name ?? '메뉴 상세'}
+        onBack={backToMenu}
+        rightSlot={
+          hasTableContext ? (
+            <button
+              type="button"
+              className={styles.menuDetail__historyButton}
+              onClick={openOrderHistoryPage}
+            >
+              주문 내역
+            </button>
+          ) : null
+        }
+      />
 
       {!menuId ? <div className={styles.menuDetail__status}>유효하지 않은 메뉴예요.</div> : null}
       {menuId && isLoading ? (
@@ -115,7 +121,7 @@ export default function MenuDetailPage() {
             {data.imageUrl ? (
               <img src={data.imageUrl} alt={data.name} className={styles.menuDetail__image} />
             ) : (
-              <div className={styles.menuDetail__imageFallback}>이미지가 없어요.</div>
+              <div className={styles.menuDetail__imageFallback}>이미지가 없어요</div>
             )}
           </section>
 
