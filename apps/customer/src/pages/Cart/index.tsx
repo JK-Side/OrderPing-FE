@@ -66,17 +66,6 @@ export default function CartPage() {
   return (
     <main className={styles.cart}>
       <PageHeader title="장바구니" onBack={() => navigate(backToMenuUrl)} />
-      {/* <header className={styles.cart__header}>
-        <button
-          type="button"
-          className={styles.cart__backButton}
-          onClick={() => navigate(backToMenuUrl)}
-        >
-          <BackIcon />
-        </button>
-        <div className={styles.cart__title}>장바구니</div>
-        <div className={styles.cart__spacer} />
-      </header> */}
 
       <section className={styles.cart__content}>
         {items.length === 0 ? (
