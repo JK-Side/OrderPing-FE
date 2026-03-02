@@ -9,17 +9,15 @@
   padding-bottom: 96px;
 
   &__historyButton {
-    height: 34px;
-    padding: 0 14px;
-    border-radius: 17px;
-    border: 1px solid rgba(37, 99, 235, 0.16);
+    display: flex;
+    padding: 6px 14px;
+    border-radius: 18px;
     background-color: $primary-50;
+    align-items: center;
     color: $white;
-    font-size: 13px;
-    font-weight: 700;
-    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.24);
   }
 
   &__status {
