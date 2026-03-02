@@ -1,8 +1,11 @@
-import clsx from 'clsx';
-import type { ReactNode, SVGProps } from 'react';
-import styles from './Input.module.scss';
+import ErrorCircleIcon from "../../assets/icons/error-circle.svg?react";
+import InfoCircleIcon from "../../assets/icons/info-circle.svg?react";
+import WarningCircleIcon from "../../assets/icons/warning-circle.svg?react";
+import clsx from "clsx";
+import type { ReactNode, SVGProps } from "react";
+import styles from "./Input.module.scss";
 
-export type InputMessageState = 'error' | 'warning' | 'success' | 'info';
+export type InputMessageState = "error" | "warning" | "success" | "info";
 
 interface InputProps {
   label?: string;
@@ -12,23 +15,17 @@ interface InputProps {
   children: ReactNode;
 }
 
-const ICON_COLOR_BY_STATE: Record<InputMessageState, string> = {
-  error: '#ff5470',
-  warning: '#ffb800',
-  success: '#11b76b',
-  info: '#008eff',
-};
-
-function MessageCircleIcon({
-  color,
-  ...props
-}: SVGProps<SVGSVGElement> & { color: string }) {
+function SuccessCircleIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" {...props}>
-      <circle cx="8" cy="8" r="7" fill={color} />
+      <circle cx="8" cy="8" r="7" fill="#11B76B" />
       <path
-        d="M8 4.25a.875.875 0 1 1 0 1.75.875.875 0 0 1 0-1.75Zm1 7H7V7h2v4.25Z"
-        fill="#fff"
+        d="m5.1 8.2 1.8 1.8 4-4"
+        fill="none"
+        stroke="#fff"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -41,6 +38,15 @@ export function InputRoot({
   required,
   children,
 }: InputProps) {
+  const MessageIcon =
+    messageState === "warning"
+      ? WarningCircleIcon
+      : messageState === "info"
+        ? InfoCircleIcon
+        : messageState === "success"
+          ? SuccessCircleIcon
+          : ErrorCircleIcon;
+
   return (
     <div className={styles.wrapper}>
       {label ? (
@@ -55,12 +61,14 @@ export function InputRoot({
       {message ? (
         <div className={styles.infoWrapper}>
           {messageState ? (
-            <MessageCircleIcon
-              className={styles.messageIcon}
-              color={ICON_COLOR_BY_STATE[messageState]}
-            />
+            <MessageIcon className={styles.messageIcon} />
           ) : null}
-          <div className={clsx(styles.message, messageState && styles[messageState])}>
+          <div
+            className={clsx(
+              styles.message,
+              messageState && styles[messageState],
+            )}
+          >
             {message}
           </div>
         </div>

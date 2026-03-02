@@ -37,6 +37,7 @@ export default function OrderConfirmPage() {
   const [depositorName, setDepositorName] = useState("");
   const [couponAmountInput, setCouponAmountInput] = useState("0");
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
+  const [isDepositorNameTouched, setIsDepositorNameTouched] = useState(false);
 
   useEffect(() => {
     setActiveTable(tableNum);
@@ -52,6 +53,10 @@ export default function OrderConfirmPage() {
   const backToCartPath = hasTableContext
     ? buildCartPath(storeId, tableNum)
     : "/cart";
+  const depositorNameError =
+    isDepositorNameTouched && !depositorName.trim()
+      ? "입금자명을 입력해 주세요."
+      : undefined;
 
   const handleCouponAmountChange = (value: string) => {
     const digits = value.replace(/[^0-9]/g, "");
@@ -71,11 +76,7 @@ export default function OrderConfirmPage() {
     }
 
     if (!depositorName.trim()) {
-      toast({
-        message: "입금자명을 입력해 주세요.",
-        variant: "warning",
-        duration: 3000,
-      });
+      setIsDepositorNameTouched(true);
       return;
     }
 
@@ -215,12 +216,18 @@ export default function OrderConfirmPage() {
             </section>
 
             <section className={styles.orderConfirm__section}>
-              <Input label="입금자명" required>
+              <Input
+                label="입금자명"
+                required
+                message={depositorNameError}
+                messageState="error"
+              >
                 <Input.Text
                   id="depositorName"
                   placeholder="입금자명을 입력해 주세요."
                   value={depositorName}
                   maxLength={20}
+                  onBlur={() => setIsDepositorNameTouched(true)}
                   onChange={(event) => setDepositorName(event.target.value)}
                 />
               </Input>
