@@ -54,17 +54,6 @@
     }
   }
 
-  &__bottom {
-    position: fixed;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 560px;
-    background-color: $gray-10;
-    padding: 10px 20px calc(16px + env(safe-area-inset-bottom));
-  }
-
   &__homeButton {
     width: 100%;
     height: 58px;

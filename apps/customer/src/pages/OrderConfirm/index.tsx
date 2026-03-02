@@ -1,5 +1,6 @@
 ﻿import BackIcon from '@/assets/icons/back.svg?react';
 import { getPaymentTossDeeplink, postCreatedCustomerOrder } from '../../api/customer';
+import BottomActionBar from '../../components/BottomActionBar';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
 import {
@@ -240,7 +241,7 @@ export default function OrderConfirmPage() {
         ) : null}
       </section>
 
-      <footer className={styles.orderConfirm__bottom}>
+      <BottomActionBar>
         <button
           type="button"
           className={styles.orderConfirm__submitButton}
@@ -252,7 +253,9 @@ export default function OrderConfirmPage() {
             {isPreparingPayment ? '주문 준비 중...' : `${formatPrice(paymentAmount)} 주문하기`}
           </span>
         </button>
-      </footer>
+      </BottomActionBar>
     </main>
   );
 }
+
+

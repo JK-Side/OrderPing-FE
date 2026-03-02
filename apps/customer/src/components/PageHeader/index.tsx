@@ -1,6 +1,6 @@
-﻿import type { CSSProperties, ReactNode } from 'react';
-import BackIcon from '@/assets/icons/back.svg?react';
-import styles from './PageHeader.module.scss';
+﻿import type { CSSProperties, ReactNode } from "react";
+import BackIcon from "@/assets/icons/back.svg?react";
+import styles from "./PageHeader.module.scss";
 
 interface PageHeaderProps {
   title: string;
@@ -19,7 +19,7 @@ export default function PageHeader({
 }: PageHeaderProps) {
   return (
     <header
-      className={[styles.pageHeader, className].filter(Boolean).join(' ')}
+      className={[styles.pageHeader, className].filter(Boolean).join(" ")}
       style={style}
     >
       <button

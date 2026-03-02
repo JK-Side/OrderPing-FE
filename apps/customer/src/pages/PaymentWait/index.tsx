@@ -1,5 +1,6 @@
 ﻿import { getPaymentTossDeeplink } from '../../api/customer';
 import CoinIcon from '../../assets/3d-coin-icon.jpg?url';
+import BottomActionBar from '../../components/BottomActionBar';
 import PageHeader from '../../components/PageHeader';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
@@ -145,7 +146,7 @@ export default function PaymentWaitPage() {
         </div>
       </section>
 
-      <footer className={styles.paymentWait__bottom}>
+      <BottomActionBar>
         <button
           type="button"
           className={styles.paymentWait__submitButton}
@@ -154,7 +155,9 @@ export default function PaymentWaitPage() {
         >
           {isMovingNext ? '다음 화면으로 이동 중...' : '결제 완료'}
         </button>
-      </footer>
+      </BottomActionBar>
     </main>
   );
 }
+
+

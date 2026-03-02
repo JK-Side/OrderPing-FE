@@ -1,0 +1,13 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.bottomActionBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 25;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  background-color: $gray-10;
+  padding: 12px 24px calc(16px + env(safe-area-inset-bottom));
+}

@@ -1,4 +1,5 @@
 ﻿import { getMenuDetailByMenuId } from '../../api/customer';
+import BottomActionBar from '../../components/BottomActionBar';
 import PageHeader from '../../components/PageHeader';
 import QuantityControl from '../../components/QuantityControl';
 import { useToast } from '../../components/Toast/useToast';
@@ -141,7 +142,7 @@ export default function MenuDetailPage() {
             </div>
           </section>
 
-          <footer className={styles.menuDetail__bottom}>
+          <BottomActionBar>
             <button
               type="button"
               className={styles.menuDetail__addButton}
@@ -157,9 +158,11 @@ export default function MenuDetailPage() {
                 </>
               )}
             </button>
-          </footer>
+          </BottomActionBar>
         </>
       ) : null}
     </main>
   );
 }
+
+

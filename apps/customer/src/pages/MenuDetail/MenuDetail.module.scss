@@ -82,17 +82,6 @@
     font-weight: 700;
   }
 
-  &__bottom {
-    position: fixed;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 560px;
-    background-color: $gray-10;
-    padding: 10px 24px calc(16px + env(safe-area-inset-bottom));
-  }
-
   &__addButton {
     width: 100%;
     height: 56px;

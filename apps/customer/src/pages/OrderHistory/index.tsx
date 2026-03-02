@@ -1,6 +1,7 @@
-import { getCustomerOrdersByTableId } from '../../api/customer';
-import PageHeader from '../../components/PageHeader';
+﻿import { getCustomerOrdersByTableId } from '../../api/customer';
 import type { CustomerOrderLookupResponse } from '../../api/customer/entity';
+import BottomActionBar from '../../components/BottomActionBar';
+import PageHeader from '../../components/PageHeader';
 import { useCart } from '../../stores/cart';
 import { buildStoreHomePath, parsePositiveInt } from '../../utils/orderFlow';
 import { useQuery } from '@tanstack/react-query';
@@ -130,7 +131,7 @@ export default function OrderHistoryPage() {
         ) : null}
       </section>
 
-      <footer className={styles.orderHistory__bottom}>
+      <BottomActionBar>
         <button
           type="button"
           className={styles.orderHistory__menuButton}
@@ -138,7 +139,7 @@ export default function OrderHistoryPage() {
         >
           메뉴판으로
         </button>
-      </footer>
+      </BottomActionBar>
     </main>
   );
 }

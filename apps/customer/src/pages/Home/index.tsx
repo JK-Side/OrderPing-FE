@@ -1,5 +1,6 @@
 ﻿import type { CSSProperties } from 'react';
 import type { CustomerStoreOrderMenu } from '../../api/customer/entity';
+import BottomActionBar from '../../components/BottomActionBar';
 import PageHeader from '../../components/PageHeader';
 import { useCart } from '../../stores/cart';
 import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
@@ -365,7 +366,7 @@ export default function HomePage() {
       ) : null}
 
       {totalQuantity > 0 ? (
-        <footer className={styles.home__cartBottom}>
+        <BottomActionBar>
           <button
             type="button"
             className={styles.home__cartButton}
@@ -374,8 +375,10 @@ export default function HomePage() {
             <span className={styles.home__cartCount}>{totalQuantity}</span>
             <span>{`${formatPrice(totalPrice)} 장바구니 보기`}</span>
           </button>
-        </footer>
+        </BottomActionBar>
       ) : null}
     </main>
   );
 }
+
+

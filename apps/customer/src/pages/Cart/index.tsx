@@ -1,14 +1,19 @@
-import BackIcon from '@/assets/icons/back.svg?react';
-import CloseIcon from '@/assets/icons/close.svg?react';
-import QuantityControl from '../../components/QuantityControl';
-import { useToast } from '../../components/Toast/useToast';
-import { useCart } from '../../stores/cart';
-import { buildOrderConfirmPath, buildStoreHomePath, parsePositiveInt } from '../../utils/orderFlow';
-import { useEffect, useMemo } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import styles from './Cart.module.scss';
+﻿import CloseIcon from "@/assets/icons/close.svg?react";
+import BottomActionBar from "../../components/BottomActionBar";
+import QuantityControl from "../../components/QuantityControl";
+import { useToast } from "../../components/Toast/useToast";
+import { useCart } from "../../stores/cart";
+import {
+  buildOrderConfirmPath,
+  buildStoreHomePath,
+  parsePositiveInt,
+} from "../../utils/orderFlow";
+import { useEffect, useMemo } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import styles from "./Cart.module.scss";
+import PageHeader from "../../components/PageHeader";
 
-const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
+const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -16,20 +21,26 @@ export default function CartPage() {
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(
-    () => parsePositiveInt(storeIdParam ?? searchParams.get('storeId')),
+    () => parsePositiveInt(storeIdParam ?? searchParams.get("storeId")),
     [searchParams, storeIdParam],
   );
   const tableNum = useMemo(
-    () => parsePositiveInt(searchParams.get('tableNum')),
+    () => parsePositiveInt(searchParams.get("tableNum")),
     [searchParams],
   );
   const hasTableContext = storeId !== null && tableNum !== null;
 
-  const { items, totalPrice, totalQuantity, removeMenu, setMenuQuantity, setActiveTable } =
-    useCart();
+  const {
+    items,
+    totalPrice,
+    totalQuantity,
+    removeMenu,
+    setMenuQuantity,
+    setActiveTable,
+  } = useCart();
 
   const backToMenuUrl = useMemo(
-    () => (hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/'),
+    () => (hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/"),
     [hasTableContext, storeId, tableNum],
   );
 
@@ -42,8 +53,8 @@ export default function CartPage() {
 
     if (!hasTableContext) {
       toast({
-        message: '테이블 정보를 확인할 수 없어요.',
-        variant: 'warning',
+        message: "테이블 정보를 확인할 수 없어요.",
+        variant: "warning",
         duration: 3000,
       });
       return;
@@ -54,7 +65,8 @@ export default function CartPage() {
 
   return (
     <main className={styles.cart}>
-      <header className={styles.cart__header}>
+      <PageHeader title="장바구니" onBack={() => navigate(backToMenuUrl)} />
+      {/* <header className={styles.cart__header}>
         <button
           type="button"
           className={styles.cart__backButton}
@@ -64,7 +76,7 @@ export default function CartPage() {
         </button>
         <div className={styles.cart__title}>장바구니</div>
         <div className={styles.cart__spacer} />
-      </header>
+      </header> */}
 
       <section className={styles.cart__content}>
         {items.length === 0 ? (
@@ -76,7 +88,9 @@ export default function CartPage() {
                 <div className={styles.cart__infoContainer}>
                   <div className={styles.cart__itemContainer}>
                     <div className={styles.cart__itemName}>{item.name}</div>
-                    <div className={styles.cart__itemPrice}>{formatPrice(item.price)}</div>
+                    <div className={styles.cart__itemPrice}>
+                      {formatPrice(item.price)}
+                    </div>
                   </div>
 
                   <button
@@ -92,8 +106,15 @@ export default function CartPage() {
                 <QuantityControl
                   className={styles.cart__quantityControl}
                   value={item.quantity}
-                  onDecrease={() => setMenuQuantity(item.menuId, Math.max(item.quantity - 1, 1))}
-                  onIncrease={() => setMenuQuantity(item.menuId, Math.min(item.quantity + 1, 99))}
+                  onDecrease={() =>
+                    setMenuQuantity(item.menuId, Math.max(item.quantity - 1, 1))
+                  }
+                  onIncrease={() =>
+                    setMenuQuantity(
+                      item.menuId,
+                      Math.min(item.quantity + 1, 99),
+                    )
+                  }
                 />
               </article>
             ))}
@@ -109,7 +130,7 @@ export default function CartPage() {
         )}
       </section>
 
-      <footer className={styles.cart__bottom}>
+      <BottomActionBar>
         <button
           type="button"
           className={styles.cart__orderButton}
@@ -119,7 +140,7 @@ export default function CartPage() {
           <span className={styles.cart__orderCount}>{totalQuantity}</span>
           <span>{`${formatPrice(totalPrice)} 주문하기`}</span>
         </button>
-      </footer>
+      </BottomActionBar>
     </main>
   );
 }

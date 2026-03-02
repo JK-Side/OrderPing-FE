@@ -1,16 +1,17 @@
-import PageHeader from '../../components/PageHeader';
-import { useCart } from '../../stores/cart';
+﻿import BottomActionBar from "../../components/BottomActionBar";
+import PageHeader from "../../components/PageHeader";
+import { useCart } from "../../stores/cart";
 import {
   buildStoreHomePath,
   clearPendingOrderDraft,
   loadPendingOrderDraft,
   parsePositiveInt,
-} from '../../utils/orderFlow';
-import { useEffect, useMemo } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import styles from './OrderIssue.module.scss';
+} from "../../utils/orderFlow";
+import { useEffect, useMemo } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import styles from "./OrderIssue.module.scss";
 
-const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
+const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
 
 export default function OrderIssuePage() {
   const navigate = useNavigate();
@@ -18,7 +19,10 @@ export default function OrderIssuePage() {
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
-  const tableNum = useMemo(() => parsePositiveInt(searchParams.get('tableNum')), [searchParams]);
+  const tableNum = useMemo(
+    () => parsePositiveInt(searchParams.get("tableNum")),
+    [searchParams],
+  );
   const draft = useMemo(() => loadPendingOrderDraft(), []);
   const hasTableContext = storeId !== null && tableNum !== null;
 
@@ -28,14 +32,18 @@ export default function OrderIssuePage() {
 
   const handleGoHome = () => {
     clearPendingOrderDraft();
-    navigate(hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/');
+    navigate(hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/");
   };
 
   return (
     <main className={styles.orderIssue}>
       <PageHeader
         title="문의 안내"
-        onBack={() => navigate(hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/')}
+        onBack={() =>
+          navigate(
+            hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/",
+          )
+        }
       />
 
       <section className={styles.orderIssue__content}>
@@ -64,11 +72,15 @@ export default function OrderIssuePage() {
         ) : null}
       </section>
 
-      <footer className={styles.orderIssue__bottom}>
-        <button type="button" className={styles.orderIssue__homeButton} onClick={handleGoHome}>
+      <BottomActionBar>
+        <button
+          type="button"
+          className={styles.orderIssue__homeButton}
+          onClick={handleGoHome}
+        >
           메뉴판으로
         </button>
-      </footer>
+      </BottomActionBar>
     </main>
   );
 }
