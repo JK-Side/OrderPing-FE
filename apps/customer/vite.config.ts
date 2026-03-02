@@ -9,6 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@order-ping/shared': path.resolve(__dirname, '../../packages/shared/src'),
       '@order-ping/shared/styles': path.resolve(__dirname, '../../packages/shared/src/styles'),
     },
   },

@@ -1,33 +1,41 @@
-﻿import BackIcon from '@/assets/icons/back.svg?react';
-import { getPaymentTossDeeplink, postCreatedCustomerOrder } from '../../api/customer';
-import BottomActionBar from '../../components/BottomActionBar';
-import { useToast } from '../../components/Toast/useToast';
-import { useCart } from '../../stores/cart';
+﻿import { Input } from "@order-ping/shared/components/Input";
+import {
+  getPaymentTossDeeplink,
+  postCreatedCustomerOrder,
+} from "../../api/customer";
+import BottomActionBar from "../../components/BottomActionBar";
+import { useToast } from "../../components/Toast/useToast";
+import { useCart } from "../../stores/cart";
 import {
   buildCartPath,
   buildOrderPaymentWaitPath,
   parsePositiveInt,
   savePendingOrderDraft,
-} from '../../utils/orderFlow';
-import { useStoreOrder } from '../Home/hooks/useStoreOrder';
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import styles from './OrderConfirm.module.scss';
+} from "../../utils/orderFlow";
+import { useStoreOrder } from "../Home/hooks/useStoreOrder";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import styles from "./OrderConfirm.module.scss";
+import PageHeader from "../../components/PageHeader";
 
-const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
+const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
 
 export default function OrderConfirmPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { clearCart, setActiveTable, items, totalQuantity, totalPrice } = useCart();
+  const { clearCart, setActiveTable, items, totalQuantity, totalPrice } =
+    useCart();
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
-  const tableNum = useMemo(() => parsePositiveInt(searchParams.get('tableNum')), [searchParams]);
+  const tableNum = useMemo(
+    () => parsePositiveInt(searchParams.get("tableNum")),
+    [searchParams],
+  );
   const hasTableContext = storeId !== null && tableNum !== null;
   const { data, isLoading } = useStoreOrder(storeId, tableNum);
-  const [depositorName, setDepositorName] = useState('');
-  const [couponAmountInput, setCouponAmountInput] = useState('0');
+  const [depositorName, setDepositorName] = useState("");
+  const [couponAmountInput, setCouponAmountInput] = useState("0");
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
 
   useEffect(() => {
@@ -35,17 +43,19 @@ export default function OrderConfirmPage() {
   }, [setActiveTable, tableNum]);
 
   const couponAmount = useMemo(() => {
-    const parsed = Number(couponAmountInput.replace(/[^0-9]/g, ''));
+    const parsed = Number(couponAmountInput.replace(/[^0-9]/g, ""));
     if (!Number.isFinite(parsed) || parsed < 0) return 0;
     return Math.min(parsed, totalPrice);
   }, [couponAmountInput, totalPrice]);
 
   const paymentAmount = Math.max(totalPrice - couponAmount, 0);
-  const backToCartPath = hasTableContext ? buildCartPath(storeId, tableNum) : '/cart';
+  const backToCartPath = hasTableContext
+    ? buildCartPath(storeId, tableNum)
+    : "/cart";
 
   const handleCouponAmountChange = (value: string) => {
-    const digits = value.replace(/[^0-9]/g, '');
-    setCouponAmountInput(digits === '' ? '0' : digits);
+    const digits = value.replace(/[^0-9]/g, "");
+    setCouponAmountInput(digits === "" ? "0" : digits);
   };
 
   const handleProceedPayment = async () => {
@@ -53,8 +63,8 @@ export default function OrderConfirmPage() {
 
     if (!hasTableContext || !data) {
       toast({
-        message: '매장 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.',
-        variant: 'info',
+        message: "매장 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.",
+        variant: "info",
         duration: 3000,
       });
       return;
@@ -62,8 +72,8 @@ export default function OrderConfirmPage() {
 
     if (!depositorName.trim()) {
       toast({
-        message: '입금자명을 입력해 주세요.',
-        variant: 'warning',
+        message: "입금자명을 입력해 주세요.",
+        variant: "warning",
         duration: 3000,
       });
       return;
@@ -71,8 +81,8 @@ export default function OrderConfirmPage() {
 
     if (paymentAmount <= 0) {
       toast({
-        message: '최종 결제 금액은 0원보다 커야 해요.',
-        variant: 'warning',
+        message: "최종 결제 금액은 0원보다 커야 해요.",
+        variant: "warning",
         duration: 3000,
       });
       return;
@@ -102,12 +112,12 @@ export default function OrderConfirmPage() {
         couponAmount,
         totalPrice,
         paymentAmount,
-        tossDeeplink: '',
+        tossDeeplink: "",
         account: {
-          bankCode: '',
-          bankName: '',
-          accountHolder: '',
-          accountNumber: '',
+          bankCode: "",
+          bankName: "",
+          accountHolder: "",
+          accountNumber: "",
         },
         items,
         createdAt: new Date().toISOString(),
@@ -132,9 +142,9 @@ export default function OrderConfirmPage() {
         toast({
           message:
             status === 404
-              ? '입금 계좌 정보를 찾을 수 없어요. 다음 화면에서 다시 시도해 주세요.'
-              : '토스 결제 링크를 불러오지 못했어요. 다음 화면에서 다시 시도해 주세요.',
-          variant: 'error',
+              ? "입금 계좌 정보를 찾을 수 없어요. 다음 화면에서 다시 시도해 주세요."
+              : "토스 결제 링크를 불러오지 못했어요. 다음 화면에서 다시 시도해 주세요.",
+          variant: "error",
           duration: 3000,
         });
       }
@@ -145,9 +155,9 @@ export default function OrderConfirmPage() {
       toast({
         message:
           status === 409
-            ? '품절된 메뉴가 있어 주문할 수 없어요.'
-            : '주문 생성에 실패했어요. 다시 시도해 주세요.',
-        variant: 'error',
+            ? "품절된 메뉴가 있어 주문할 수 없어요."
+            : "주문 생성에 실패했어요. 다시 시도해 주세요.",
+        variant: "error",
         duration: 3000,
       });
     } finally {
@@ -157,36 +167,40 @@ export default function OrderConfirmPage() {
 
   return (
     <main className={styles.orderConfirm}>
-      <header className={styles.orderConfirm__header}>
-        <button
-          type="button"
-          className={styles.orderConfirm__backButton}
-          onClick={() => navigate(backToCartPath)}
-        >
-          <BackIcon />
-        </button>
-        <div className={styles.orderConfirm__title}>결제 전 확인</div>
-        <div className={styles.orderConfirm__spacer} />
-      </header>
+      <PageHeader
+        title="결제 전 확인"
+        onBack={() => navigate(backToCartPath)}
+      />
 
       <section className={styles.orderConfirm__content}>
         {!hasTableContext ? (
-          <div className={styles.orderConfirm__status}>테이블 정보를 확인할 수 없어요.</div>
+          <div className={styles.orderConfirm__status}>
+            테이블 정보를 확인할 수 없어요.
+          </div>
         ) : null}
         {hasTableContext && isLoading ? (
-          <div className={styles.orderConfirm__status}>주문 정보를 불러오는 중...</div>
+          <div className={styles.orderConfirm__status}>
+            주문 정보를 불러오는 중...
+          </div>
         ) : null}
 
         {hasTableContext && !isLoading && items.length === 0 ? (
-          <div className={styles.orderConfirm__status}>장바구니가 비어 있어요.</div>
+          <div className={styles.orderConfirm__status}>
+            장바구니가 비어 있어요.
+          </div>
         ) : null}
 
         {hasTableContext && !isLoading && items.length > 0 ? (
           <>
             <section className={styles.orderConfirm__section}>
               {items.map((item) => (
-                <article key={item.menuId} className={styles.orderConfirm__item}>
-                  <div className={styles.orderConfirm__itemName}>{item.name}</div>
+                <article
+                  key={item.menuId}
+                  className={styles.orderConfirm__item}
+                >
+                  <div className={styles.orderConfirm__itemName}>
+                    {item.name}
+                  </div>
                   <div className={styles.orderConfirm__itemMeta}>
                     <span>{formatPrice(item.price)}</span>
                     <span>{`x ${item.quantity}`}</span>
@@ -196,31 +210,29 @@ export default function OrderConfirmPage() {
             </section>
 
             <section className={styles.orderConfirm__section}>
-              <label className={styles.orderConfirm__fieldLabel} htmlFor="depositorName">
-                입금자명
-              </label>
-              <input
-                id="depositorName"
-                className={styles.orderConfirm__input}
-                placeholder="입금자명을 입력해 주세요."
-                value={depositorName}
-                maxLength={20}
-                onChange={(event) => setDepositorName(event.target.value)}
-              />
+              <Input label="입금자명" required>
+                <Input.Text
+                  id="depositorName"
+                  placeholder="입금자명을 입력해 주세요."
+                  value={depositorName}
+                  maxLength={20}
+                  onChange={(event) => setDepositorName(event.target.value)}
+                />
+              </Input>
             </section>
 
             <section className={styles.orderConfirm__section}>
-              <label className={styles.orderConfirm__fieldLabel} htmlFor="couponAmount">
-                쿠폰 적용
-              </label>
-              <input
-                id="couponAmount"
-                inputMode="numeric"
-                className={styles.orderConfirm__input}
-                placeholder="쿠폰 금액을 입력해 주세요."
-                value={couponAmountInput}
-                onChange={(event) => handleCouponAmountChange(event.target.value)}
-              />
+              <Input label="쿠폰 적용">
+                <Input.Text
+                  id="couponAmount"
+                  inputMode="numeric"
+                  placeholder="쿠폰 금액을 입력해 주세요."
+                  value={couponAmountInput}
+                  onChange={(event) =>
+                    handleCouponAmountChange(event.target.value)
+                  }
+                />
+              </Input>
             </section>
 
             <section className={styles.orderConfirm__summary}>
@@ -245,17 +257,21 @@ export default function OrderConfirmPage() {
         <button
           type="button"
           className={styles.orderConfirm__submitButton}
-          disabled={!hasTableContext || items.length === 0 || isPreparingPayment}
+          disabled={
+            !hasTableContext || items.length === 0 || isPreparingPayment
+          }
           onClick={handleProceedPayment}
         >
-          <span className={styles.orderConfirm__submitCount}>{totalQuantity}</span>
+          <span className={styles.orderConfirm__submitCount}>
+            {totalQuantity}
+          </span>
           <span>
-            {isPreparingPayment ? '주문 준비 중...' : `${formatPrice(paymentAmount)} 주문하기`}
+            {isPreparingPayment
+              ? "주문 준비 중..."
+              : `${formatPrice(paymentAmount)} 주문하기`}
           </span>
         </button>
       </BottomActionBar>
     </main>
   );
 }
-
-
