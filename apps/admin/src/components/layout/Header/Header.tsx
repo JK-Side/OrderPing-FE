@@ -10,8 +10,9 @@ export default function Header() {
   const { pathname } = useLocation();
   const { isLoggedIn, clearAccessToken } = useAuth();
   const isHomePage = pathname === '/';
+  const isMyPage = pathname === '/mypage';
   const isStoreCreatePage = pathname.startsWith('/store/create');
-  const isAuthHeaderPage = isHomePage || isStoreCreatePage;
+  const isAuthHeaderPage = isHomePage || isMyPage || isStoreCreatePage;
   const storeId =
     pathname.match(/^\/store\/operate\/([^/]+)/)?.[1] ?? pathname.match(/^\/store\/([^/]+)\/(start|orders|menu)/)?.[1];
   const isStoreStartPage = /^\/store\/[^/]+\/start/.test(pathname);
@@ -58,7 +59,7 @@ export default function Header() {
           </>
         ) : isLoggedIn ? (
           <>
-            <Link to="/mypage" className={styles.navItem}>
+            <Link to="/mypage" className={`${styles.navItem} ${isMyPage ? styles.navItemActive : ''}`}>
               마이페이지
             </Link>
             <button type="button" className={styles.navItem} onClick={handleLogout}>

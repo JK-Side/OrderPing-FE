@@ -1,0 +1,273 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.myPage {
+  width: 100%;
+  padding: 72px 80px 120px;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: min(980px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 4px;
+}
+
+.pageTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eyebrow {
+  display: flex;
+  color: $primary-50;
+  width: 80px;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 4px 12px;
+  background-color: $gray-10;
+  border-radius: 999px;
+}
+
+.title {
+  margin: 0;
+  color: $gray-90;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.titleAccent {
+  color: $primary-50;
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #fee500;
+  color: $black;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $black;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.card,
+.stateCard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 6px 28px 18px;
+  border: 1px solid $gray-20;
+  border-radius: 24px;
+  background: $background;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 60px;
+  border-bottom: 1px solid $gray-20;
+}
+
+.cardTitle {
+  margin: 0;
+  color: $gray-90;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.storeMeta {
+  color: $gray-50;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.infoFixButton.infoFixButton {
+  min-width: 104px;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.infoGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.groupTitle {
+  color: $gray-80;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.infoList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  margin-left: 12px;
+}
+
+.infoLabel {
+  width: 100px;
+  flex-shrink: 0;
+  color: $gray-60;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.infoValue {
+  color: $gray-90;
+  font-size: 16px;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.actionLink,
+.primaryLink,
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.actionLink {
+  border: 1px solid $primary-40;
+  color: $primary-50;
+  background: $white;
+}
+
+.primaryLink {
+  background: $primary-50;
+  color: $white;
+}
+
+.secondaryLink {
+  border: 1px solid $gray-20;
+  color: $gray-80;
+  background: $white;
+}
+
+.stateCard {
+  align-items: center;
+  text-align: center;
+}
+
+.stateTitle {
+  margin: 0;
+  color: $gray-90;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stateDescription {
+  margin: 0;
+  color: $gray-70;
+  font-size: 15px;
+}
+
+.stateActions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .myPage {
+    padding: 56px 24px 80px;
+  }
+
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    gap: 20px;
+  }
+
+  .card,
+  .stateCard {
+    padding: 24px 20px;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .infoRow {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .infoLabel {
+    width: auto;
+  }
+
+  .cardActions,
+  .stateActions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .actionLink,
+  .primaryLink,
+  .secondaryLink,
+  .infoFixButton {
+    width: 100%;
+  }
+}

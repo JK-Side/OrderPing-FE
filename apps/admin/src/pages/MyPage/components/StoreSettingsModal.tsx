@@ -1,8 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query';
+import clsx from 'clsx';
 import { useState, type ChangeEvent } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
-import SettingDetailIcon from '@/assets/icons/setting-2.svg?react';
-import UploadIcon from '@/assets/icons/upload.svg?react';
+import type { MyPageStore } from '@/api/user/entity';
 import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -10,13 +10,11 @@ import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, M
 import { useToast } from '@/components/Toast/useToast';
 import { useUpdateStore } from '@/pages/StoreOperate/hooks/useUpdateStore';
 import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
-import styles from './StoreSettingsModal.module.scss';
+import styles from './InfoEditModal.module.scss';
 
 interface StoreSettingsModalProps {
-  storeId: number;
-  storeName: string;
-  storeDescription: string;
-  storeImageUrl: string;
+  store: MyPageStore;
+  className?: string;
 }
 
 interface StoreSettingsForm {
@@ -24,12 +22,7 @@ interface StoreSettingsForm {
   description: string;
 }
 
-export default function StoreSettingsModal({
-  storeId,
-  storeName,
-  storeDescription,
-  storeImageUrl,
-}: StoreSettingsModalProps) {
+export default function StoreSettingsModal({ store, className }: StoreSettingsModalProps) {
   const queryClient = useQueryClient();
   const { mutateAsync: updateStore } = useUpdateStore();
   const { toast } = useToast();
@@ -37,37 +30,36 @@ export default function StoreSettingsModal({
   const [open, setOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const currentImageUrl = storeImageUrl || StoreDefault;
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const currentImageUrl = store.imageUrl || StoreDefault;
 
   const {
     register,
     reset,
     handleSubmit,
-    formState: { errors, isDirty, isValid, isSubmitting },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<StoreSettingsForm>({
     mode: 'onChange',
     defaultValues: {
-      name: storeName,
-      description: storeDescription,
+      name: store.name,
+      description: store.description,
     },
   });
 
-  const hasChanges = isDirty || !!selectedFile;
-
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
+    setSubmitError(null);
 
     if (nextOpen) {
       reset({
-        name: storeName,
-        description: storeDescription,
+        name: store.name,
+        description: store.description,
       });
     }
 
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
-
     setPreviewUrl(null);
     setSelectedFile(null);
   };
@@ -79,14 +71,13 @@ export default function StoreSettingsModal({
       if (previous) {
         URL.revokeObjectURL(previous);
       }
-
       return file ? URL.createObjectURL(file) : null;
     });
   };
 
   const uploadStoreImage = async (file: File | null) => {
     if (!file) {
-      return storeImageUrl;
+      return store.imageUrl ?? '';
     }
 
     return await upload({
@@ -98,15 +89,13 @@ export default function StoreSettingsModal({
   };
 
   const handleSubmitStore: SubmitHandler<StoreSettingsForm> = async (data) => {
-    if (!hasChanges) {
-      return;
-    }
+    setSubmitError(null);
 
     try {
       const imageUrl = await uploadStoreImage(selectedFile);
 
       await updateStore({
-        storeId,
+        storeId: store.storeId,
         body: {
           name: data.name.trim(),
           description: data.description.trim(),
@@ -114,57 +103,55 @@ export default function StoreSettingsModal({
         },
       });
 
-      await queryClient.invalidateQueries({ queryKey: ['store', storeId] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['myPage'] }),
+        queryClient.invalidateQueries({ queryKey: ['store', store.storeId] }),
+        queryClient.invalidateQueries({ queryKey: ['userInfo'] }),
+      ]);
+
       toast({
-        message: '주점 정보 수정이 완료되었습니다.',
+        message: '주점 정보 업데이트에 성공했습니다.',
         variant: 'info',
       });
       setOpen(false);
     } catch (error) {
       const status = (error as { status?: number })?.status;
 
-      toast({
-        message: '주점 정보 수정을 실패하였습니다.',
-        variant: 'error',
-      });
-
       if (status === 401) {
         toast({
-          message: '인증이 필요합니다.',
+          message: '로그인이 필요합니다.',
           variant: 'error',
         });
       } else if (status === 403) {
         toast({
-          message: '본인 매장이 아닙니다.',
+          message: '본인 주점이 아닙니다.',
           variant: 'error',
         });
       } else if (status === 404) {
         toast({
-          message: '매장을 찾을 수 없습니다.',
+          message: '주점을 찾을 수 없습니다.',
           variant: 'error',
         });
       } else {
         toast({
-          message: '주점 정보를 수정하지 못했어요.',
+          message: '주점 정보 업데이트에 실패했습니다.',
           variant: 'error',
         });
       }
-      console.error('Failed to update store', error);
     }
   };
 
   return (
     <Modal open={open} onOpenChange={handleOpenChange}>
       <ModalTrigger asChild>
-        <Button className={styles.triggerButton} size="md" variant="ghost">
-          <SettingDetailIcon className={styles.triggerIcon} aria-hidden="true" />
-          주점 설정
+        <Button type="button" variant="ghost" className={clsx(styles.triggerButton, className)}>
+          수정하기
         </Button>
       </ModalTrigger>
 
-      <ModalContent>
+      <ModalContent className={styles.modalContent}>
         <ModalHeader>
-          <ModalTitle>주점 기본 정보 수정</ModalTitle>
+          <ModalTitle>주점 정보 수정</ModalTitle>
         </ModalHeader>
 
         <form onSubmit={handleSubmit(handleSubmitStore)}>
@@ -202,21 +189,18 @@ export default function StoreSettingsModal({
                 <div className={styles.imageColumn}>
                   <div className={styles.imageLabel}>현재 이미지</div>
                   <div className={styles.imagePreview}>
-                    <img src={currentImageUrl} alt={`${storeName} 주점 이미지`} />
+                    <img src={currentImageUrl} alt={`${store.name} 주점`} />
                   </div>
                 </div>
 
                 <div className={styles.imageColumn}>
-                  <div className={styles.imageLabel}>변경할 이미지</div>
+                  <div className={styles.imageLabel}>새 이미지</div>
                   <label className={styles.imageUpload}>
                     <input type="file" accept="image/*" hidden onChange={handleImageChange} />
                     {previewUrl ? (
-                      <img className={styles.imagePreviewImage} src={previewUrl} alt="변경할 이미지 미리보기" />
+                      <img className={styles.imagePreviewImage} src={previewUrl} alt="새 이미지" />
                     ) : (
-                      <>
-                        <UploadIcon className={styles.uploadIcon} aria-hidden="true" />
-                        <span>드래그 하여 이미지 삽입</span>
-                      </>
+                      <span className={styles.uploadHint}>클릭하여 이미지 업로드</span>
                     )}
                   </label>
                 </div>
@@ -228,13 +212,17 @@ export default function StoreSettingsModal({
             <Button
               type="submit"
               size="md"
-              className={styles.submitButton}
-              disabled={!isValid || !hasChanges || isSubmitting}
+              className={styles.footerButton}
+              isLoading={isSubmitting}
+              disabled={!isValid || isSubmitting}
+              loadingText="수정 중..."
             >
-              수정 완료
+              수정하기
             </Button>
           </ModalFooter>
         </form>
+
+        {submitError ? <p className={styles.submitError}>{submitError}</p> : null}
       </ModalContent>
     </Modal>
   );
