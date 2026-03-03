@@ -9,6 +9,7 @@ import StoreCreate from '@/pages/StoreCreate';
 import StoreOperate from '@/pages/StoreOperate';
 import StoreOrders from '@/pages/StoreOrders';
 import TableStart from '@/pages/TableOperate';
+import TableQrPrint from '@/pages/TableQrPrint';
 import { useAuthInit } from '@/utils/hooks/useAuthInit';
 import './App.css';
 
@@ -26,6 +27,7 @@ function App() {
         <Route path="/store/:id/menu/:menuId/edit" element={<MenuEdit />} />
         <Route path="/store/:id/orders" element={<StoreOrders />} />
         <Route path="/store/:id/start" element={<TableStart />} />
+        <Route path="/store/:id/qr-print" element={<TableQrPrint />} />
       </Route>
 
       <Route path="/callback" element={<OAuthCallback />} />

@@ -94,6 +94,19 @@
   min-width: 120px;
 }
 
+.printButton {
+  min-width: 148px;
+}
+
+.printButtonIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.printButtonIcon path {
+  fill: currentColor;
+}
+
 .actionButtons {
   display: flex;
   align-items: center;

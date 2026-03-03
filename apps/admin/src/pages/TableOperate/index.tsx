@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import type { TableResponse } from '@/api/table/entity';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
+import DownloadIcon from '@/assets/icons/download.svg?react';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import Button from '@/components/Button';
 import { useToast } from '@/components/Toast/useToast';
@@ -113,6 +114,11 @@ export default function TableOperate() {
     setSelectedTableIds((prev) => (prev.includes(tableId) ? prev.filter((id) => id !== tableId) : [...prev, tableId]));
   };
 
+  const handleOpenQrPrint = () => {
+    if (!storeId || typeof window === 'undefined') return;
+    window.open(`/store/${storeId}/qr-print`, '_blank', 'noopener,noreferrer');
+  };
+
   const handleClearTables = async () => {
     if (!storeId || selectedTableIds.length === 0 || isClearing) return;
 
@@ -199,6 +205,10 @@ export default function TableOperate() {
               </div>
             ) : null}
             <div className={styles.actionButtons}>
+              <Button className={styles.printButton} variant="secondary" size="md" onClick={handleOpenQrPrint} disabled={!storeId}>
+                <DownloadIcon className={styles.printButtonIcon} aria-hidden="true" />
+                QR 일괄 출력
+              </Button>
               <Button
                 className={styles.clearButton}
                 size="md"
