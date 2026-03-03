@@ -71,7 +71,6 @@ function StoreInfoCard({ store }: { store: MyPageStore }) {
 
         <div className={styles.cardBody}>
           <section className={styles.infoGroup}>
-            <div className={styles.groupTitle}>주점 정보</div>
             <div className={styles.infoList}>
               <div className={styles.infoRow}>
                 <span className={styles.infoLabel}> · 주점명</span>
