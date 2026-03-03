@@ -15,7 +15,7 @@ import {
   parsePositiveInt,
   savePendingOrderDraft,
 } from '../../utils/orderFlow';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styles from './PaymentWait.module.scss';
 
@@ -52,7 +52,7 @@ export default function PaymentWaitPage() {
     }
   }, [draft, hasTableContext, navigate, storeId, tableNum, toast]);
 
-  const ensureTossDeeplink = async () => {
+  const ensureTossDeeplink = useCallback(async () => {
     if (!draft) {
       throw new Error('Missing draft');
     }
@@ -74,9 +74,9 @@ export default function PaymentWaitPage() {
 
     savePendingOrderDraft(nextDraft);
     return nextDraft;
-  };
+  }, [draft]);
 
-  const openToss = async () => {
+  const openToss = useCallback(async () => {
     const latestDraft = await ensureTossDeeplink();
 
     await openTossWithStoreFallback(latestDraft.tossDeeplink, () => {
@@ -86,7 +86,7 @@ export default function PaymentWaitPage() {
         duration: 3000,
       });
     });
-  };
+  }, [ensureTossDeeplink, toast]);
 
   useEffect(() => {
     if (!draft || hasAutoOpenedRef.current) return;
@@ -103,7 +103,7 @@ export default function PaymentWaitPage() {
         duration: 3000,
       });
     });
-  }, [draft, toast]);
+  }, [draft, openToss, toast]);
 
   const handleCompletePayment = () => {
     if (!draft || isMovingNext) return;
