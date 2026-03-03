@@ -123,11 +123,6 @@ export default function StoreSettingsModal({
     } catch (error) {
       const status = (error as { status?: number })?.status;
 
-      toast({
-        message: '주점 정보 수정을 실패하였습니다.',
-        variant: 'error',
-      });
-
       if (status === 401) {
         toast({
           message: '인증이 필요합니다.',
