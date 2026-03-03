@@ -35,8 +35,8 @@ const isTableClearable = (rawStatus: TableResponse['orderStatus']) => {
 const resolveQrValue = (table: TableResponse) => {
   if (table.qrImageUrl) return table.qrImageUrl;
   if (typeof window === 'undefined') return '';
-  const url = new URL(`/customer/store/${table.storeId}`, window.location.origin);
-  url.searchParams.set('tableId', String(table.tableNum));
+  const url = new URL(`/stores/${table.storeId}`, window.location.origin);
+  url.searchParams.set('tableNum', String(table.tableNum));
   return url.toString();
 };
 
