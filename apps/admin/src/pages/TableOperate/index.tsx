@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import type { TableResponse } from '@/api/table/entity';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
@@ -65,6 +65,7 @@ const isOrderableTable = (table?: TableResponse | null) => table?.status === 'OC
 
 export default function TableOperate() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
@@ -115,8 +116,8 @@ export default function TableOperate() {
   };
 
   const handleOpenQrPrint = () => {
-    if (!storeId || typeof window === 'undefined') return;
-    window.open(`/store/${storeId}/qr-print`, '_blank', 'noopener,noreferrer');
+    if (!storeId) return;
+    navigate(`/store/${storeId}/qr-print`);
   };
 
   const handleClearTables = async () => {
