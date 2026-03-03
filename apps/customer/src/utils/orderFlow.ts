@@ -40,6 +40,9 @@ export const buildOrderConfirmPath = (storeId: number, tableNum: number) =>
 export const buildOrderPaymentWaitPath = (storeId: number, tableNum: number) =>
   `/stores/${storeId}/orders/payment?tableNum=${tableNum}`;
 
+export const buildOrderPaymentAccountPath = (storeId: number, tableNum: number) =>
+  `/stores/${storeId}/orders/payment/account?tableNum=${tableNum}`;
+
 export const buildOrderStatusPath = (
   storeId: number,
   tableNum: number,

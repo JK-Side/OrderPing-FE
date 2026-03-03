@@ -6,6 +6,7 @@ import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
 import {
   buildCartPath,
+  buildOrderPaymentAccountPath,
   buildOrderStatusPath,
   buildStoreHomePath,
   clearPendingOrderDraft,
@@ -139,7 +140,7 @@ export default function PaymentWaitPage() {
           <button
             type="button"
             className={styles.paymentWait__linkButton}
-            onClick={() => void openToss()}
+            onClick={() => navigate(buildOrderPaymentAccountPath(storeId, tableNum))}
           >
             토스앱이 열리지 않나요?
           </button>
