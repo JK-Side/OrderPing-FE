@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { MyPageStore } from '@/api/user/entity';
 import KakaoIcon from '@/assets/icons/kakao.svg?react';
+import Button from '@/components/Button';
 import { useMyPage } from '@/pages/MyPage/hooks/useMyPage';
 import { useUserInfo } from '@/utils/hooks/useUserInfo';
 import styles from './MyPage.module.scss';
@@ -15,52 +16,76 @@ function getValue(value?: string | number | null) {
 
 function StoreInfoCard({ store }: { store: MyPageStore }) {
   return (
-    <article className={styles.card}>
-      <div className={styles.cardHeader}>
-        <h2 className={styles.cardTitle}>{getValue(store.name)}</h2>
-        <span className={styles.storeMeta}>Store ID {store.storeId}</span>
-      </div>
+    <>
+      <article className={styles.card}>
+        <div className={styles.cardHeader}>
+          <h2 className={styles.cardTitle}>계좌 정보</h2>
+          <Button
+            type="button"
+            variant="ghost"
+            className={styles.infoFixButton}
+            onClick={() => {}}
+            // isLoading={}
+            // disabled={}
+            loadingText="수정 중..."
+          >
+            수정하기
+          </Button>
+        </div>
 
-      <div className={styles.cardBody}>
-        <section className={styles.infoGroup}>
-          <div className={styles.groupTitle}>계좌 정보</div>
-          <div className={styles.infoList}>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}> · 계좌 번호</span>
-              <span className={styles.infoValue}>{getValue(store.account?.accountNumber)}</span>
+        <div className={styles.cardBody}>
+          <section className={styles.infoGroup}>
+            <div className={styles.infoList}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}> · 계좌 번호</span>
+                <span className={styles.infoValue}>{getValue(store.account?.accountNumber)}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}> · 은행명</span>
+                <span className={styles.infoValue}>{getValue(store.account?.bankName)}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}> · 입금자명</span>
+                <span className={styles.infoValue}>{getValue(store.account?.accountHolder)}</span>
+              </div>
             </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}> · 은행명</span>
-              <span className={styles.infoValue}>{getValue(store.account?.bankName)}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}> · 입금자명</span>
-              <span className={styles.infoValue}>{getValue(store.account?.accountHolder)}</span>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
+      </article>
 
-        <section className={styles.infoGroup}>
-          <div className={styles.groupTitle}>주점 정보</div>
-          <div className={styles.infoList}>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}> · 주점명</span>
-              <span className={styles.infoValue}>{getValue(store.name)}</span>
-            </div>
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}> · 주점 설명</span>
-              <span className={styles.infoValue}>{getValue(store.description)}</span>
-            </div>
-          </div>
-        </section>
-      </div>
+      <article className={styles.card}>
+        <div className={styles.cardHeader}>
+          <h2 className={styles.cardTitle}>주점 정보</h2>
+          <Button
+            type="button"
+            variant="ghost"
+            className={styles.infoFixButton}
+            onClick={() => {}}
+            // isLoading={}
+            // disabled={}
+            loadingText="수정 중..."
+          >
+            수정하기
+          </Button>
+        </div>
 
-      <div className={styles.cardActions}>
-        <Link to={`/store/operate/${store.storeId}`} className={styles.actionLink}>
-          Open store
-        </Link>
-      </div>
-    </article>
+        <div className={styles.cardBody}>
+          <section className={styles.infoGroup}>
+            <div className={styles.groupTitle}>주점 정보</div>
+            <div className={styles.infoList}>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}> · 주점명</span>
+                <span className={styles.infoValue}>{getValue(store.name)}</span>
+              </div>
+              <div className={styles.infoRow}>
+                <span className={styles.infoLabel}> · 주점 설명</span>
+                <span className={styles.infoValue}>{getValue(store.description)}</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </>
   );
 }
 
