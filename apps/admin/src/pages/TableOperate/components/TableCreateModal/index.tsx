@@ -18,6 +18,7 @@ import styles from './TableCreateModal.module.scss';
 
 const QR_IMAGE_SIZE = 256;
 const QR_S3_DIRECTORY = 'tables';
+const CUSTOMER_PRODUCTION_URL = 'https://order-ping-customer.vercel.app';
 
 type QrUploadTarget = {
   id: number;
@@ -45,12 +46,7 @@ const createQrSvgMarkup = (value: string) => {
 const resolveCustomerBaseUrl = () => {
   const configuredBaseUrl = import.meta.env.VITE_CUSTOMER_URL?.trim();
   if (configuredBaseUrl) return configuredBaseUrl;
-
-  if (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
-    return window.location.origin;
-  }
-
-  throw new Error('VITE_CUSTOMER_URL is required to generate QR codes.');
+  return CUSTOMER_PRODUCTION_URL;
 };
 
 const createQrValue = (storeId: number, tableNum: number) => {

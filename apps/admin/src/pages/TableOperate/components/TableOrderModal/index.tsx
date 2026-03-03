@@ -19,6 +19,7 @@ const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 const formatTableLabel = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 
 const QR_DISPLAY_SIZE = 100;
+const CUSTOMER_PRODUCTION_URL = 'https://order-ping-customer.vercel.app';
 
 const isSvgImageUrl = (url: string) => /\.svg(\?|#|$)/i.test(url) || url.startsWith('data:image/svg+xml');
 
@@ -34,8 +35,7 @@ const isTableClearable = (rawStatus: TableResponse['orderStatus']) => {
 
 const resolveQrValue = (table: TableResponse) => {
   if (table.qrImageUrl) return table.qrImageUrl;
-  if (typeof window === 'undefined') return '';
-  const url = new URL(`/stores/${table.storeId}`, window.location.origin);
+  const url = new URL(`/stores/${table.storeId}`, CUSTOMER_PRODUCTION_URL);
   url.searchParams.set('tableNum', String(table.tableNum));
   return url.toString();
 };
