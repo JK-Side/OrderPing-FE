@@ -42,9 +42,19 @@ const createQrSvgMarkup = (value: string) => {
   return `<?xml version="1.0" encoding="UTF-8"?>\n${svgWithNamespace}`;
 };
 
+const resolveCustomerBaseUrl = () => {
+  const configuredBaseUrl = import.meta.env.VITE_CUSTOMER_URL?.trim();
+  if (configuredBaseUrl) return configuredBaseUrl;
+
+  if (typeof window !== 'undefined' && ['localhost', '127.0.0.1'].includes(window.location.hostname)) {
+    return window.location.origin;
+  }
+
+  throw new Error('VITE_CUSTOMER_URL is required to generate QR codes.');
+};
+
 const createQrValue = (storeId: number, tableNum: number) => {
-  const baseUrl = import.meta.env.VITE_CUSTOMER_URL || 'http://localhost:5173';
-  const url = new URL(`/customer/stores/${storeId}`, baseUrl);
+  const url = new URL(`/stores/${storeId}`, resolveCustomerBaseUrl());
   url.searchParams.set('tableNum', String(tableNum));
 
   return url.toString();
