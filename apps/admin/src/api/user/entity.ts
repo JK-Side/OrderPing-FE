@@ -1,4 +1,6 @@
 export interface MyPageAccount {
+  id?: number;
+  accountId?: number;
   bankCode: string;
   bankName: string;
   accountHolder: string;
@@ -9,6 +11,7 @@ export interface MyPageStore {
   storeId: number;
   name: string;
   description: string;
+  imageUrl?: string;
   account: MyPageAccount | null;
 }
 

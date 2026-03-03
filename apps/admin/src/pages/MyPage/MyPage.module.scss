@@ -114,6 +114,10 @@
   font-weight: 600;
 }
 
+.infoFixButton.infoFixButton {
+  min-width: 104px;
+}
+
 .cardBody {
   display: flex;
   flex-direction: column;
@@ -262,7 +266,8 @@
 
   .actionLink,
   .primaryLink,
-  .secondaryLink {
+  .secondaryLink,
+  .infoFixButton {
     width: 100%;
   }
 }

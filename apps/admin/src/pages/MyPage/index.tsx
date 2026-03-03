@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import type { MyPageStore } from '@/api/user/entity';
 import KakaoIcon from '@/assets/icons/kakao.svg?react';
-import Button from '@/components/Button';
+import AccountSettingsModal from '@/pages/MyPage/components/AccountSettingsModal';
+import StoreSettingsModal from '@/pages/MyPage/components/StoreSettingsModal';
 import { useMyPage } from '@/pages/MyPage/hooks/useMyPage';
 import { useUserInfo } from '@/utils/hooks/useUserInfo';
 import styles from './MyPage.module.scss';
@@ -20,17 +21,7 @@ function StoreInfoCard({ store }: { store: MyPageStore }) {
       <article className={styles.card}>
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>계좌 정보</h2>
-          <Button
-            type="button"
-            variant="ghost"
-            className={styles.infoFixButton}
-            onClick={() => {}}
-            // isLoading={}
-            // disabled={}
-            loadingText="수정 중..."
-          >
-            수정하기
-          </Button>
+          <AccountSettingsModal store={store} className={styles.infoFixButton} />
         </div>
 
         <div className={styles.cardBody}>
@@ -56,17 +47,7 @@ function StoreInfoCard({ store }: { store: MyPageStore }) {
       <article className={styles.card}>
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>주점 정보</h2>
-          <Button
-            type="button"
-            variant="ghost"
-            className={styles.infoFixButton}
-            onClick={() => {}}
-            // isLoading={}
-            // disabled={}
-            loadingText="수정 중..."
-          >
-            수정하기
-          </Button>
+          <StoreSettingsModal store={store} className={styles.infoFixButton} />
         </div>
 
         <div className={styles.cardBody}>
@@ -91,8 +72,8 @@ function StoreInfoCard({ store }: { store: MyPageStore }) {
 function LoadingState() {
   return (
     <div className={styles.stateCard}>
-      <h2 className={styles.stateTitle}>Loading your account</h2>
-      <p className={styles.stateDescription}>We are fetching your stores and payout details.</p>
+      <h2 className={styles.stateTitle}>계좌 정보 로딩 중</h2>
+      <p className={styles.stateDescription}>주점 정보와 계좌 정보를 가져오고 있습니다.</p>
     </div>
   );
 }
