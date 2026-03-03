@@ -22,7 +22,12 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@order-ping/shared": ["../../packages/shared/src/index.ts"],
+      "@order-ping/shared/*": ["../../packages/shared/src/*"]
+    }
   },
-  "include": ["src", "../../packages/shared/src/types/**/*.d.ts"]
+  "include": ["src", "../../packages/shared/src/**/*"]
 }

@@ -1,0 +1,67 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.orderIssue {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: $white;
+  padding-bottom: 116px;
+
+  &__content {
+    padding: 32px 24px 24px;
+  }
+
+  &__title {
+    margin: 0;
+    color: $black;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.3;
+  }
+
+  &__description {
+    margin: 18px 0 0;
+    color: $gray-70;
+    font-size: 16px;
+    line-height: 1.6;
+    word-break: keep-all;
+  }
+
+  &__summaryCard {
+    margin-top: 28px;
+    border-radius: 18px;
+    background-color: $gray-10;
+    padding: 20px;
+  }
+
+  &__summaryRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: $black;
+    font-size: 15px;
+
+    & + & {
+      margin-top: 14px;
+    }
+
+    strong {
+      font-size: 16px;
+      font-weight: 700;
+      text-align: right;
+    }
+  }
+
+  &__homeButton {
+    width: 100%;
+    height: 58px;
+    border-radius: 16px;
+    background-color: $primary-50;
+    color: $white;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+}

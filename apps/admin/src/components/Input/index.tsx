@@ -1,8 +1,5 @@
+import { Input as SharedInput } from '@order-ping/shared/components/Input';
 import { Image } from './Image';
-import { InputRoot } from './Input';
-import InputSelect from './InputSelect';
-import { Text } from './Text';
-import { TextArea } from './TextArea';
 
 /* ----------------------------------------------
   사용법 (컴파운드 컴포넌트 패턴)
@@ -17,9 +14,6 @@ import { TextArea } from './TextArea';
 
 ---------------------------------------------- */
 
-export const Input = Object.assign(InputRoot, {
-  Text,
-  TextArea,
-  InputSelect,
+export const Input = Object.assign(SharedInput, {
   Image,
 });

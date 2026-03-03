@@ -1,4 +1,4 @@
-@use "@order-ping/shared/styles/colors" as *;
+﻿@use "@order-ping/shared/styles/colors" as *;
 
 .menuDetail {
   width: 100%;
@@ -8,40 +8,15 @@
   background-color: $gray-10;
   padding-bottom: 96px;
 
-  &__header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    height: 74px;
-    padding: max(20px, env(safe-area-inset-top)) 16px 12px;
-    background-color: $white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  &__backButton {
-    width: 36px;
-    height: 36px;
-    border-radius: 18px;
-    background-color: transparent;
-    color: $gray-90;
-    font-size: 26px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-
   &__historyButton {
-    height: 40px;
-    padding: 0 18px;
-    border-radius: 20px;
-    color: $white;
+    display: flex;
+    padding: 6px 14px;
+    border-radius: 18px;
     background-color: $primary-50;
+    align-items: center;
+    color: $white;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 500;
     cursor: pointer;
   }
 
@@ -105,17 +80,6 @@
     color: $black;
     font-size: 18px;
     font-weight: 700;
-  }
-
-  &__bottom {
-    position: fixed;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 560px;
-    background-color: $gray-10;
-    padding: 10px 24px calc(16px + env(safe-area-inset-bottom));
   }
 
   &__addButton {

@@ -1,5 +1,9 @@
-﻿import type { CustomerStoreOrderMenu } from '../../api/customer/entity';
+﻿import type { CSSProperties } from 'react';
+import type { CustomerStoreOrderMenu } from '../../api/customer/entity';
+import BottomActionBar from '../../components/BottomActionBar';
+import PageHeader from '../../components/PageHeader';
 import { useCart } from '../../stores/cart';
+import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useStoreOrder } from './hooks/useStoreOrder';
@@ -7,7 +11,12 @@ import styles from './Home.module.scss';
 
 type TabKey = 'main' | 'side';
 
+const HEADER_HEIGHT_PX = 74;
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value));
+const mixChannel = (from: number, to: number, progress: number) =>
+  Math.round(from + (to - from) * progress);
 
 interface MenuCardProps {
   menu: CustomerStoreOrderMenu;
@@ -33,7 +42,9 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
       <div className={styles.home__menuInfo}>
         <div className={styles.home__menuTitleRow}>
           <div className={styles.home__menuName}>{menu.name}</div>
-          {menu.isSoldOut ? <span className={styles.home__soldOutBadge}>품절</span> : null}
+          {menu.isSoldOut ? (
+            <span className={styles.home__soldOutBadge}>품절</span>
+          ) : null}
         </div>
 
         <div className={styles.home__menuPrice}>{formatPrice(menu.price)}</div>
@@ -43,9 +54,13 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
       </div>
 
       {menu.imageUrl ? (
-        <img src={menu.imageUrl} alt={menu.name} className={styles.home__menuImage} />
+        <img
+          src={menu.imageUrl}
+          alt={menu.name}
+          className={styles.home__menuImage}
+        />
       ) : (
-        <div className={styles.home__menuImageFallback}>이미지가 없어요.</div>
+        <div className={styles.home__menuImageFallback}>이미지가 없어요</div>
       )}
     </article>
   );
@@ -54,17 +69,16 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabKey>('main');
   const [isTabSticky, setIsTabSticky] = useState(false);
+  const [headerProgress, setHeaderProgress] = useState(0);
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
-  const storeId = useMemo(() => {
-    const parsed = Number(storeIdParam);
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-  }, [storeIdParam]);
-  const tableNum = useMemo(() => {
-    const parsed = Number(searchParams.get('tableNum'));
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-  }, [searchParams]);
+  const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
+  const tableNum = useMemo(
+    () => parsePositiveInt(searchParams.get('tableNum')),
+    [searchParams],
+  );
 
+  const heroSectionRef = useRef<HTMLElement | null>(null);
   const mainSectionRef = useRef<HTMLElement | null>(null);
   const sideSectionRef = useRef<HTMLElement | null>(null);
   const tabContainerRef = useRef<HTMLDivElement | null>(null);
@@ -77,13 +91,19 @@ export default function HomePage() {
 
   const mainCategory = useMemo(() => {
     if (categories.length === 0) return null;
-    return categories.find((category) => /main/i.test(category.name)) ?? categories[0];
+    return (
+      categories.find((category) => /main/i.test(category.name)) ??
+      categories[0]
+    );
   }, [categories]);
 
   const sideCategory = useMemo(() => {
     if (!mainCategory) return null;
     return (
-      categories.find((category) => category.id !== mainCategory.id && /side/i.test(category.name)) ??
+      categories.find(
+        (category) =>
+          category.id !== mainCategory.id && /side/i.test(category.name),
+      ) ??
       categories.find((category) => category.id !== mainCategory.id) ??
       null
     );
@@ -95,8 +115,23 @@ export default function HomePage() {
   const mainSectionLabel = mainCategory?.name ?? '메인 메뉴';
   const sideSectionLabel = sideCategory?.name ?? '사이드 메뉴';
   const hasSideSection = sideCategory !== null;
-  const hasNotFoundError = (error as { status?: number } | null)?.status === 404;
+  const hasNotFoundError =
+    (error as { status?: number } | null)?.status === 404;
   const hasTableContext = storeId !== null && tableNum !== null;
+
+  const headerStyle = useMemo(() => {
+    const colorChannel = mixChannel(255, 17, headerProgress);
+    const greenChannel = mixChannel(255, 24, headerProgress);
+    const blueChannel = mixChannel(255, 39, headerProgress);
+
+    return {
+      '--page-header-background': `rgba(255, 255, 255, ${0.24 + headerProgress * 0.76})`,
+      '--page-header-border': `rgba(229, 231, 235, ${0.08 + headerProgress * 0.92})`,
+      '--page-header-color': `rgb(${colorChannel}, ${greenChannel}, ${blueChannel})`,
+      '--page-header-backdrop': 'saturate(180%) blur(16px)',
+      '--page-header-shadow': `0 8px 24px rgba(15, 23, 42, ${headerProgress * 0.08})`,
+    } as CSSProperties;
+  }, [headerProgress]);
 
   useEffect(() => {
     setActiveTable(tableNum);
@@ -104,13 +139,23 @@ export default function HomePage() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const top = tabContainerRef.current?.getBoundingClientRect().top ?? 0;
-      setIsTabSticky(top <= 0);
+      const heroHeight = heroSectionRef.current?.offsetHeight ?? 0;
+      const transitionDistance = Math.max(heroHeight - HEADER_HEIGHT_PX, 1);
+      const nextProgress = clamp(window.scrollY / transitionDistance, 0, 1);
+      const top = tabContainerRef.current?.getBoundingClientRect().top ?? Infinity;
+
+      setHeaderProgress(nextProgress);
+      setIsTabSticky(top <= HEADER_HEIGHT_PX);
     };
 
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -131,7 +176,9 @@ export default function HomePage() {
     );
 
     if (mainSectionRef.current) observer.observe(mainSectionRef.current);
-    if (sideSectionRef.current && hasSideSection) observer.observe(sideSectionRef.current);
+    if (sideSectionRef.current && hasSideSection) {
+      observer.observe(sideSectionRef.current);
+    }
 
     return () => observer.disconnect();
   }, [hasSideSection, mainMenus.length, sideMenus.length]);
@@ -140,7 +187,8 @@ export default function HomePage() {
     if (tab === 'side' && !hasSideSection) return;
 
     setActiveTab(tab);
-    const target = tab === 'main' ? mainSectionRef.current : sideSectionRef.current;
+    const target =
+      tab === 'main' ? mainSectionRef.current : sideSectionRef.current;
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -153,31 +201,57 @@ export default function HomePage() {
   };
 
   const openCartPage = () => {
-    navigate(hasTableContext ? `/cart?storeId=${storeId}&tableNum=${tableNum}` : '/cart');
+    navigate(
+      hasTableContext
+        ? `/cart?storeId=${storeId}&tableNum=${tableNum}`
+        : '/cart',
+    );
   };
 
   const openOrderHistoryPage = () => {
-    navigate(hasTableContext ? `/orders/completed?storeId=${storeId}&tableNum=${tableNum}` : '/orders/completed');
+    navigate(hasTableContext ? buildOrderHistoryPath(storeId, tableNum) : '/');
   };
 
   return (
     <main className={styles.home}>
-      <section className={styles.home__hero}>
-        {data?.storeImageUrl ? (
-          <img src={data.storeImageUrl} alt={data.storeName} className={styles.home__heroImage} />
-        ) : (
-          <div className={styles.home__heroFallback}>이미지가 없어요.</div>
-        )}
+      <PageHeader
+        className={styles.home__pageHeader}
+        style={headerStyle}
+        title={data?.storeName ?? '메뉴판'}
+        onBack={() => navigate('/')}
+        rightSlot={
+          hasTableContext ? (
+            <button
+              type="button"
+              className={styles.home__headerActionButton}
+              onClick={openOrderHistoryPage}
+            >
+              주문 내역
+            </button>
+          ) : null
+        }
+      />
 
-        <button type="button" className={styles.home__historyFloatingButton} onClick={openOrderHistoryPage}>
-          주문 내역
-        </button>
+      <section ref={heroSectionRef} className={styles.home__hero}>
+        {data?.storeImageUrl ? (
+          <img
+            src={data.storeImageUrl}
+            alt={data.storeName}
+            className={styles.home__heroImage}
+          />
+        ) : (
+          <div className={styles.home__heroFallback}>이미지가 없어요</div>
+        )}
       </section>
 
       <section className={styles.home__storeMeta}>
         <div className={styles.home__titleRow}>
-          <div className={styles.home__storeName}>{data?.storeName ?? '매장 정보를 불러오는 중...'}</div>
-          <span className={styles.home__tableText}>{`${data?.tableNum ?? '-'}번 테이블`}</span>
+          <div className={styles.home__storeName}>
+            {data?.storeName ?? '매장 정보를 불러오는 중...'}
+          </div>
+          <span
+            className={styles.home__tableText}
+          >{`${data?.tableNum ?? '-'}번 테이블`}</span>
         </div>
 
         <div className={styles.home__descriptionBox}>
@@ -219,19 +293,19 @@ export default function HomePage() {
               </button>
             ) : null}
           </div>
-
-          {isTabSticky ? (
-            <button type="button" className={styles.home__historyTabButton} onClick={openOrderHistoryPage}>
-              주문 내역
-            </button>
-          ) : null}
         </div>
       </div>
 
-      {!hasTableContext ? <div className={styles.home__statusBox}>테이블 정보가 없어요.</div> : null}
-      {hasTableContext && isLoading ? <div className={styles.home__statusBox}>메뉴를 불러오는 중...</div> : null}
+      {!hasTableContext ? (
+        <div className={styles.home__statusBox}>테이블 정보가 없어요.</div>
+      ) : null}
+      {hasTableContext && isLoading ? (
+        <div className={styles.home__statusBox}>메뉴를 불러오는 중...</div>
+      ) : null}
       {hasTableContext && !isLoading && hasNotFoundError ? (
-        <div className={styles.home__statusBox}>테이블 또는 매장을 찾을 수 없어요.</div>
+        <div className={styles.home__statusBox}>
+          테이블 또는 매장을 찾을 수 없어요.
+        </div>
       ) : null}
       {hasTableContext && !isLoading && !hasNotFoundError && error ? (
         <div className={styles.home__statusBox}>메뉴를 불러오지 못했어요.</div>
@@ -239,12 +313,20 @@ export default function HomePage() {
 
       {hasTableContext && !isLoading && !error ? (
         <>
-          <section ref={mainSectionRef} data-tab="main" className={styles.home__menuSection}>
+          <section
+            ref={mainSectionRef}
+            data-tab="main"
+            className={styles.home__menuSection}
+          >
             <div className={styles.home__sectionTitle}>{mainSectionLabel}</div>
             {mainMenus.length > 0 ? (
               <div className={styles.home__menuList}>
                 {mainMenus.map((menu) => (
-                  <MenuCard key={menu.id} menu={menu} onClick={handleMenuCardClick} />
+                  <MenuCard
+                    key={menu.id}
+                    menu={menu}
+                    onClick={handleMenuCardClick}
+                  />
                 ))}
               </div>
             ) : (
@@ -252,15 +334,25 @@ export default function HomePage() {
             )}
           </section>
 
-          {hasSideSection ? <div className={styles.home__sectionDivider} /> : null}
+          {hasSideSection ? (
+            <div className={styles.home__sectionDivider} />
+          ) : null}
 
           {hasSideSection ? (
-            <section ref={sideSectionRef} data-tab="side" className={styles.home__menuSection}>
+            <section
+              ref={sideSectionRef}
+              data-tab="side"
+              className={styles.home__menuSection}
+            >
               <h2 className={styles.home__sectionTitle}>{sideSectionLabel}</h2>
               {sideMenus.length > 0 ? (
                 <div className={styles.home__menuList}>
                   {sideMenus.map((menu) => (
-                    <MenuCard key={menu.id} menu={menu} onClick={handleMenuCardClick} />
+                    <MenuCard
+                      key={menu.id}
+                      menu={menu}
+                      onClick={handleMenuCardClick}
+                    />
                   ))}
                 </div>
               ) : (
@@ -274,13 +366,19 @@ export default function HomePage() {
       ) : null}
 
       {totalQuantity > 0 ? (
-        <footer className={styles.home__cartBottom}>
-          <button type="button" className={styles.home__cartButton} onClick={openCartPage}>
+        <BottomActionBar>
+          <button
+            type="button"
+            className={styles.home__cartButton}
+            onClick={openCartPage}
+          >
             <span className={styles.home__cartCount}>{totalQuantity}</span>
             <span>{`${formatPrice(totalPrice)} 장바구니 보기`}</span>
           </button>
-        </footer>
+        </BottomActionBar>
       ) : null}
     </main>
   );
 }
+
+

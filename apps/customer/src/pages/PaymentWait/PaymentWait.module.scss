@@ -1,0 +1,80 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.paymentWait {
+  width: 100%;
+  max-width: 560px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: $white;
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+    margin-top: 60px;
+  }
+
+  &__coinIcon {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 20px;
+    animation: floatingCoin 2.4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  &__headline {
+    color: $black;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  &__summary {
+    margin-top: 12px;
+    color: $primary-50;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &__helper {
+    margin-top: 28px;
+  }
+
+  &__linkButton {
+    color: $gray-50;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &__submitButton {
+    width: 100%;
+    height: 56px;
+    border-radius: 16px;
+    color: $white;
+    background-color: $primary-50;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:disabled {
+      background-color: $gray-40;
+      cursor: not-allowed;
+    }
+  }
+}
+
+@keyframes floatingCoin {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

@@ -1,6 +1,7 @@
-@use "@order-ping/shared/styles/colors" as *;
+﻿@use "@order-ping/shared/styles/colors" as *;
 
 .home {
+  --home-header-height: calc(44px + max(10px, env(safe-area-inset-top)) + 10px);
   width: 100%;
   max-width: 560px;
   min-height: 100vh;
@@ -8,12 +9,41 @@
   background-color: $white;
   padding-bottom: 20px;
 
+  &__pageHeader {
+    margin-bottom: calc(-1 * var(--home-header-height));
+  }
+
+  &__headerActionButton {
+    display: flex;
+    padding: 6px 14px;
+    border-radius: 18px;
+    background-color: $primary-50;
+    align-items: center;
+    color: $white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
   &__hero {
     position: relative;
     width: 100%;
     aspect-ratio: 1.5;
     overflow: hidden;
     background-color: $gray-10;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(15, 23, 42, 0.28) 0%,
+        rgba(15, 23, 42, 0.12) 28%,
+        rgba(15, 23, 42, 0) 62%
+      );
+      pointer-events: none;
+    }
   }
 
   &__heroImage {
@@ -39,19 +69,6 @@
         transparent 45%
       ),
       linear-gradient(135deg, #bde9ff 0%, #ffd3ec 55%, #ffe2f2 100%);
-  }
-
-  &__historyFloatingButton {
-    position: absolute;
-    top: max(24px, env(safe-area-inset-top));
-    right: 24px;
-    padding: 8px 16px;
-    border-radius: 24px;
-    color: $white;
-    background-color: $primary-50;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
   }
 
   &__storeMeta {
@@ -111,10 +128,12 @@
 
   &__tabStickyWrap {
     position: sticky;
-    top: 0;
+    top: var(--home-header-height);
     z-index: 20;
-    background-color: $white;
+    background-color: rgba(255, 255, 255, 0.96);
     border-bottom: 1px solid $gray-10;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 
     &--stuck {
       box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
@@ -152,17 +171,6 @@
     }
   }
 
-  &__historyTabButton {
-    flex-shrink: 0;
-    height: 44px;
-    padding: 0 18px;
-    border-radius: 22px;
-    color: $white;
-    background-color: $primary-50;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
   &__statusBox {
     padding: 22px 24px;
     color: $gray-70;
@@ -170,7 +178,7 @@
   }
 
   &__menuSection {
-    scroll-margin-top: 70px;
+    scroll-margin-top: calc(var(--home-header-height) + 56px);
     padding: 24px 0 0;
   }
 
@@ -294,14 +302,15 @@
 
   &__cartToast {
     position: fixed;
-    left: 50%;
+    left: 0;
+    right: 0;
     bottom: calc(100px + env(safe-area-inset-bottom));
-    transform: translateX(-50%);
     z-index: 30;
     display: flex;
     align-items: center;
     gap: 10px;
     width: 240px;
+    margin: 0 auto;
     justify-content: center;
     padding: 8px 12px;
     border-radius: 32px;
@@ -316,18 +325,6 @@
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-  }
-
-  &__cartBottom {
-    position: fixed;
-    left: 50%;
-    bottom: 0;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 560px;
-    background-color: $gray-10;
-    padding: 10px 24px calc(16px + env(safe-area-inset-bottom));
-    z-index: 25;
   }
 
   &__cartButton {
