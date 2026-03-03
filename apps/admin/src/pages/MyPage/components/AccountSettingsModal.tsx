@@ -7,6 +7,7 @@ import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, ModalTrigger } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
+import { useStoreAccounts } from '@/pages/MyPage/hooks/useStoreAccounts';
 import { useUpdateStoreAccount } from '@/pages/MyPage/hooks/useUpdateStoreAccount';
 import { useBanks } from '@/pages/StoreCreate/hooks/useBanks';
 import styles from './InfoEditModal.module.scss';
@@ -28,8 +29,10 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
   const { data: banks, isLoading: isBanksLoading } = useBanks();
   const { mutateAsync: updateStoreAccount } = useUpdateStoreAccount();
   const [open, setOpen] = useState(false);
-  const accountId = store.account?.id ?? store.account?.accountId;
+  const { data: storeAccounts = [], isPending: isStoreAccountsPending } = useStoreAccounts(store.storeId, open);
   const bankOptions = banks?.map((bank) => ({ value: bank.code, label: bank.name })) ?? [];
+  const activeAccount = storeAccounts.find((account) => account.isActive) ?? storeAccounts[0];
+  const accountId = activeAccount?.id;
 
   const {
     register,
@@ -78,7 +81,11 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
         },
       });
 
-      await queryClient.invalidateQueries({ queryKey: ['myPage'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['myPage'] }),
+        queryClient.invalidateQueries({ queryKey: ['storeAccounts', store.storeId] }),
+      ]);
+
       toast({
         message: '계좌 정보가 수정되었습니다.',
         variant: 'info',
@@ -163,9 +170,9 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
                 messageState={errors.accountHolder ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="Enter account holder"
+                  placeholder="입금자명을 입력해 주세요."
                   {...register('accountHolder', {
-                    required: 'Enter account holder.',
+                    required: '입금자명을 입력해 주세요.',
                   })}
                 />
               </Input>
@@ -177,10 +184,10 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
                 messageState={errors.accountNumber ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="Enter account number"
+                  placeholder="계좌번호를 입력해 주세요."
                   inputMode="numeric"
                   {...register('accountNumber', {
-                    required: 'Enter account number.',
+                    required: '계좌번호를 입력해 주세요.',
                   })}
                 />
               </Input>
@@ -193,7 +200,7 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
               size="md"
               className={styles.footerButton}
               isLoading={isSubmitting}
-              disabled={!isValid || isSubmitting}
+              disabled={!isValid || isSubmitting || isStoreAccountsPending || !accountId}
               loadingText="수정 중..."
             >
               수정하기

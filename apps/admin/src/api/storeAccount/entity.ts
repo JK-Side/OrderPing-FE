@@ -4,6 +4,15 @@ export interface UpdateStoreAccountRequest {
   accountNumber: string;
 }
 
+export interface StoreAccountListItem {
+  id: number;
+  storeId: number;
+  bankCode: string;
+  accountHolder: string;
+  accountNumberMask: string;
+  isActive: boolean;
+}
+
 export interface StoreAccountResponse {
   id?: number;
   bankCode: string;

@@ -110,7 +110,7 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
       ]);
 
       toast({
-        message: '주점 정보가 업데이트에 성공했습니다.',
+        message: '주점 정보 업데이트에 성공했습니다.',
         variant: 'info',
       });
       setOpen(false);
@@ -164,9 +164,9 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
                 messageState={errors.name ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="Enter store name"
+                  placeholder="주점명을 입력해 주세요."
                   {...register('name', {
-                    required: 'Enter store name.',
+                    required: '주점명을 입력해 주세요.',
                   })}
                 />
               </Input>
@@ -178,9 +178,9 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
                 messageState={errors.description ? 'error' : undefined}
               >
                 <Input.TextArea
-                  placeholder="Enter store description"
+                  placeholder="주점 설명을 입력해 주세요."
                   {...register('description', {
-                    required: 'Enter store description.',
+                    required: '주점 설명을 입력해 주세요.',
                   })}
                 />
               </Input>
