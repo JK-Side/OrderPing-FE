@@ -17,10 +17,6 @@ import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
 import styles from './TableCreateModal.module.scss';
 
 const QR_IMAGE_SIZE = 256;
-const QR_HORIZONTAL_PADDING = 12;
-const QR_TOP_PADDING = 8;
-const QR_LABEL_GAP = 18;
-const QR_TEXT_AREA_HEIGHT = 20;
 const QR_S3_DIRECTORY = 'tables';
 
 type QrUploadTarget = {
@@ -37,35 +33,13 @@ type QrUploadEntryWithImage = QrUploadEntry & {
   qrImageUrl: string;
 };
 
-const escapeXml = (text: string) =>
-  text
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;');
-
-const createQrSvgMarkup = (value: string, tableNum: number) => {
+const createQrSvgMarkup = (value: string) => {
   const qrSvg = renderToStaticMarkup(<QRCodeSVG value={value} size={QR_IMAGE_SIZE} level="M" includeMargin />);
-  const positionedQrSvg = qrSvg.replace('<svg', `<svg x="${QR_HORIZONTAL_PADDING}" y="${QR_TOP_PADDING}"`);
-  const label = escapeXml(`${tableNum}번 테이블`);
-  const width = QR_IMAGE_SIZE + QR_HORIZONTAL_PADDING * 2;
-  const height = QR_TOP_PADDING + QR_IMAGE_SIZE + QR_LABEL_GAP + QR_TEXT_AREA_HEIGHT;
-  const labelY = QR_TOP_PADDING + QR_IMAGE_SIZE + QR_LABEL_GAP;
+  const svgWithNamespace = qrSvg.includes('xmlns=')
+    ? qrSvg
+    : qrSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
 
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
-  <rect width="100%" height="100%" fill="#ffffff"/>
-  ${positionedQrSvg}
-  <text x="${width / 2}" y="${labelY}"
-        text-anchor="middle"
-        font-size="18"
-        font-family="Pretendard, Arial, sans-serif"
-        font-weight="600"
-        fill="#000">
-    ${label}
-  </text>
-</svg>`;
+  return `<?xml version="1.0" encoding="UTF-8"?>\n${svgWithNamespace}`;
 };
 
 const createQrValue = (storeId: number, tableNum: number) => {
@@ -202,7 +176,7 @@ export default function TableCreateModal({
     const results = await Promise.allSettled(
       targets.map(async (table) => {
         const qrValue = createQrValue(table.storeId, table.tableNum);
-        const svgMarkup = createQrSvgMarkup(qrValue, table.tableNum);
+        const svgMarkup = createQrSvgMarkup(qrValue);
         const svgBlob = new Blob([svgMarkup], { type: 'image/svg+xml' });
         const imageUrl = await upload({
           directory: QR_S3_DIRECTORY,

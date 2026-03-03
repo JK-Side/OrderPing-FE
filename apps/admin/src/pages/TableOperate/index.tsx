@@ -1,9 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import type { TableResponse } from '@/api/table/entity';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
+import DownloadIcon from '@/assets/icons/download.svg?react';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import Button from '@/components/Button';
 import { useToast } from '@/components/Toast/useToast';
@@ -64,6 +65,7 @@ const isOrderableTable = (table?: TableResponse | null) => table?.status === 'OC
 
 export default function TableOperate() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
@@ -111,6 +113,11 @@ export default function TableOperate() {
 
   const handleToggleSelect = (tableId: number) => {
     setSelectedTableIds((prev) => (prev.includes(tableId) ? prev.filter((id) => id !== tableId) : [...prev, tableId]));
+  };
+
+  const handleOpenQrPrint = () => {
+    if (!storeId) return;
+    navigate(`/store/${storeId}/qr-print`);
   };
 
   const handleClearTables = async () => {
@@ -199,6 +206,10 @@ export default function TableOperate() {
               </div>
             ) : null}
             <div className={styles.actionButtons}>
+              <Button className={styles.printButton} variant="secondary" size="md" onClick={handleOpenQrPrint} disabled={!storeId}>
+                <DownloadIcon className={styles.printButtonIcon} aria-hidden="true" />
+                QR 일괄 출력
+              </Button>
               <Button
                 className={styles.clearButton}
                 size="md"

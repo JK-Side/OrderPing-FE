@@ -3,6 +3,7 @@ import type {
   AllTableListResponse,
   CreateAllTableRequest,
   CreateTableRequest,
+  TableQrListResponse,
   TableListResponse,
   TableResponse,
   TableStatus,
@@ -14,6 +15,12 @@ import type {
 export const getTablesByStore = async (storeId: number, status?: TableStatus) => {
   return await apiClient.get<TableListResponse>('/api/tables', {
     params: status ? { storeId, status } : { storeId },
+  });
+};
+
+export const getTableQrList = async (storeId: number) => {
+  return await apiClient.get<TableQrListResponse>('/api/tables/qr', {
+    params: { storeId },
   });
 };
 

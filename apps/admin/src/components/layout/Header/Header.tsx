@@ -14,8 +14,9 @@ export default function Header() {
   const isStoreCreatePage = pathname.startsWith('/store/create');
   const isAuthHeaderPage = isHomePage || isMyPage || isStoreCreatePage;
   const storeId =
-    pathname.match(/^\/store\/operate\/([^/]+)/)?.[1] ?? pathname.match(/^\/store\/([^/]+)\/(start|orders|menu)/)?.[1];
-  const isStoreStartPage = /^\/store\/[^/]+\/start/.test(pathname);
+    pathname.match(/^\/store\/operate\/([^/]+)/)?.[1] ??
+    pathname.match(/^\/store\/([^/]+)\/(start|orders|menu|qr-print)/)?.[1];
+  const isStoreStartPage = /^\/store\/[^/]+\/(start|qr-print)/.test(pathname);
   const isStoreOrdersPage = /^\/store\/[^/]+\/orders/.test(pathname);
   const menuManagePath = storeId ? `/store/operate/${storeId}` : '/';
   const orderManagePath = storeId ? `/store/${storeId}/orders` : '/';

@@ -45,6 +45,16 @@ export interface UpdateTableQrImageRequest {
   qrImageUrl: string;
 }
 
+export interface TableQrItem {
+  tableNum: number;
+  qrImageUrl: string;
+}
+
+export interface TableQrListResponse {
+  storeId: number;
+  tables: TableQrItem[];
+}
+
 interface CreateAllTableResponse {
   id: number;
   storeId: number;
