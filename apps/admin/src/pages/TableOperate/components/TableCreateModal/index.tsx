@@ -9,6 +9,7 @@ import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, ModalTrigger } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
+import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import { useCreateAllTable } from '@/pages/TableOperate/hooks/useCreateAllTable';
 import { useUpdateTableQrImage } from '@/pages/TableOperate/hooks/useUpdateTableQrImage';
 import { useUpdateTableQrImages } from '@/pages/TableOperate/hooks/useUpdateTableQrImages';
@@ -120,11 +121,13 @@ export default function TableCreateModal({
 }: TableCreateModalProps) {
   const [open, setOpen] = useState(false);
   const [isUploadingQr, setIsUploadingQr] = useState(false);
+  const [isResettingTables, setIsResettingTables] = useState(false);
   const [retryEntries, setRetryEntries] = useState<QrUploadEntry[]>([]);
   const [retryMessage, setRetryMessage] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { mutateAsync: createAllTables, isPending } = useCreateAllTable();
+  const { mutateAsync: clearTable } = useClearTable();
   const { mutateAsync: updateTableQrImage, isPending: isUpdatingTableQrImage } = useUpdateTableQrImage();
   const { mutateAsync: updateTableQrImages } = useUpdateTableQrImages(storeId ?? 0);
   const { upload } = usePresignedUploader();
@@ -448,6 +451,60 @@ export default function TableCreateModal({
     });
   };
 
+  void handleResetTables;
+
+  const handleResetTablesSubmit = async () => {
+    if (!storeId) return;
+    if (hasActiveOrders) {
+      toast({
+        message: '주문 중인 테이블이 있어 전체 비우기를 진행할 수 없습니다.',
+        variant: 'error',
+      });
+      return;
+    }
+    if (mode === 'create') {
+      toast({
+        message: '기존 테이블이 있어야 전체 비우기를 진행할 수 있습니다.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    const resetTargets = existingTables.filter((table) => table.status !== 'CLOSED');
+    if (resetTargets.length === 0) {
+      toast({
+        message: '비울 수 있는 테이블이 없습니다.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    if (onReset) {
+      await onReset();
+      return;
+    }
+
+    try {
+      setIsResettingTables(true);
+      await Promise.all(resetTargets.map((table) => clearTable(table.id)));
+      await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
+      toast({
+        message: '전체 테이블 비우기가 완료되었습니다.',
+        variant: 'info',
+      });
+      setOpen(false);
+    } catch (error) {
+      toast({
+        message: '전체 테이블 비우기에 실패했습니다.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('Failed to clear all tables', error);
+    } finally {
+      setIsResettingTables(false);
+    }
+  };
+
   return (
     <Modal open={open} onOpenChange={handleOpenChange}>
       <ModalTrigger asChild>
@@ -552,8 +609,9 @@ export default function TableCreateModal({
               size="md"
               variant="danger"
               fullWidth
-              disabled={isSubmitting || isPending || isUploadingQr || isUpdatingTableQrImage}
-              onClick={handleResetTables}
+              disabled={isSubmitting || isPending || isUploadingQr || isUpdatingTableQrImage || isResettingTables}
+              isLoading={isResettingTables}
+              onClick={handleResetTablesSubmit}
             >
               전체 테이블 비우기
             </Button>
