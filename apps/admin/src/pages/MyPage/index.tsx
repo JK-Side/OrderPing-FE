@@ -81,11 +81,11 @@ function LoadingState() {
 function EmptyState() {
   return (
     <div className={styles.stateCard}>
-      <h2 className={styles.stateTitle}>No store yet</h2>
-      <p className={styles.stateDescription}>Create your first store to manage store and account details here.</p>
+      <div className={styles.stateTitle}>아직 등록된 주점이 없어요</div>
+      <div className={styles.stateDescription}>첫 번째 주점을 등록하고 주점 정보와 계정 정보를 관리해보세요.</div>
       <div className={styles.stateActions}>
         <Link to="/store/create" className={styles.primaryLink}>
-          Create store
+          주점 생성하러 가기
         </Link>
       </div>
     </div>
@@ -96,10 +96,10 @@ function ErrorState({ error }: { error: unknown }) {
   const status = typeof error === 'object' && error && 'status' in error ? Number(error.status) : undefined;
   const message =
     status === 404
-      ? 'We could not find account details for this login.'
+      ? '해당 로그인 정보로 등록된 계정 정보를 찾을 수 없어요.'
       : error instanceof Error
         ? error.message
-        : 'Unable to load this page right now.';
+        : '현재 페이지를 불러올 수 없어요. 잠시 후 다시 시도해 주세요.';
 
   return (
     <div className={styles.stateCard}>
