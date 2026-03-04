@@ -1,5 +1,5 @@
 import * as Select from '@radix-ui/react-select';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import styles from './Input.module.scss';
 
 type SelectOption = {
@@ -46,10 +46,14 @@ export default function InputSelect({
   triggerClassName,
 }: InputSelectProps) {
   const [open, setOpen] = useState(false);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
   const hasValue = value != null && value !== '';
+  const handleWrapperRef = useCallback((node: HTMLDivElement | null) => {
+    setPortalContainer(node?.closest<HTMLElement>('[role="dialog"]') ?? null);
+  }, []);
 
   return (
-    <div className={[styles.selectWrapper, className ?? ''].join(' ')}>
+    <div ref={handleWrapperRef} className={[styles.selectWrapper, className ?? ''].join(' ')}>
       {name ? (
         <input type="hidden" name={name} value={value ?? ''} required={required} />
       ) : null}
@@ -71,7 +75,7 @@ export default function InputSelect({
           />
         </Select.Trigger>
 
-        <Select.Portal>
+        <Select.Portal container={portalContainer ?? undefined}>
           <Select.Content className={styles.selectContent} position="popper" sideOffset={6}>
             <Select.Viewport className={styles.selectViewport}>
               {options.map((opt) => (

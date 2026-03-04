@@ -1,0 +1,12 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.image {
+  height: 120px;
+  border-radius: 4px;
+  border: 2px dashed $gray-30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $gray-50;
+  cursor: pointer;
+}
