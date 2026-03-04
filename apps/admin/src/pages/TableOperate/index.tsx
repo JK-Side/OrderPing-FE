@@ -13,6 +13,7 @@ import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
 import TableOrderModal from '@/pages/TableOperate/components/TableOrderModal';
 import TableServiceModal from '@/pages/TableOperate/components/TableServiceModal';
 import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
+import { useDeleteTable } from '@/pages/TableOperate/hooks/useDeleteTable';
 import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
 
@@ -75,6 +76,7 @@ export default function TableOperate() {
 
   const { data: tables = [] } = useTablesByStore(storeId);
   const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
+  const { mutateAsync: deleteTable, isPending: isDeleting } = useDeleteTable();
   const { toast } = useToast();
 
   const sortedTables = [...tables].sort((a, b) => a.tableNum - b.tableNum);
@@ -154,6 +156,30 @@ export default function TableOperate() {
     }
   };
 
+  const handleDeleteTables = async () => {
+    if (!storeId || selectedTableIds.length === 0 || isDeleting) return;
+
+    const selectedTables = tables.filter((table) => selectedTableIds.includes(table.id));
+    if (selectedTables.length === 0) return;
+
+    try {
+      await Promise.all(selectedTables.map((table) => deleteTable(table.id)));
+      await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
+      setSelectedTableIds([]);
+      toast({
+        message: '테이블 삭제가 완료되었습니다.',
+        variant: 'info',
+      });
+    } catch (error) {
+      toast({
+        message: '테이블 삭제에 실패했습니다.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('Failed to delete tables', error);
+    }
+  };
+
   const handleOpenDetail = (table: TableResponse) => {
     if (!hasOrdersForTable(table)) return;
     setSelectedTableId(table.id);
@@ -206,6 +232,19 @@ export default function TableOperate() {
               </div>
             ) : null}
             <div className={styles.actionButtons}>
+              {selectedTableIds.length > 0 ? (
+                <Button
+                  className={styles.deleteButton}
+                  type="button"
+                  variant="danger"
+                  size="md"
+                  onClick={handleDeleteTables}
+                  disabled={isDeleting}
+                  isLoading={isDeleting}
+                >
+                  테이블 삭제
+                </Button>
+              ) : null}
               <Button className={styles.printButton} variant="secondary" size="md" onClick={handleOpenQrPrint} disabled={!storeId}>
                 <DownloadIcon className={styles.printButtonIcon} aria-hidden="true" />
                 QR 일괄 출력
