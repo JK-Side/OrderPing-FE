@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { QRCodeSVG } from 'qrcode.react';
+// import { QRCodeSVG } from 'qrcode.react';
 import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
@@ -18,10 +18,10 @@ const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 
 const formatTableLabel = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 
-const QR_DISPLAY_SIZE = 100;
-const CUSTOMER_PRODUCTION_URL = 'https://order-ping-customer.vercel.app';
+// const QR_DISPLAY_SIZE = 100;
+// const CUSTOMER_PRODUCTION_URL = 'https://order-ping-customer.vercel.app';
 
-const isSvgImageUrl = (url: string) => /\.svg(\?|#|$)/i.test(url) || url.startsWith('data:image/svg+xml');
+// const isSvgImageUrl = (url: string) => /\.svg(\?|#|$)/i.test(url) || url.startsWith('data:image/svg+xml');
 
 const resolveOrderStatuses = (rawStatus: TableResponse['orderStatus']) => {
   if (!rawStatus) return [];
@@ -33,12 +33,12 @@ const isTableClearable = (rawStatus: TableResponse['orderStatus']) => {
   return statuses.length > 0 && statuses.every((status) => status === 'COMPLETE');
 };
 
-const resolveQrValue = (table: TableResponse) => {
-  if (table.qrImageUrl) return table.qrImageUrl;
-  const url = new URL(`/stores/${table.storeId}`, CUSTOMER_PRODUCTION_URL);
-  url.searchParams.set('tableNum', String(table.tableNum));
-  return url.toString();
-};
+// const resolveQrValue = (table: TableResponse) => {
+//   if (table.qrImageUrl) return table.qrImageUrl;
+//   const url = new URL(`/stores/${table.storeId}`, CUSTOMER_PRODUCTION_URL);
+//   url.searchParams.set('tableNum', String(table.tableNum));
+//   return url.toString();
+// };
 
 export default function TableOrderModal({ open, onOpenChange, onServiceAdd, table }: TableOrderModalProps) {
   const queryClient = useQueryClient();
@@ -78,21 +78,22 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
       console.error('Failed to clear table', error);
     }
   };
-  const qrValue = resolveQrValue(table);
-  const qrNode =
-    isSvgImageUrl(table.qrImageUrl) && qrValue ? (
-      <QRCodeSVG
-        className={styles.qrImage}
-        value={qrValue}
-        size={QR_DISPLAY_SIZE}
-        level="M"
-        includeMargin
-        role="img"
-        aria-label="Table QR"
-      />
-    ) : (
-      <img className={styles.qrImage} src={table.qrImageUrl} alt="Table QR" />
-    );
+
+  // const qrValue = resolveQrValue(table);
+  // const qrNode =
+  //   isSvgImageUrl(table.qrImageUrl) && qrValue ? (
+  //     <QRCodeSVG
+  //       className={styles.qrImage}
+  //       value={qrValue}
+  //       size={QR_DISPLAY_SIZE}
+  //       level="M"
+  //       includeMargin
+  //       role="img"
+  //       aria-label="Table QR"
+  //     />
+  //   ) : (
+  //     <img className={styles.qrImage} src={table.qrImageUrl} alt="Table QR" />
+  //   );
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
@@ -129,7 +130,11 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
 
           <div className={styles.qrSection}>
             <div className={styles.qrTitle}>테이블 QR</div>
-            {table.qrImageUrl ? qrNode : <div className={styles.qrPlaceholder}>QR코드가 존재하지 않습니다.</div>}
+            {table.qrImageUrl ? (
+              <img src={table.qrImageUrl} className={styles.qrImg} alt="qr 이미지" />
+            ) : (
+              <div className={styles.qrPlaceholder}>QR코드가 존재하지 않습니다.</div>
+            )}
           </div>
 
           <div className={styles['summary-group']}>
