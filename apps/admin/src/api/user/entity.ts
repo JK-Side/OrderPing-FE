@@ -9,6 +9,7 @@ export interface MyPageAccount {
 
 export interface MyPageStore {
   storeId: number;
+  userId?: number;
   name: string;
   description: string;
   imageUrl?: string;
@@ -16,5 +17,6 @@ export interface MyPageStore {
 }
 
 export interface MyPageResponse {
+  userId?: number;
   stores: MyPageStore[];
 }
