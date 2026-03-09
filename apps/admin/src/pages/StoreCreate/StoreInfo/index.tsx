@@ -1,9 +1,9 @@
+import { Input } from '@order-ping/shared/components/Input';
 import { useCallback, useRef, useState, type ChangeEvent, type DragEvent, type MouseEvent } from 'react';
 import { FieldErrors, UseFormRegister } from 'react-hook-form';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import UploadIcon from '@/assets/icons/upload.svg?react';
 import Button from '@/components/Button';
-import { Input } from '@/components/Input';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
 import styles from './StoreInfo.module.scss';
 
@@ -101,8 +101,10 @@ export default function StoreInfo({ register, errors, onSubmit, storePreviewUrl,
           >
             <Input.Text
               placeholder="주점명을 입력해 주세요."
+              maxLength={50}
               {...register('storeName', {
                 required: '주점명을 입력해 주세요.',
+                maxLength: { value: 50, message: '주점명은 최대 50자입니다.' },
               })}
             />
           </Input>

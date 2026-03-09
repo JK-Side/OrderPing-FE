@@ -34,3 +34,7 @@ export const putStoreById = async (id: number, body: UpdateStoreRequest) => {
 export const getMyStore = async () => {
   return await apiClient.get<MyStoreListResponse>('/api/stores');
 };
+
+export const deleteStoreById = async (id: number) => {
+  return await apiClient.delete<void>(`/api/stores/${id}`);
+};

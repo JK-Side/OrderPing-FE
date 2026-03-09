@@ -124,6 +124,17 @@
   gap: 30px;
 }
 
+.dangerActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+.dangerActionButton {
+  min-width: 120px;
+}
+
 .infoGroup {
   display: flex;
   flex-direction: column;
@@ -218,6 +229,25 @@
   gap: 12px;
 }
 
+.dangerModalContent {
+  width: min(520px, 92vw);
+}
+
+.dangerModalMessage {
+  margin: 0;
+  text-align: center;
+  color: $gray-80;
+  font-size: 15px;
+}
+
+.dangerModalFooter {
+  gap: 12px;
+}
+
+.dangerModalButton {
+  min-width: 120px;
+}
+
 @media (max-width: 900px) {
   .myPage {
     padding: 56px 24px 80px;
@@ -263,10 +293,18 @@
     flex-direction: column;
   }
 
+  .dangerActions {
+    width: 100%;
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
   .actionLink,
   .primaryLink,
   .secondaryLink,
-  .infoFixButton {
+  .infoFixButton,
+  .dangerActionButton,
+  .dangerModalButton {
     width: 100%;
   }
 }
