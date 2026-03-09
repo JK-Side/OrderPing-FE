@@ -59,12 +59,12 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
 
           <div className={styles.guideItems}>
             <div className={styles.guideItem}>
-              <div className={styles.guideHeading}>주점 설정</div>
-              <div className={styles.guideText}>주점 정보를 등록하고 운영 설정을 확인할 수 있어요.</div>
-            </div>
-            <div className={styles.guideItem}>
               <div className={styles.guideHeading}>주점 시작</div>
               <div className={styles.guideText}>주문을 받고 판매를 시작해보세요.</div>
+            </div>
+            <div className={styles.guideItem}>
+              <div className={styles.guideHeading}>주점 설정</div>
+              <div className={styles.guideText}>주점 정보를 등록하고 운영 설정을 확인할 수 있어요.</div>
             </div>
           </div>
         </aside>

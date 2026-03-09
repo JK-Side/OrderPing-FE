@@ -40,6 +40,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  align-items: center;
 }
 
 .storeCard {
@@ -80,6 +81,7 @@
 }
 
 .storeButton {
+  font-size: 16px;
   min-width: 120px;
 }
 
@@ -95,7 +97,7 @@
 }
 
 .settingsText {
-  font-size: 22px;
+  font-size: 16px;
 }
 
 .guide {
