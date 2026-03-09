@@ -32,8 +32,6 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
   const { toast } = useToast();
   const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
 
-  console.log('table:', table);
-
   if (!table) return null;
 
   const orderMenus = table.orderMenus ?? [];
