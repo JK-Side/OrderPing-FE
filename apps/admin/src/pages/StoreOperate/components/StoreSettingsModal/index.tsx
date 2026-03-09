@@ -144,7 +144,6 @@ export default function StoreSettingsModal({
           variant: 'error',
         });
       }
-      console.error('Failed to update store', error);
     }
   };
 
