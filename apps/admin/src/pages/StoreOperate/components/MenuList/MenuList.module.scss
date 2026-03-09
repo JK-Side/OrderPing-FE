@@ -34,6 +34,23 @@
   display: none;
 }
 
+.menuSoldOut {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: $white;
+  font-size: 18px;
+  font-weight: 600;
+}
+
 .menuCard {
   display: flex;
   flex-direction: column;
@@ -69,6 +86,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 11; /* 품절 텍스트 z-index가 10이기 때문에 11로 설정*/
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }

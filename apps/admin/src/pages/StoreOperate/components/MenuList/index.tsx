@@ -23,6 +23,12 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
         {menus.map((menu) => (
           <article key={menu.id} className={styles.menuCard}>
             <div className={styles.menuImageWrap}>
+              {menu.stock === 0 && (
+                <div className={styles.menuSoldOut}>
+                  SOLD <br />
+                  OUT
+                </div>
+              )}
               <img className={styles.menuImage} src={menu.imageUrl || MenuDefault} alt={menu.name} />
               <button
                 type="button"
