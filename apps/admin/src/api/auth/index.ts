@@ -1,8 +1,13 @@
 import { apiClient } from '..';
 import { UserInfoResponse, RefreshResponse } from './entity';
 
-export const postLogout = async () => {
-  return await apiClient.post<void>('/api/auth/logout');
+interface AuthRequestOptions {
+  skipAuth?: boolean;
+  skipRefresh?: boolean;
+}
+
+export const postLogout = async (options: AuthRequestOptions = {}) => {
+  return await apiClient.post<void>('/api/auth/logout', options);
 };
 
 export const getUserInfo = async () => {

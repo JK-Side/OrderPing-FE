@@ -9,6 +9,7 @@ export default function OAuthCallback() {
   const { toast } = useToast();
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const hasHandled = useRef(false);
+  const REFRESH_BLOCKED_KEY = 'auth:refresh-blocked';
 
   useEffect(() => {
     if (hasHandled.current) return;
@@ -20,6 +21,7 @@ export default function OAuthCallback() {
     const message = params.get('message');
 
     if (accessToken) {
+      sessionStorage.removeItem(REFRESH_BLOCKED_KEY);
       setAccessToken(accessToken);
       navigate('/', { replace: true });
       return;
