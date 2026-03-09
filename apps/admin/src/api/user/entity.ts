@@ -17,6 +17,6 @@ export interface MyPageStore {
 }
 
 export interface MyPageResponse {
-  userId?: number;
+  userId: number;
   stores: MyPageStore[];
 }
