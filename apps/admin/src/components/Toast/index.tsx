@@ -141,7 +141,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 )}
               </div>
               <ToastPrimitive.Close className={styles.closeButton} aria-label="닫기">
-                <CloseIcon aria-hidden="true" />
+                <CloseIcon aria-hidden="true" fill="#727272" />
               </ToastPrimitive.Close>
             </ToastPrimitive.Root>
           );
