@@ -86,6 +86,22 @@ const resolveErrorMessage = (error: unknown) => {
         : '테이블 생성에 실패했습니다.';
 };
 
+const resolveOrderStatuses = (rawStatus: TableResponse['orderStatus']) => {
+  if (!rawStatus) return [];
+  return Array.isArray(rawStatus) ? rawStatus : [rawStatus];
+};
+
+const hasIncompleteOrderOnTable = (table: TableResponse) => {
+  const statuses = resolveOrderStatuses(table.orderStatus);
+  if (statuses.length > 0) {
+    return statuses.some((status) => status !== 'COMPLETE');
+  }
+
+  return (
+    (table.orderMenus?.length ?? 0) > 0 || (table.serviceMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0
+  );
+};
+
 interface TableCreateModalProps {
   storeId?: number;
   onCreated?: (tables: AllTableListResponse, layout: { columns: number; rows: number }) => void;
@@ -457,7 +473,7 @@ export default function TableCreateModal({
     if (!storeId) return;
     if (hasActiveOrders) {
       toast({
-        message: '주문 중인 테이블이 있어 전체 비우기를 진행할 수 없습니다.',
+        message: '모든 주문이 완료 상태가 아닙니다.',
         variant: 'error',
       });
       return;
@@ -474,6 +490,15 @@ export default function TableCreateModal({
     if (resetTargets.length === 0) {
       toast({
         message: '비울 수 있는 테이블이 없습니다.',
+        variant: 'error',
+      });
+      return;
+    }
+
+    const hasIncompleteOrderTables = resetTargets.some(hasIncompleteOrderOnTable);
+    if (hasIncompleteOrderTables) {
+      toast({
+        message: 'Only tables with COMPLETE orders can be cleared.',
         variant: 'error',
       });
       return;

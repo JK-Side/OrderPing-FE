@@ -56,6 +56,24 @@ const resolvePriorityOrderStatus = (rawStatus: TableResponse['orderStatus']) => 
   return ORDER_STATUS_PRIORITY.find((status) => statuses.includes(status));
 };
 
+const resolveOrderStatuses = (rawStatus: TableResponse['orderStatus']) => {
+  if (!rawStatus) return [];
+  return Array.isArray(rawStatus) ? rawStatus : [rawStatus];
+};
+
+const hasIncompleteOrderOnTable = (table: TableResponse) => {
+  const statuses = resolveOrderStatuses(table.orderStatus);
+  if (statuses.length > 0) {
+    return statuses.some((status) => status !== 'COMPLETE');
+  }
+
+  return (
+    (table.orderMenus?.length ?? 0) > 0 ||
+    (table.serviceMenus?.length ?? 0) > 0 ||
+    (table.totalOrderAmount ?? 0) > 0
+  );
+};
+
 const hasOrdersForTable = (table: TableResponse) =>
   (table.orderMenus?.length ?? 0) > 0 ||
   (table.serviceMenus?.length ?? 0) > 0 ||
@@ -81,7 +99,7 @@ export default function TableOperate() {
 
   const sortedTables = [...tables].sort((a, b) => a.tableNum - b.tableNum);
   const hasTables = tables.length > 0;
-  const hasActiveOrders = tables.some((table: TableResponse) => table.status === 'OCCUPIED');
+  const hasActiveOrders = tables.some(hasIncompleteOrderOnTable);
   const tableButtonLabel = hasTables ? '테이블 수정' : '테이블 추가';
   const [isNoticeVisible, setIsNoticeVisible] = useState(true);
   const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
@@ -130,7 +148,7 @@ export default function TableOperate() {
     const selectedTables = tables.filter((table) => selectedTableIds.includes(table.id));
     const eligibleTables = selectedTables.filter((table) => table.status !== 'CLOSED');
     if (eligibleTables.length === 0) return;
-    const hasOrderTables = eligibleTables.some((table) => table.orderStatus && table.orderStatus !== 'COMPLETE');
+    const hasOrderTables = eligibleTables.some(hasIncompleteOrderOnTable);
 
     if (hasOrderTables) {
       toast({
@@ -194,7 +212,6 @@ export default function TableOperate() {
   };
 
   const handleOpenDetail = (table: TableResponse) => {
-    if (!hasOrdersForTable(table)) return;
     setSelectedTableId(table.id);
     setIsDetailOpen(true);
   };
