@@ -80,7 +80,7 @@ export default function OrderConfirmPage() {
       return;
     }
 
-    if (paymentAmount <= 0) {
+    if (paymentAmount < 0) {
       toast({
         message: "최종 결제 금액은 0원보다 커야 해요.",
         variant: "warning",

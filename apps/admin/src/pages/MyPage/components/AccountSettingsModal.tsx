@@ -26,9 +26,9 @@ interface AccountSettingsForm {
 export default function AccountSettingsModal({ store, className }: AccountSettingsModalProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { data: banks, isLoading: isBanksLoading } = useBanks();
-  const { mutateAsync: updateStoreAccount } = useUpdateStoreAccount();
   const [open, setOpen] = useState(false);
+  const { data: banks, isLoading } = useBanks(open);
+  const { mutateAsync: updateStoreAccount } = useUpdateStoreAccount();
   const { data: storeAccounts = [], isPending: isStoreAccountsPending } = useStoreAccounts(store.storeId, open);
   const bankOptions = banks?.map((bank) => ({ value: bank.code, label: bank.name })) ?? [];
   const activeAccount = storeAccounts.find((account) => account.isActive) ?? storeAccounts[0];
@@ -148,7 +148,7 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
                 <Controller
                   name="bankCode"
                   control={control}
-                  rules={{ required: 'Select a bank.' }}
+                  rules={{ required: '은행명을 선택해 주세요.' }}
                   render={({ field }) => (
                     <Input.InputSelect
                       name={field.name}
@@ -156,7 +156,7 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
                       onValueChange={field.onChange}
                       options={bankOptions}
                       placeholder="Select bank"
-                      disabled={isBanksLoading || isSubmitting}
+                      disabled={isLoading || isSubmitting}
                       required
                     />
                   )}

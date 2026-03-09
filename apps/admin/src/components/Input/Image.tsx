@@ -1,4 +1,4 @@
-import styles from './Input.module.scss';
+import styles from './Image.module.scss';
 
 interface ImageProps {
   onChange?: (file: File | null) => void;
