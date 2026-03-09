@@ -233,16 +233,10 @@
   width: min(520px, 92vw);
 }
 
-.dangerModalBody {
-  padding-top: 24px;
-  padding-bottom: 16px;
-}
-
 .dangerModalMessage {
   margin: 0;
   text-align: center;
   color: $gray-80;
-  line-height: 1.6;
   font-size: 15px;
 }
 

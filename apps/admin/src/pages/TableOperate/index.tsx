@@ -91,7 +91,9 @@ export default function TableOperate() {
   const [isServiceOpen, setIsServiceOpen] = useState(false);
 
   const storedTableLayout =
-    storeId && typeof window !== 'undefined' ? parseStoredLayout(localStorage.getItem(getLayoutStorageKey(storeId))) : null;
+    storeId && typeof window !== 'undefined'
+      ? parseStoredLayout(localStorage.getItem(getLayoutStorageKey(storeId)))
+      : null;
   const hasLayoutOverrideForStore = layoutOverride !== null && layoutOverride.storeId === storeId;
   const tableLayout = hasLayoutOverrideForStore ? layoutOverride.layout : storedTableLayout;
 
@@ -171,12 +173,23 @@ export default function TableOperate() {
         variant: 'info',
       });
     } catch (error) {
+      const status = (error as { status?: number })?.status;
+
+      const message =
+        status === 400
+          ? '주문이 존재하는 테이블은 삭제할 수 없습니다.'
+          : status === 401
+            ? '로그인이 필요한 기능입니다.'
+            : status === 403
+              ? '자신의 주점의 테이블만 삭제 가능합니다.'
+              : status === 404
+                ? '주점을 찾을 수 없습니다.'
+                : '주점 삭제에 실패했습니다.';
+
       toast({
-        message: '테이블 삭제에 실패했습니다.',
-        description: error instanceof Error ? error.message : undefined,
+        message,
         variant: 'error',
       });
-      console.error('Failed to delete tables', error);
     }
   };
 
@@ -245,7 +258,13 @@ export default function TableOperate() {
                   테이블 삭제
                 </Button>
               ) : null}
-              <Button className={styles.printButton} variant="secondary" size="md" onClick={handleOpenQrPrint} disabled={!storeId}>
+              <Button
+                className={styles.printButton}
+                variant="secondary"
+                size="md"
+                onClick={handleOpenQrPrint}
+                disabled={!storeId}
+              >
                 <DownloadIcon className={styles.printButtonIcon} aria-hidden="true" />
                 QR 일괄 출력
               </Button>

@@ -348,14 +348,14 @@ export default function MyPage() {
             <ModalTitle>주점 삭제</ModalTitle>
           </ModalHeader>
           <ModalBody className={styles.dangerModalBody}>
-            <p className={styles.dangerModalMessage}>
+            <div className={styles.dangerModalMessage}>
               {'<'}
               {deleteTargetStore?.name ?? '주점'}
               {'>'}
               을(를) 정말 삭제하시겠습니까?
               <br />
               삭제한 주점은 복구할 수 없습니다.
-            </p>
+            </div>
           </ModalBody>
           <ModalFooter className={styles.dangerModalFooter}>
             <Button
