@@ -68,9 +68,7 @@ const hasIncompleteOrderOnTable = (table: TableResponse) => {
   }
 
   return (
-    (table.orderMenus?.length ?? 0) > 0 ||
-    (table.serviceMenus?.length ?? 0) > 0 ||
-    (table.totalOrderAmount ?? 0) > 0
+    (table.orderMenus?.length ?? 0) > 0 || (table.serviceMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0
   );
 };
 
