@@ -499,7 +499,6 @@ export default function TableCreateModal({
         description: error instanceof Error ? error.message : undefined,
         variant: 'error',
       });
-      console.error('Failed to clear all tables', error);
     } finally {
       setIsResettingTables(false);
     }
