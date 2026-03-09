@@ -32,7 +32,7 @@ export default function StoreCreate() {
   const [storeImageFile, setStoreImageFile] = useState<File | null>(null);
   const [storePreviewUrl, setStorePreviewUrl] = useState<string | null>(null);
   const storePreviewUrlRef = useRef<string | null>(null);
-  const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(null);
+  // const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(null);
   const qrPreviewUrlRef = useRef<string | null>(null);
   const { upload } = usePresignedUploader();
 
@@ -50,17 +50,17 @@ export default function StoreCreate() {
     });
   }, []);
 
-  const handleQrCodeImageChange = useCallback((file: File | null) => {
-    setQrPreviewUrl((previousUrl) => {
-      if (previousUrl) {
-        URL.revokeObjectURL(previousUrl);
-      }
+  // const handleQrCodeImageChange = useCallback((file: File | null) => {
+  //   setQrPreviewUrl((previousUrl) => {
+  //     if (previousUrl) {
+  //       URL.revokeObjectURL(previousUrl);
+  //     }
 
-      const nextUrl = file ? URL.createObjectURL(file) : null;
-      qrPreviewUrlRef.current = nextUrl;
-      return nextUrl;
-    });
-  }, []);
+  //     const nextUrl = file ? URL.createObjectURL(file) : null;
+  //     qrPreviewUrlRef.current = nextUrl;
+  //     return nextUrl;
+  //   });
+  // }, []);
 
   useEffect(() => {
     return () => {
@@ -183,8 +183,8 @@ export default function StoreCreate() {
             control={control}
             errors={errors}
             onSubmit={handleSubmit(handleAccountInfoSubmit)}
-            qrPreviewUrl={qrPreviewUrl}
-            onQrCodeImageChange={handleQrCodeImageChange}
+            // qrPreviewUrl={qrPreviewUrl}
+            // onQrCodeImageChange={handleQrCodeImageChange}
           />
         )}
         {step === 3 && <StoreCreateComplete storeName={getValues('storeName')} />}

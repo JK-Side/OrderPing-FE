@@ -1,3 +1,4 @@
+import { Input } from '@order-ping/shared/components/Input';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useState, type ChangeEvent } from 'react';
@@ -5,7 +6,7 @@ import { useForm, type SubmitHandler } from 'react-hook-form';
 import type { MyPageStore } from '@/api/user/entity';
 import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
-import { Input } from '@/components/Input';
+// import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, ModalTrigger } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import { useUpdateStore } from '@/pages/StoreOperate/hooks/useUpdateStore';
@@ -165,6 +166,7 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
               >
                 <Input.Text
                   placeholder="주점명을 입력해 주세요."
+                  maxLength={50}
                   {...register('name', {
                     required: '주점명을 입력해 주세요.',
                   })}

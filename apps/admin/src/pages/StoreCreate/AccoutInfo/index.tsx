@@ -1,13 +1,13 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import { Controller, FieldErrors, type Control, type UseFormRegister } from 'react-hook-form';
-import InfoIcon from '@/assets/icons/info-circle.svg?react';
-import QrIcon from '@/assets/icons/qr-code.svg?react';
-import tossStep1 from '@/assets/imgs/toss1.jpg';
-import tossStep2 from '@/assets/imgs/toss2.jpg';
-import tossStep3 from '@/assets/imgs/toss3.jpg';
+// import InfoIcon from '@/assets/icons/info-circle.svg?react';
+// import QrIcon from '@/assets/icons/qr-code.svg?react';
+// import tossStep1 from '@/assets/imgs/toss1.jpg';
+// import tossStep2 from '@/assets/imgs/toss2.jpg';
+// import tossStep3 from '@/assets/imgs/toss3.jpg';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
+// import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useBanks } from '@/pages/StoreCreate/hooks/useBanks';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
 import styles from './AccoutInfo.module.scss';
@@ -26,43 +26,45 @@ export default function AccoutInfo({
   control,
   errors,
   onSubmit,
-  qrPreviewUrl,
-  onQrCodeImageChange,
+  // qrPreviewUrl,
+  // onQrCodeImageChange,
 }: AccoutInfoProps) {
   const { data: banks, isLoading } = useBanks();
-  const [isHelpOpen, setIsHelpOpen] = useState(false);
+  // const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const bankOptions = banks?.map((b) => ({ value: b.code, label: b.name })) ?? [];
-  const qrCodeImageField = register('qrCodeImage');
-  const { onChange: handleQrCodeImageChange, ref: qrCodeImageRef, ...qrCodeImageFieldProps } = qrCodeImageField;
+  // const qrCodeImageField = register('qrCodeImage');
+  // const { onChange: handleQrCodeImageChange, ref: qrCodeImageRef, ...qrCodeImageFieldProps } = qrCodeImageField;
 
   return (
     <>
       <header className={styles.header}>
         <h1 className={styles.mainTitle}>정산 받을 계좌를 등록해 주세요.</h1>
-        <p className={styles.mainSubtitle}>먼저, 주점의 기본 정보를 입력해 주세요.</p>
+        <p className={styles.mainSubtitle}>마지막으로 주점의 대표 계좌를 설정해 주세요!</p>
       </header>
 
       <form className={styles.form} onSubmit={onSubmit}>
         <h2 className={styles.sectionTitle}>정산 계좌 정보</h2>
 
         <div className={styles.fields}>
-          <Controller
-            name="bankCode"
-            control={control}
-            rules={{ required: '은행명을 선택해 주세요.' }}
-            render={({ field }) => (
-              <Input.InputSelect
-                name={field.name}
-                value={field.value ?? ''}
-                onValueChange={field.onChange}
-                options={bankOptions}
-                placeholder="은행명을 선택해 주세요."
-                disabled={isLoading}
-                required
-              />
-            )}
-          />
+          <div className={styles.bankField}>
+            <Controller
+              name="bankCode"
+              control={control}
+              rules={{ required: '은행명을 선택해 주세요.' }}
+              render={({ field }) => (
+                <Input.InputSelect
+                  name={field.name}
+                  value={field.value ?? ''}
+                  onValueChange={field.onChange}
+                  options={bankOptions}
+                  placeholder="은행명을 선택해 주세요."
+                  disabled={isLoading}
+                  required
+                />
+              )}
+            />
+          </div>
 
           <Input
             label="예금주"
@@ -88,7 +90,7 @@ export default function AccoutInfo({
             />
           </Input>
 
-          <div className={styles.qrSection}>
+          {/* <div className={styles.qrSection}>
             <h3 className={styles.qrTitle}>토스 QR 코드 등록</h3>
             <input
               id="qrCodeImage"
@@ -116,7 +118,7 @@ export default function AccoutInfo({
               <InfoIcon className={styles.qrHelpIcon} aria-hidden="true" />
               토스 QR 코드 추가하는 법
             </button>
-          </div>
+          </div> */}
         </div>
 
         <Button type="submit" size="lg" className={styles.nextButton}>
@@ -124,7 +126,7 @@ export default function AccoutInfo({
         </Button>
       </form>
 
-      <Modal open={isHelpOpen} onOpenChange={setIsHelpOpen}>
+      {/* <Modal open={isHelpOpen} onOpenChange={setIsHelpOpen}>
         <ModalContent className={styles.helpModalContent}>
           <ModalHeader>
             <ModalTitle>토스 QR 등록 방법</ModalTitle>
@@ -172,7 +174,7 @@ export default function AccoutInfo({
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </Modal> */}
     </>
   );
 }
