@@ -55,7 +55,17 @@ export default function OrderStatusPage() {
     queryFn: () =>
       getCustomerOrdersByTableId(storeId as number, tableNum as number),
     enabled: hasTableContext && orderId !== null,
-    refetchInterval: orderId ? 5000 : false, // 폴링
+    refetchInterval: (query) => {
+      if (!orderId) return false;
+
+      const orders = query.state.data as
+        | CustomerOrderLookupResponse[]
+        | undefined;
+      const targetOrder = orders?.find((order) => order.id === orderId);
+      if (targetOrder?.orderStatus === "COMPLETE") return false;
+
+      return 5000;
+    },
   });
 
   useEffect(() => {
@@ -79,7 +89,7 @@ export default function OrderStatusPage() {
 
   const hasNotFoundError =
     (error as { status?: number } | null)?.status === 404;
-  const currentStatus = currentOrder?.status ?? "PENDING";
+  const currentStatus = currentOrder?.orderStatus ?? "PENDING";
   const currentStatusMeta = getOrderStatusMeta(currentStatus);
   const title = currentOrder ? currentStatusMeta.label : "주문 상태";
   const titleDescription = currentOrder ? currentStatusMeta.description : "";
