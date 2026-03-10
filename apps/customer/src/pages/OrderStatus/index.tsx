@@ -8,6 +8,10 @@ import {
   buildStoreHomePath,
   parsePositiveInt,
 } from "../../utils/orderFlow";
+import {
+  ORDER_STATUS_STEPS,
+  getOrderStatusMeta,
+} from "../../utils/orderStatus";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -29,12 +33,6 @@ const getPaidAmount = (order: CustomerOrderLookupResponse) =>
 
 const getOrderMenuCount = (order: CustomerOrderLookupResponse) =>
   order.menus.reduce((sum, menu) => sum + menu.quantity, 0);
-
-const getTitle = (order: CustomerOrderLookupResponse | null) => {
-  if (!order || order.status === "PENDING") return "주문을 확인 중입니다";
-  if (order.status === "COOKING") return "주문이 접수되었어요";
-  return "주문을 완료했어요 👍";
-};
 
 export default function OrderStatusPage() {
   const navigate = useNavigate();
@@ -81,7 +79,15 @@ export default function OrderStatusPage() {
 
   const hasNotFoundError =
     (error as { status?: number } | null)?.status === 404;
-  const title = getTitle(currentOrder);
+  const currentStatus = currentOrder?.status ?? "PENDING";
+  const currentStatusMeta = getOrderStatusMeta(currentStatus);
+  const title = currentOrder ? currentStatusMeta.label : "주문 상태";
+  const titleDescription = currentOrder ? currentStatusMeta.description : "";
+  const progressToneClassName = {
+    red: styles["orderStatus__progress--red"],
+    green: styles["orderStatus__progress--green"],
+    blue: styles["orderStatus__progress--blue"],
+  }[currentStatusMeta.tone];
 
   return (
     <main className={styles.orderStatus}>
@@ -97,6 +103,11 @@ export default function OrderStatusPage() {
       <section className={styles.orderStatus__content}>
         <header className={styles.orderStatus__hero}>
           <h1 className={styles.orderStatus__title}>{title}</h1>
+          {titleDescription ? (
+            <div className={styles.orderStatus__description}>
+              {titleDescription}
+            </div>
+          ) : null}
           {currentOrder ? (
             <div className={styles.orderStatus__summary}>
               {`총 ${getOrderMenuCount(currentOrder)}개 | ${formatPrice(getPaidAmount(currentOrder))}`}
@@ -147,6 +158,39 @@ export default function OrderStatusPage() {
         !error &&
         currentOrder ? (
           <section className={styles.orderStatus__list}>
+            <ol
+              className={[styles.orderStatus__progress, progressToneClassName]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {ORDER_STATUS_STEPS.map((status) => {
+                const stepMeta = getOrderStatusMeta(status);
+                const isDone = stepMeta.stepIndex < currentStatusMeta.stepIndex;
+                const isActive =
+                  stepMeta.stepIndex === currentStatusMeta.stepIndex;
+
+                return (
+                  <li
+                    key={status}
+                    className={[
+                      styles.orderStatus__progressStep,
+                      isDone ? styles["orderStatus__progressStep--done"] : "",
+                      isActive
+                        ? styles["orderStatus__progressStep--active"]
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <span className={styles.orderStatus__stepDot} />
+                    <span className={styles.orderStatus__stepLabel}>
+                      {stepMeta.label}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+
             <article className={styles.orderStatus__orderCard}>
               <div className={styles.orderStatus__orderHeader}>
                 <span className={styles.orderStatus__orderNumber}>
