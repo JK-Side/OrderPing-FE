@@ -35,7 +35,7 @@ export default function OrderConfirmPage() {
   const hasTableContext = storeId !== null && tableNum !== null;
   const { data, isLoading } = useStoreOrder(storeId, tableNum);
   const [depositorName, setDepositorName] = useState("");
-  const [couponAmountInput, setCouponAmountInput] = useState("0");
+  const [couponAmountInput, setCouponAmountInput] = useState("");
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
   const [isDepositorNameTouched, setIsDepositorNameTouched] = useState(false);
 
@@ -44,7 +44,10 @@ export default function OrderConfirmPage() {
   }, [setActiveTable, tableNum]);
 
   const couponAmount = useMemo(() => {
-    const parsed = Number(couponAmountInput.replace(/[^0-9]/g, ""));
+    const digits = couponAmountInput.replace(/[^0-9]/g, "");
+    if (digits === "") return 0;
+
+    const parsed = Number(digits);
     if (!Number.isFinite(parsed) || parsed < 0) return 0;
     return Math.min(parsed, totalPrice);
   }, [couponAmountInput, totalPrice]);
@@ -60,7 +63,7 @@ export default function OrderConfirmPage() {
 
   const handleCouponAmountChange = (value: string) => {
     const digits = value.replace(/[^0-9]/g, "");
-    setCouponAmountInput(digits === "" ? "0" : digits);
+    setCouponAmountInput(digits);
   };
 
   const handleProceedPayment = async () => {
@@ -91,13 +94,19 @@ export default function OrderConfirmPage() {
 
     try {
       setIsPreparingPayment(true);
+      const normalizedCouponAmount =
+        couponAmountInput.trim() === "" ? 0 : couponAmount;
+      const normalizedPaymentAmount = Math.max(
+        totalPrice - normalizedCouponAmount,
+        0,
+      );
 
       const createdOrder = await postCreatedCustomerOrder({
         tableId: data.tableId,
         tableNum: data.tableNum,
         storeId: data.storeId,
         depositorName: depositorName.trim(),
-        couponAmount,
+        couponAmount: normalizedCouponAmount,
         menus: items.map((item) => ({
           menuId: item.menuId,
           quantity: item.quantity,
@@ -110,9 +119,9 @@ export default function OrderConfirmPage() {
         tableId: data.tableId,
         tableNum: data.tableNum,
         depositorName: depositorName.trim(),
-        couponAmount,
+        couponAmount: normalizedCouponAmount,
         totalPrice,
-        paymentAmount,
+        paymentAmount: normalizedPaymentAmount,
         tossDeeplink: "",
         account: {
           bankCode: "",
@@ -130,7 +139,7 @@ export default function OrderConfirmPage() {
       try {
         const paymentInfo = await getPaymentTossDeeplink({
           storeId: data.storeId,
-          amount: paymentAmount,
+          amount: normalizedPaymentAmount,
         });
 
         savePendingOrderDraft({
@@ -156,7 +165,7 @@ export default function OrderConfirmPage() {
       toast({
         message:
           status === 409
-            ? "품절된 메뉴가 있어 주문할 수 없어요."
+            ? "재고가 부족하여 주문할 수 없어요. 수량을 조절해 주세요."
             : "주문 생성에 실패했어요. 다시 시도해 주세요.",
         variant: "error",
         duration: 3000,

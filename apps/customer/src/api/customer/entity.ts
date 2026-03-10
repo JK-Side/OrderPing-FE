@@ -1,4 +1,4 @@
-type OrderStatus = 'PENDING' | 'COOKING' | 'COMPLETE';
+export type OrderStatus = 'PENDING' | 'COOKING' | 'COMPLETE';
 
 // POST /api/customer/orders
 export interface CreateCustomerOrderRequest {
@@ -90,7 +90,8 @@ export interface CustomerOrderLookupResponse {
   tableNum: number;
   storeId: number;
   depositorName: string;
-  status: OrderStatus;
+  orderStatus: OrderStatus;
+  // status: OrderStatus;
   totalPrice: number;
   couponAmount: number;
   cashAmount: number;

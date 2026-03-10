@@ -57,6 +57,12 @@
     font-size: 14px;
   }
 
+  &__orderMeta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
   &__orderTime {
     color: $gray-60;
     font-size: 14px;

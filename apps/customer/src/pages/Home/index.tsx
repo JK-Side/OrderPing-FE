@@ -1,18 +1,19 @@
-﻿import type { CSSProperties } from 'react';
-import type { CustomerStoreOrderMenu } from '../../api/customer/entity';
-import BottomActionBar from '../../components/BottomActionBar';
-import PageHeader from '../../components/PageHeader';
-import { useCart } from '../../stores/cart';
-import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { useStoreOrder } from './hooks/useStoreOrder';
-import styles from './Home.module.scss';
+﻿import type { CSSProperties } from "react";
+import type { CustomerStoreOrderMenu } from "../../api/customer/entity";
+import BottomActionBar from "../../components/BottomActionBar";
+import PageHeader from "../../components/PageHeader";
+import { useCart } from "../../stores/cart";
+import DEFAULTIMG from "../../assets/imgs/store_default.svg?react";
+import { buildOrderHistoryPath, parsePositiveInt } from "../../utils/orderFlow";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useStoreOrder } from "./hooks/useStoreOrder";
+import styles from "./Home.module.scss";
 
-type TabKey = 'main' | 'side';
+type TabKey = "main" | "side";
 
 const HEADER_HEIGHT_PX = 74;
-const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
+const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 const mixChannel = (from: number, to: number, progress: number) =>
@@ -27,13 +28,13 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
   return (
     <article
       className={`${styles.home__menuCard} ${
-        menu.isSoldOut ? styles['home__menuCard--soldOut'] : ''
+        menu.isSoldOut ? styles["home__menuCard--soldOut"] : ""
       }`}
       onClick={() => onClick(menu.id)}
       role="button"
       tabIndex={0}
       onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
+        if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           onClick(menu.id);
         }
@@ -49,7 +50,7 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
 
         <div className={styles.home__menuPrice}>{formatPrice(menu.price)}</div>
         <div className={styles.home__menuDescription}>
-          {menu.isSoldOut ? '현재 품절된 메뉴입니다.' : ''}
+          {menu.isSoldOut ? "현재 품절된 메뉴입니다." : ""}
         </div>
       </div>
 
@@ -67,14 +68,14 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
 }
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('main');
+  const [activeTab, setActiveTab] = useState<TabKey>("main");
   const [isTabSticky, setIsTabSticky] = useState(false);
   const [headerProgress, setHeaderProgress] = useState(0);
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
   const tableNum = useMemo(
-    () => parsePositiveInt(searchParams.get('tableNum')),
+    () => parsePositiveInt(searchParams.get("tableNum")),
     [searchParams],
   );
 
@@ -112,8 +113,8 @@ export default function HomePage() {
   const mainMenus = mainCategory?.menus ?? [];
   const sideMenus = sideCategory?.menus ?? [];
 
-  const mainSectionLabel = mainCategory?.name ?? '메인 메뉴';
-  const sideSectionLabel = sideCategory?.name ?? '사이드 메뉴';
+  const mainSectionLabel = mainCategory?.name ?? "메인 메뉴";
+  const sideSectionLabel = sideCategory?.name ?? "사이드 메뉴";
   const hasSideSection = sideCategory !== null;
   const hasNotFoundError =
     (error as { status?: number } | null)?.status === 404;
@@ -125,11 +126,11 @@ export default function HomePage() {
     const blueChannel = mixChannel(255, 39, headerProgress);
 
     return {
-      '--page-header-background': `rgba(255, 255, 255, ${0.24 + headerProgress * 0.76})`,
-      '--page-header-border': `rgba(229, 231, 235, ${0.08 + headerProgress * 0.92})`,
-      '--page-header-color': `rgb(${colorChannel}, ${greenChannel}, ${blueChannel})`,
-      '--page-header-backdrop': 'saturate(180%) blur(16px)',
-      '--page-header-shadow': `0 8px 24px rgba(15, 23, 42, ${headerProgress * 0.08})`,
+      "--page-header-background": `rgba(255, 255, 255, ${0.24 + headerProgress * 0.76})`,
+      "--page-header-border": `rgba(229, 231, 235, ${0.08 + headerProgress * 0.92})`,
+      "--page-header-color": `rgb(${colorChannel}, ${greenChannel}, ${blueChannel})`,
+      "--page-header-backdrop": "saturate(180%) blur(16px)",
+      "--page-header-shadow": `0 8px 24px rgba(15, 23, 42, ${headerProgress * 0.08})`,
     } as CSSProperties;
   }, [headerProgress]);
 
@@ -142,19 +143,20 @@ export default function HomePage() {
       const heroHeight = heroSectionRef.current?.offsetHeight ?? 0;
       const transitionDistance = Math.max(heroHeight - HEADER_HEIGHT_PX, 1);
       const nextProgress = clamp(window.scrollY / transitionDistance, 0, 1);
-      const top = tabContainerRef.current?.getBoundingClientRect().top ?? Infinity;
+      const top =
+        tabContainerRef.current?.getBoundingClientRect().top ?? Infinity;
 
       setHeaderProgress(nextProgress);
       setIsTabSticky(top <= HEADER_HEIGHT_PX);
     };
 
     handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('resize', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
     };
   }, []);
 
@@ -163,15 +165,15 @@ export default function HomePage() {
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
-          const tab = entry.target.getAttribute('data-tab');
-          if (tab === 'main' || tab === 'side') {
+          const tab = entry.target.getAttribute("data-tab");
+          if (tab === "main" || tab === "side") {
             setActiveTab(tab);
           }
         });
       },
       {
         threshold: 0.15,
-        rootMargin: '-30% 0px -55% 0px',
+        rootMargin: "-30% 0px -55% 0px",
       },
     );
 
@@ -184,12 +186,12 @@ export default function HomePage() {
   }, [hasSideSection, mainMenus.length, sideMenus.length]);
 
   const scrollToTabSection = (tab: TabKey) => {
-    if (tab === 'side' && !hasSideSection) return;
+    if (tab === "side" && !hasSideSection) return;
 
     setActiveTab(tab);
     const target =
-      tab === 'main' ? mainSectionRef.current : sideSectionRef.current;
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      tab === "main" ? mainSectionRef.current : sideSectionRef.current;
+    target?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const handleMenuCardClick = (menuId: number) => {
@@ -204,12 +206,12 @@ export default function HomePage() {
     navigate(
       hasTableContext
         ? `/cart?storeId=${storeId}&tableNum=${tableNum}`
-        : '/cart',
+        : "/cart",
     );
   };
 
   const openOrderHistoryPage = () => {
-    navigate(hasTableContext ? buildOrderHistoryPath(storeId, tableNum) : '/');
+    navigate(hasTableContext ? buildOrderHistoryPath(storeId, tableNum) : "/");
   };
 
   return (
@@ -217,8 +219,8 @@ export default function HomePage() {
       <PageHeader
         className={styles.home__pageHeader}
         style={headerStyle}
-        title={data?.storeName ?? '메뉴판'}
-        onBack={() => navigate('/')}
+        title={data?.storeName ?? "메뉴판"}
+        onBack={() => navigate("/")}
         rightSlot={
           hasTableContext ? (
             <button
@@ -240,18 +242,20 @@ export default function HomePage() {
             className={styles.home__heroImage}
           />
         ) : (
-          <div className={styles.home__heroFallback}>이미지가 없어요</div>
+          <div className={styles.home__heroFallback}>
+            <DEFAULTIMG />
+          </div>
         )}
       </section>
 
       <section className={styles.home__storeMeta}>
         <div className={styles.home__titleRow}>
           <div className={styles.home__storeName}>
-            {data?.storeName ?? '매장 정보를 불러오는 중...'}
+            {data?.storeName ?? "매장 정보를 불러오는 중..."}
           </div>
           <span
             className={styles.home__tableText}
-          >{`${data?.tableNum ?? '-'}번 테이블`}</span>
+          >{`${data?.tableNum ?? "-"}번 테이블`}</span>
         </div>
 
         <div className={styles.home__descriptionBox}>
@@ -259,7 +263,7 @@ export default function HomePage() {
             i
           </span>
           <p className={styles.home__descriptionText}>
-            {data?.storeDescription ?? '매장 소개가 없어요.'}
+            {data?.storeDescription ?? "매장 소개가 없어요."}
           </p>
         </div>
       </section>
@@ -267,7 +271,7 @@ export default function HomePage() {
       <div
         ref={tabContainerRef}
         className={`${styles.home__tabStickyWrap} ${
-          isTabSticky ? styles['home__tabStickyWrap--stuck'] : ''
+          isTabSticky ? styles["home__tabStickyWrap--stuck"] : ""
         }`}
       >
         <div className={styles.home__tabHeader}>
@@ -275,9 +279,9 @@ export default function HomePage() {
             <button
               type="button"
               className={`${styles.home__tabButton} ${
-                activeTab === 'main' ? styles['home__tabButton--active'] : ''
+                activeTab === "main" ? styles["home__tabButton--active"] : ""
               }`}
-              onClick={() => scrollToTabSection('main')}
+              onClick={() => scrollToTabSection("main")}
             >
               메인 메뉴
             </button>
@@ -285,9 +289,9 @@ export default function HomePage() {
               <button
                 type="button"
                 className={`${styles.home__tabButton} ${
-                  activeTab === 'side' ? styles['home__tabButton--active'] : ''
+                  activeTab === "side" ? styles["home__tabButton--active"] : ""
                 }`}
-                onClick={() => scrollToTabSection('side')}
+                onClick={() => scrollToTabSection("side")}
               >
                 사이드 메뉴
               </button>
@@ -356,7 +360,9 @@ export default function HomePage() {
                   ))}
                 </div>
               ) : (
-                <p className={styles.home__emptyMessage}>사이드 메뉴가 없어요.</p>
+                <p className={styles.home__emptyMessage}>
+                  사이드 메뉴가 없어요.
+                </p>
               )}
             </section>
           ) : null}
@@ -380,5 +386,3 @@ export default function HomePage() {
     </main>
   );
 }
-
-

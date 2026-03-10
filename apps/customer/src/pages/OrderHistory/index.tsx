@@ -1,22 +1,23 @@
-﻿import { getCustomerOrdersByTableId } from '../../api/customer';
-import type { CustomerOrderLookupResponse } from '../../api/customer/entity';
-import BottomActionBar from '../../components/BottomActionBar';
-import PageHeader from '../../components/PageHeader';
-import { useCart } from '../../stores/cart';
-import { buildStoreHomePath, parsePositiveInt } from '../../utils/orderFlow';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import styles from './OrderHistory.module.scss';
+import { getCustomerOrdersByTableId } from "../../api/customer";
+import type { CustomerOrderLookupResponse } from "../../api/customer/entity";
+import BottomActionBar from "../../components/BottomActionBar";
+import OrderStatusBadge from "../../components/OrderStatusBadge";
+import PageHeader from "../../components/PageHeader";
+import { useCart } from "../../stores/cart";
+import { buildStoreHomePath, parsePositiveInt } from "../../utils/orderFlow";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import styles from "./OrderHistory.module.scss";
 
-const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
+const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
 
 const formatOrderTime = (value: string) => {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '--:--';
+  if (Number.isNaN(date.getTime())) return "--:--";
 
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
 };
 
@@ -29,13 +30,18 @@ export default function OrderHistoryPage() {
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
-  const tableNum = useMemo(() => parsePositiveInt(searchParams.get('tableNum')), [searchParams]);
+  const tableNum = useMemo(
+    () => parsePositiveInt(searchParams.get("tableNum")),
+    [searchParams],
+  );
   const hasTableContext = storeId !== null && tableNum !== null;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ['customer', 'orders', 'history', storeId, tableNum],
-    queryFn: () => getCustomerOrdersByTableId(storeId as number, tableNum as number),
+    queryKey: ["customer", "orders", "history", storeId, tableNum],
+    queryFn: () =>
+      getCustomerOrdersByTableId(storeId as number, tableNum as number),
     enabled: hasTableContext,
+    refetchInterval: hasTableContext ? 10000 : false,
   });
 
   useEffect(() => {
@@ -45,7 +51,8 @@ export default function OrderHistoryPage() {
   const orders = useMemo(
     () =>
       [...(data ?? [])].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       ),
     [data],
   );
@@ -53,7 +60,8 @@ export default function OrderHistoryPage() {
   const totalMenuCount = useMemo(
     () =>
       orders.reduce(
-        (sum, order) => sum + order.menus.reduce((acc, menu) => acc + menu.quantity, 0),
+        (sum, order) =>
+          sum + order.menus.reduce((acc, menu) => acc + menu.quantity, 0),
         0,
       ),
     [orders],
@@ -64,13 +72,18 @@ export default function OrderHistoryPage() {
     [orders],
   );
 
-  const hasNotFoundError = (error as { status?: number } | null)?.status === 404;
+  const hasNotFoundError =
+    (error as { status?: number } | null)?.status === 404;
 
   return (
     <main className={styles.orderHistory}>
       <PageHeader
         title="주문 내역"
-        onBack={() => navigate(hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/')}
+        onBack={() =>
+          navigate(
+            hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/",
+          )
+        }
       />
 
       <section className={styles.orderHistory__content}>
@@ -82,11 +95,15 @@ export default function OrderHistoryPage() {
         </header>
 
         {!hasTableContext ? (
-          <div className={styles.orderHistory__status}>테이블 정보를 확인할 수 없어요.</div>
+          <div className={styles.orderHistory__status}>
+            테이블 정보를 확인할 수 없어요.
+          </div>
         ) : null}
 
         {hasTableContext && isLoading ? (
-          <div className={styles.orderHistory__status}>주문 내역을 불러오는 중...</div>
+          <div className={styles.orderHistory__status}>
+            주문 내역을 불러오는 중...
+          </div>
         ) : null}
 
         {hasTableContext && !isLoading && hasNotFoundError ? (
@@ -94,20 +111,30 @@ export default function OrderHistoryPage() {
         ) : null}
 
         {hasTableContext && !isLoading && !hasNotFoundError && error ? (
-          <div className={styles.orderHistory__status}>주문 내역을 불러오지 못했어요.</div>
+          <div className={styles.orderHistory__status}>
+            주문 내역을 불러오지 못했어요.
+          </div>
         ) : null}
 
         {hasTableContext && !isLoading && !error ? (
           <section className={styles.orderHistory__list}>
             {orders.length === 0 ? (
-              <div className={styles.orderHistory__status}>아직 주문 내역이 없어요.</div>
+              <div className={styles.orderHistory__status}>
+                아직 주문 내역이 없어요.
+              </div>
             ) : (
               orders.map((order) => (
-                <article key={order.id} className={styles.orderHistory__orderCard}>
+                <article
+                  key={order.id}
+                  className={styles.orderHistory__orderCard}
+                >
                   <div className={styles.orderHistory__orderHeader}>
-                    <span className={styles.orderHistory__orderNumber}>
-                      {`주문 번호 ${String(order.id).padStart(2, '0')}`}
-                    </span>
+                    <div className={styles.orderHistory__orderMeta}>
+                      <span className={styles.orderHistory__orderNumber}>
+                        {`주문 번호 ${String(order.id).padStart(2, "0")}`}
+                      </span>
+                      <OrderStatusBadge status={order.orderStatus} />
+                    </div>
                     <span className={styles.orderHistory__orderTime}>
                       {formatOrderTime(order.createdAt)}
                     </span>
@@ -115,7 +142,10 @@ export default function OrderHistoryPage() {
 
                   <div className={styles.orderHistory__menuList}>
                     {order.menus.map((menu) => (
-                      <div key={`${order.id}-${menu.menuId}`} className={styles.orderHistory__menuLine}>
+                      <div
+                        key={`${order.id}-${menu.menuId}`}
+                        className={styles.orderHistory__menuLine}
+                      >
                         {`${menu.menuName} x ${menu.quantity}`}
                       </div>
                     ))}
@@ -135,7 +165,11 @@ export default function OrderHistoryPage() {
         <button
           type="button"
           className={styles.orderHistory__menuButton}
-          onClick={() => navigate(hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/')}
+          onClick={() =>
+            navigate(
+              hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/",
+            )
+          }
         >
           메뉴판으로
         </button>

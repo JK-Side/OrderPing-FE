@@ -1,0 +1,33 @@
+@use "@order-ping/shared/styles/colors" as *;
+
+.orderStatusBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  &--red {
+    color: $red-50;
+    background-color: $white;
+    border-color: $red-50;
+  }
+
+  &--green {
+    color: $green-50;
+    background-color: $white;
+    border-color: $green-50;
+  }
+
+  &--blue {
+    color: $primary-50;
+    background-color: $white;
+    border-color: $primary-50;
+  }
+}
