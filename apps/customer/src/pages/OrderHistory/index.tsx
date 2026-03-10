@@ -1,6 +1,7 @@
-﻿import { getCustomerOrdersByTableId } from '../../api/customer';
+import { getCustomerOrdersByTableId } from '../../api/customer';
 import type { CustomerOrderLookupResponse } from '../../api/customer/entity';
 import BottomActionBar from '../../components/BottomActionBar';
+import OrderStatusBadge from '../../components/OrderStatusBadge';
 import PageHeader from '../../components/PageHeader';
 import { useCart } from '../../stores/cart';
 import { buildStoreHomePath, parsePositiveInt } from '../../utils/orderFlow';
@@ -36,6 +37,7 @@ export default function OrderHistoryPage() {
     queryKey: ['customer', 'orders', 'history', storeId, tableNum],
     queryFn: () => getCustomerOrdersByTableId(storeId as number, tableNum as number),
     enabled: hasTableContext,
+    refetchInterval: hasTableContext ? 10000 : false,
   });
 
   useEffect(() => {
@@ -105,9 +107,12 @@ export default function OrderHistoryPage() {
               orders.map((order) => (
                 <article key={order.id} className={styles.orderHistory__orderCard}>
                   <div className={styles.orderHistory__orderHeader}>
-                    <span className={styles.orderHistory__orderNumber}>
-                      {`주문 번호 ${String(order.id).padStart(2, '0')}`}
-                    </span>
+                    <div className={styles.orderHistory__orderMeta}>
+                      <span className={styles.orderHistory__orderNumber}>
+                        {`주문 번호 ${String(order.id).padStart(2, '0')}`}
+                      </span>
+                      <OrderStatusBadge status={order.status} />
+                    </div>
                     <span className={styles.orderHistory__orderTime}>
                       {formatOrderTime(order.createdAt)}
                     </span>
