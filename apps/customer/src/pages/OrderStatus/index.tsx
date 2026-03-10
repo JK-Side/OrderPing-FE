@@ -92,7 +92,7 @@ export default function OrderStatusPage() {
   return (
     <main className={styles.orderStatus}>
       <PageHeader
-        title="주문 상태"
+        title="주문 완료"
         onBack={() =>
           navigate(
             hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/",
