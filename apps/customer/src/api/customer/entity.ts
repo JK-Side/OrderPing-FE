@@ -90,8 +90,8 @@ export interface CustomerOrderLookupResponse {
   tableNum: number;
   storeId: number;
   depositorName: string;
-  // orderStatus: OrderStatus;
-  status: OrderStatus;
+  orderStatus: OrderStatus;
+  // status: OrderStatus;
   totalPrice: number;
   couponAmount: number;
   cashAmount: number;
