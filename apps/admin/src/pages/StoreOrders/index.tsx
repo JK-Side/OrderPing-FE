@@ -1,7 +1,7 @@
 ﻿import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import type { OrderLookupResponse, OrderStatus } from '@/api/order/entity';
+import type { OrderDetailResponse, OrderLookupResponse, OrderStatus } from '@/api/order/entity';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import OrderLookupCard from '@/components/OrderLookupCard';
 import { useToast } from '@/components/Toast/useToast';
@@ -22,6 +22,11 @@ type OrderCardData = {
   depositAmount: number;
   couponAmount?: number;
   status: OrderStatus;
+};
+
+type OrderActionTarget = Pick<OrderLookupResponse | OrderDetailResponse, 'id' | 'tableId' | 'status' | 'depositorName'> & {
+  cashAmount: number;
+  couponAmount?: number;
 };
 
 type OrderSection = {
@@ -128,16 +133,17 @@ export default function StoreOrders() {
   };
 
   const handleOpenRejectFromDetail = () => {
-    if (!selectedOrder) return;
+    const targetOrder = orderDetail ?? selectedOrder;
+    if (!targetOrder) return;
 
     handleOpenReject({
-      id: `detail-${selectedOrder.id}`,
-      orderId: selectedOrder.id,
-      tableNumber: selectedOrder.tableId,
-      depositorName: selectedOrder.depositorName,
-      depositAmount: selectedOrder.cashAmount,
-      couponAmount: selectedOrder.couponAmount,
-      status: selectedOrder.status,
+      id: `detail-${targetOrder.id}`,
+      orderId: targetOrder.id,
+      tableNumber: targetOrder.tableId,
+      depositorName: targetOrder.depositorName,
+      depositAmount: targetOrder.cashAmount,
+      couponAmount: targetOrder.couponAmount,
+      status: targetOrder.status,
     });
     handleDetailOpenChange(false);
   };
@@ -254,6 +260,22 @@ export default function StoreOrders() {
     }
   };
 
+  const handleAcceptFromDetail = async () => {
+    const targetOrder = (orderDetail ?? selectedOrder) as OrderActionTarget | null;
+    if (!targetOrder) return;
+    if (targetOrder.depositorName === '서비스') return;
+
+    await handleAccept({
+      id: `detail-${targetOrder.id}`,
+      orderId: targetOrder.id,
+      tableNumber: targetOrder.tableId,
+      depositorName: targetOrder.depositorName,
+      depositAmount: targetOrder.cashAmount,
+      couponAmount: targetOrder.couponAmount,
+      status: targetOrder.status,
+    });
+  };
+
   const handlePrev = async (order: OrderCardData) => {
     if (order.status === 'PENDING') return;
     if (revertingOrderId === order.orderId) return;
@@ -284,6 +306,13 @@ export default function StoreOrders() {
   };
 
   const selectedOrder = selectedOrderId ? (visibleOrders.find((order) => order.id === selectedOrderId) ?? null) : null;
+  const detailOrder = orderDetail ?? selectedOrder;
+  const isDetailAccepting = detailOrder ? acceptingOrderId === detailOrder.id : false;
+  const isDetailAcceptDisabled =
+    !storeId ||
+    !detailOrder ||
+    detailOrder.status === 'COMPLETE' ||
+    detailOrder.depositorName === '서비스';
 
   return (
     <section className={styles.storeOrders}>
@@ -337,9 +366,12 @@ export default function StoreOrders() {
       <OrderDetailModal
         open={isDetailOpen}
         onOpenChange={handleDetailOpenChange}
-        order={orderDetail ?? selectedOrder}
+        order={detailOrder}
         menus={orderDetail?.menus ?? []}
         onReject={handleOpenRejectFromDetail}
+        onAccept={handleAcceptFromDetail}
+        isAccepting={isDetailAccepting}
+        isAcceptDisabled={isDetailAcceptDisabled}
       />
       <OrderRejectModal
         open={isRejectOpen}

@@ -9,6 +9,9 @@ interface OrderDetailModalProps {
   order: OrderLookupResponse | OrderDetailResponse | null;
   menus: OrderMenuItem[];
   onReject?: () => void;
+  onAccept?: () => void;
+  isAccepting?: boolean;
+  isAcceptDisabled?: boolean;
 }
 
 const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
@@ -27,7 +30,16 @@ const formatDateTime = (value: string) => {
 
 const formatTableLabel = (tableId: number) => `테이블 ${String(tableId).padStart(2, '0')}`;
 
-export default function OrderDetailModal({ open, onOpenChange, order, menus, onReject }: OrderDetailModalProps) {
+export default function OrderDetailModal({
+  open,
+  onOpenChange,
+  order,
+  menus,
+  onReject,
+  onAccept,
+  isAccepting = false,
+  isAcceptDisabled = false,
+}: OrderDetailModalProps) {
   if (!order) return null;
 
   return (
@@ -99,7 +111,13 @@ export default function OrderDetailModal({ open, onOpenChange, order, menus, onR
             <Button type="button" variant="danger" className={styles.footerButton} onClick={onReject}>
               거절
             </Button>
-            <Button type="button" className={styles.footerButton}>
+            <Button
+              type="button"
+              className={styles.footerButton}
+              onClick={onAccept}
+              disabled={isAcceptDisabled || isAccepting}
+              isLoading={isAccepting}
+            >
               수락
             </Button>
           </div>

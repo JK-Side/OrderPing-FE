@@ -31,7 +31,9 @@ export default function StoreCreate() {
   const { mutateAsync: createStore } = useCreateStore();
   const [storeImageFile, setStoreImageFile] = useState<File | null>(null);
   const [storePreviewUrl, setStorePreviewUrl] = useState<string | null>(null);
+  const [isAccountSubmitting, setIsAccountSubmitting] = useState(false);
   const storePreviewUrlRef = useRef<string | null>(null);
+  const accountSubmitLockRef = useRef(false);
   // const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(null);
   const qrPreviewUrlRef = useRef<string | null>(null);
   const { upload } = usePresignedUploader();
@@ -71,9 +73,11 @@ export default function StoreCreate() {
   }, []);
 
   useEffect(() => {
+    const currentQrPreviewUrlRef = qrPreviewUrlRef;
     return () => {
-      if (qrPreviewUrlRef.current) {
-        URL.revokeObjectURL(qrPreviewUrlRef.current);
+      const qrPreviewUrl = currentQrPreviewUrlRef.current;
+      if (qrPreviewUrl) {
+        URL.revokeObjectURL(qrPreviewUrl);
       }
     };
   }, []);
@@ -115,6 +119,11 @@ export default function StoreCreate() {
 
   const handleAccountInfoSubmit = useCallback<SubmitHandler<StoreCreateForm>>(
     async (data) => {
+      if (accountSubmitLockRef.current) return;
+
+      accountSubmitLockRef.current = true;
+      setIsAccountSubmitting(true);
+
       try {
         const imageUrl = await uploadStoreImage(storeImageFile ?? data.storeImage?.[0] ?? null);
         await createStore({
@@ -128,6 +137,9 @@ export default function StoreCreate() {
         updateStep(3);
       } catch (error) {
         console.error('Failed to create store', error);
+      } finally {
+        accountSubmitLockRef.current = false;
+        setIsAccountSubmitting(false);
       }
     },
     [createStore, storeImageFile, updateStep, uploadStoreImage],
@@ -182,6 +194,7 @@ export default function StoreCreate() {
             register={register}
             control={control}
             errors={errors}
+            isSubmitting={isAccountSubmitting}
             onSubmit={handleSubmit(handleAccountInfoSubmit)}
             // qrPreviewUrl={qrPreviewUrl}
             // onQrCodeImageChange={handleQrCodeImageChange}

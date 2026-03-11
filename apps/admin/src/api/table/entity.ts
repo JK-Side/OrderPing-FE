@@ -32,6 +32,11 @@ export interface CreateAllTableRequest {
   count: number;
 }
 
+export interface BulkTableOperationRequest {
+  storeId: number;
+  tableNums: number[];
+}
+
 export interface UpdateTableQrImagePayload {
   tableId: number;
   qrImageUrl: string;

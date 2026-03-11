@@ -12,8 +12,8 @@ import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
 import TableOrderModal from '@/pages/TableOperate/components/TableOrderModal';
 import TableServiceModal from '@/pages/TableOperate/components/TableServiceModal';
-import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
-import { useDeleteTable } from '@/pages/TableOperate/hooks/useDeleteTable';
+import { useClearTables } from '@/pages/TableOperate/hooks/useClearTables';
+import { useDeleteTables } from '@/pages/TableOperate/hooks/useDeleteTables';
 import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
 
@@ -91,8 +91,8 @@ export default function TableOperate() {
   const [layoutOverride, setLayoutOverride] = useState<{ storeId?: number; layout: TableLayout | null } | null>(null);
 
   const { data: tables = [] } = useTablesByStore(storeId);
-  const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
-  const { mutateAsync: deleteTable, isPending: isDeleting } = useDeleteTable();
+  const { mutateAsync: clearTables, isPending: isClearing } = useClearTables();
+  const { mutateAsync: deleteTables, isPending: isDeleting } = useDeleteTables();
   const { toast } = useToast();
 
   const sortedTables = [...tables].sort((a, b) => a.tableNum - b.tableNum);
@@ -105,6 +105,9 @@ export default function TableOperate() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [serviceTableId, setServiceTableId] = useState<number | null>(null);
   const [isServiceOpen, setIsServiceOpen] = useState(false);
+  const selectableTableIds = sortedTables.map((table) => table.id);
+  const isAllSelected =
+    selectableTableIds.length > 0 && selectableTableIds.every((tableId) => selectedTableIds.includes(tableId));
 
   const storedTableLayout =
     storeId && typeof window !== 'undefined'
@@ -135,6 +138,11 @@ export default function TableOperate() {
     setSelectedTableIds((prev) => (prev.includes(tableId) ? prev.filter((id) => id !== tableId) : [...prev, tableId]));
   };
 
+  const handleToggleSelectAll = () => {
+    if (selectableTableIds.length === 0) return;
+    setSelectedTableIds(isAllSelected ? [] : selectableTableIds);
+  };
+
   const handleOpenQrPrint = () => {
     if (!storeId) return;
     navigate(`/store/${storeId}/qr-print`);
@@ -157,7 +165,10 @@ export default function TableOperate() {
     }
 
     try {
-      await Promise.all(eligibleTables.map((table) => clearTable(table.id)));
+      await clearTables({
+        storeId,
+        tableNums: eligibleTables.map((table) => table.tableNum),
+      });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
       toast({
@@ -165,9 +176,18 @@ export default function TableOperate() {
         variant: 'info',
       });
     } catch (error) {
+      const status = (error as { status?: number })?.status;
+      const message =
+        status === 401
+          ? '로그인이 필요한 기능입니다.'
+          : status === 403
+            ? '본인 매장의 테이블만 비울 수 있습니다.'
+            : status === 404
+              ? '비울 테이블을 찾을 수 없습니다.'
+              : '테이블 비우기에 실패했습니다.';
+
       toast({
-        message: 'Failed to clear tables.',
-        description: error instanceof Error ? error.message : undefined,
+        message,
         variant: 'error',
       });
       console.error('Failed to clear tables', error);
@@ -181,7 +201,10 @@ export default function TableOperate() {
     if (selectedTables.length === 0) return;
 
     try {
-      await Promise.all(selectedTables.map((table) => deleteTable(table.id)));
+      await deleteTables({
+        storeId,
+        tableNums: selectedTables.map((table) => table.tableNum),
+      });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
       toast({
@@ -273,6 +296,18 @@ export default function TableOperate() {
                   테이블 삭제
                 </Button>
               ) : null}
+              {hasTables ? (
+                <Button
+                  className={styles.selectAllButton}
+                  type="button"
+                  variant="ghost"
+                  size="md"
+                  onClick={handleToggleSelectAll}
+                >
+                  {isAllSelected ? '선택 해제' : '전체 선택'}
+                </Button>
+              ) : null}
+
               <Button
                 className={styles.printButton}
                 variant="secondary"

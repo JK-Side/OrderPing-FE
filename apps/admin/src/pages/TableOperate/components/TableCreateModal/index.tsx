@@ -9,7 +9,7 @@ import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, ModalTrigger } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
-import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
+// import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import { useCreateAllTable } from '@/pages/TableOperate/hooks/useCreateAllTable';
 import { useUpdateTableQrImage } from '@/pages/TableOperate/hooks/useUpdateTableQrImage';
 import { useUpdateTableQrImages } from '@/pages/TableOperate/hooks/useUpdateTableQrImages';
@@ -86,21 +86,21 @@ const resolveErrorMessage = (error: unknown) => {
         : '테이블 생성에 실패했습니다.';
 };
 
-const resolveOrderStatuses = (rawStatus: TableResponse['orderStatus']) => {
-  if (!rawStatus) return [];
-  return Array.isArray(rawStatus) ? rawStatus : [rawStatus];
-};
+// const resolveOrderStatuses = (rawStatus: TableResponse['orderStatus']) => {
+//   if (!rawStatus) return [];
+//   return Array.isArray(rawStatus) ? rawStatus : [rawStatus];
+// };
 
-const hasIncompleteOrderOnTable = (table: TableResponse) => {
-  const statuses = resolveOrderStatuses(table.orderStatus);
-  if (statuses.length > 0) {
-    return statuses.some((status) => status !== 'COMPLETE');
-  }
+// const hasIncompleteOrderOnTable = (table: TableResponse) => {
+//   const statuses = resolveOrderStatuses(table.orderStatus);
+//   if (statuses.length > 0) {
+//     return statuses.some((status) => status !== 'COMPLETE');
+//   }
 
-  return (
-    (table.orderMenus?.length ?? 0) > 0 || (table.serviceMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0
-  );
-};
+//   return (
+//     (table.orderMenus?.length ?? 0) > 0 || (table.serviceMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0
+//   );
+// };
 
 interface TableCreateModalProps {
   storeId?: number;
@@ -137,13 +137,13 @@ export default function TableCreateModal({
 }: TableCreateModalProps) {
   const [open, setOpen] = useState(false);
   const [isUploadingQr, setIsUploadingQr] = useState(false);
-  const [isResettingTables, setIsResettingTables] = useState(false);
+  // const [isResettingTables, setIsResettingTables] = useState(false);
   const [retryEntries, setRetryEntries] = useState<QrUploadEntry[]>([]);
   const [retryMessage, setRetryMessage] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { mutateAsync: createAllTables, isPending } = useCreateAllTable();
-  const { mutateAsync: clearTable } = useClearTable();
+  // const { mutateAsync: clearTable } = useClearTable();
   const { mutateAsync: updateTableQrImage, isPending: isUpdatingTableQrImage } = useUpdateTableQrImage();
   const { mutateAsync: updateTableQrImages } = useUpdateTableQrImages(storeId ?? 0);
   const { upload } = usePresignedUploader();
@@ -181,8 +181,9 @@ export default function TableCreateModal({
 
   const watchedTableColumns = useWatch({ control, name: 'tableColumns' });
   const watchedTableRows = useWatch({ control, name: 'tableRows' });
+  const isEditMode = mode === 'edit';
   const isLayoutUnchanged =
-    mode === 'edit' &&
+    isEditMode &&
     !!initialValues &&
     Number(watchedTableColumns) === initialValues.tableColumns &&
     Number(watchedTableRows) === initialValues.tableRows;
@@ -291,7 +292,7 @@ export default function TableCreateModal({
         return;
       }
 
-      if (mode === 'edit') {
+      if (isEditMode) {
         const sortedTables = [...existingTables].sort((a, b) => a.tableNum - b.tableNum);
 
         if (sortedTables.length === 0) {
@@ -404,9 +405,7 @@ export default function TableCreateModal({
         needsUpload.length > 0 ? await uploadQrImages(needsUpload) : { succeeded: [], failed: [] };
 
       const updateTargets = [...alreadyUploaded, ...succeeded];
-      const updateFailures = await (mode === 'edit'
-        ? updateQrImagesByTable(updateTargets)
-        : updateQrImages(updateTargets));
+      const updateFailures = await (isEditMode ? updateQrImagesByTable(updateTargets) : updateQrImages(updateTargets));
       const pendingRetries = [...failed, ...updateFailures];
 
       if (updateTargets.length > 0) {
@@ -469,65 +468,65 @@ export default function TableCreateModal({
 
   void handleResetTables;
 
-  const handleResetTablesSubmit = async () => {
-    if (!storeId) return;
-    if (hasActiveOrders) {
-      toast({
-        message: '모든 주문이 완료 상태가 아닙니다.',
-        variant: 'error',
-      });
-      return;
-    }
-    if (mode === 'create') {
-      toast({
-        message: '기존 테이블이 있어야 전체 비우기를 진행할 수 있습니다.',
-        variant: 'error',
-      });
-      return;
-    }
+  // const handleResetTablesSubmit = async () => {
+  //   if (!storeId) return;
+  //   if (hasActiveOrders) {
+  //     toast({
+  //       message: '모든 주문이 완료 상태가 아닙니다.',
+  //       variant: 'error',
+  //     });
+  //     return;
+  //   }
+  //   if (!isEditMode) {
+  //     toast({
+  //       message: '기존 테이블이 있어야 전체 비우기를 진행할 수 있습니다.',
+  //       variant: 'error',
+  //     });
+  //     return;
+  //   }
 
-    const resetTargets = existingTables.filter((table) => table.status !== 'CLOSED');
-    if (resetTargets.length === 0) {
-      toast({
-        message: '비울 수 있는 테이블이 없습니다.',
-        variant: 'error',
-      });
-      return;
-    }
+  //   const resetTargets = existingTables.filter((table) => table.status !== 'CLOSED');
+  //   if (resetTargets.length === 0) {
+  //     toast({
+  //       message: '비울 수 있는 테이블이 없습니다.',
+  //       variant: 'error',
+  //     });
+  //     return;
+  //   }
 
-    const hasIncompleteOrderTables = resetTargets.some(hasIncompleteOrderOnTable);
-    if (hasIncompleteOrderTables) {
-      toast({
-        message: 'Only tables with COMPLETE orders can be cleared.',
-        variant: 'error',
-      });
-      return;
-    }
+  //   const hasIncompleteOrderTables = resetTargets.some(hasIncompleteOrderOnTable);
+  //   if (hasIncompleteOrderTables) {
+  //     toast({
+  //       message: 'Only tables with COMPLETE orders can be cleared.',
+  //       variant: 'error',
+  //     });
+  //     return;
+  //   }
 
-    if (onReset) {
-      await onReset();
-      return;
-    }
+  //   if (onReset) {
+  //     await onReset();
+  //     return;
+  //   }
 
-    try {
-      setIsResettingTables(true);
-      await Promise.all(resetTargets.map((table) => clearTable(table.id)));
-      await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
-      toast({
-        message: '전체 테이블 비우기가 완료되었습니다.',
-        variant: 'info',
-      });
-      setOpen(false);
-    } catch (error) {
-      toast({
-        message: '전체 테이블 비우기에 실패했습니다.',
-        description: error instanceof Error ? error.message : undefined,
-        variant: 'error',
-      });
-    } finally {
-      setIsResettingTables(false);
-    }
-  };
+  //   try {
+  //     setIsResettingTables(true);
+  //     await Promise.all(resetTargets.map((table) => clearTable(table.id)));
+  //     await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
+  //     toast({
+  //       message: '전체 테이블 비우기가 완료되었습니다.',
+  //       variant: 'info',
+  //     });
+  //     setOpen(false);
+  //   } catch (error) {
+  //     toast({
+  //       message: '전체 테이블 비우기에 실패했습니다.',
+  //       description: error instanceof Error ? error.message : undefined,
+  //       variant: 'error',
+  //     });
+  //   } finally {
+  //     setIsResettingTables(false);
+  //   }
+  // };
 
   return (
     <Modal open={open} onOpenChange={handleOpenChange}>
@@ -553,6 +552,11 @@ export default function TableCreateModal({
                 <Input.Text
                   type="text"
                   inputMode="numeric"
+                  readOnly={isEditMode}
+                  aria-readonly={isEditMode}
+                  tabIndex={isEditMode ? -1 : undefined}
+                  className={isEditMode ? styles.readonlyInput : undefined}
+                  onFocus={isEditMode ? (event) => event.currentTarget.blur() : undefined}
                   placeholder="숫자만 입력하세요."
                   {...register('tableCount', {
                     required: '테이블 수를 입력해 주세요.',
@@ -628,6 +632,7 @@ export default function TableCreateModal({
             >
               {name}
             </Button>
+            {/* {!isEditMode ? (
             <Button
               type="button"
               size="md"
@@ -639,6 +644,7 @@ export default function TableCreateModal({
             >
               전체 테이블 비우기
             </Button>
+            ) : null} */}
           </ModalFooter>
         </form>
       </ModalContent>
