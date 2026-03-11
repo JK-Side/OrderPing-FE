@@ -40,3 +40,15 @@
 .retryButton {
   flex-shrink: 0;
 }
+
+.readonlyInput {
+  background: $gray-20;
+  color: $gray-40;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.readonlyInput:focus-visible {
+  outline: none;
+  background: $gray-20;
+}

@@ -181,8 +181,9 @@ export default function TableCreateModal({
 
   const watchedTableColumns = useWatch({ control, name: 'tableColumns' });
   const watchedTableRows = useWatch({ control, name: 'tableRows' });
+  const isEditMode = mode === 'edit';
   const isLayoutUnchanged =
-    mode === 'edit' &&
+    isEditMode &&
     !!initialValues &&
     Number(watchedTableColumns) === initialValues.tableColumns &&
     Number(watchedTableRows) === initialValues.tableRows;
@@ -291,7 +292,7 @@ export default function TableCreateModal({
         return;
       }
 
-      if (mode === 'edit') {
+      if (isEditMode) {
         const sortedTables = [...existingTables].sort((a, b) => a.tableNum - b.tableNum);
 
         if (sortedTables.length === 0) {
@@ -404,7 +405,7 @@ export default function TableCreateModal({
         needsUpload.length > 0 ? await uploadQrImages(needsUpload) : { succeeded: [], failed: [] };
 
       const updateTargets = [...alreadyUploaded, ...succeeded];
-      const updateFailures = await (mode === 'edit'
+      const updateFailures = await (isEditMode
         ? updateQrImagesByTable(updateTargets)
         : updateQrImages(updateTargets));
       const pendingRetries = [...failed, ...updateFailures];
@@ -478,7 +479,7 @@ export default function TableCreateModal({
       });
       return;
     }
-    if (mode === 'create') {
+    if (!isEditMode) {
       toast({
         message: '기존 테이블이 있어야 전체 비우기를 진행할 수 있습니다.',
         variant: 'error',
@@ -553,6 +554,11 @@ export default function TableCreateModal({
                 <Input.Text
                   type="text"
                   inputMode="numeric"
+                  readOnly={isEditMode}
+                  aria-readonly={isEditMode}
+                  tabIndex={isEditMode ? -1 : undefined}
+                  className={isEditMode ? styles.readonlyInput : undefined}
+                  onFocus={isEditMode ? (event) => event.currentTarget.blur() : undefined}
                   placeholder="숫자만 입력하세요."
                   {...register('tableCount', {
                     required: '테이블 수를 입력해 주세요.',
@@ -628,7 +634,7 @@ export default function TableCreateModal({
             >
               {name}
             </Button>
-            {mode === 'create' ? (
+            {!isEditMode ? (
             <Button
               type="button"
               size="md"
