@@ -1,6 +1,7 @@
 import { apiClient } from '..';
 import type {
   AllTableListResponse,
+  BulkTableOperationRequest,
   CreateAllTableRequest,
   CreateTableRequest,
   TableQrListResponse,
@@ -63,5 +64,16 @@ export const deleteTableById = async (tableId: number) => {
   return await apiClient.delete<void>(`/api/tables/${tableId}`);
 };
 
-// PATCH /api/tables/bulk/clear 테이블 일괄 수정
-// 예정
+// POST /api/tables/bulk/clear 테이블 일괄 비우기
+export const postClearTablesBulk = async (body: BulkTableOperationRequest) => {
+  return await apiClient.post<TableListResponse>('/api/tables/bulk/clear', {
+    body,
+  });
+};
+
+// DELETE /api/tables/bulk 테이블 일괄 삭제
+export const deleteTablesBulk = async (body: BulkTableOperationRequest) => {
+  return await apiClient.delete<void>('/api/tables/bulk', {
+    body,
+  });
+};

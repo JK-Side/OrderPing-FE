@@ -628,6 +628,7 @@ export default function TableCreateModal({
             >
               {name}
             </Button>
+            {mode === 'create' ? (
             <Button
               type="button"
               size="md"
@@ -639,6 +640,7 @@ export default function TableCreateModal({
             >
               전체 테이블 비우기
             </Button>
+            ) : null}
           </ModalFooter>
         </form>
       </ModalContent>
