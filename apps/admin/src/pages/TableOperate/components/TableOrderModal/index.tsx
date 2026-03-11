@@ -1,9 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { useState, type ChangeEvent } from 'react';
 import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
+import { useUpdateTableMemo } from '@/pages/TableOperate/hooks/useUpdateTableMemo';
 import styles from './TableOrderModal.module.scss';
 
 interface TableOrderModalProps {
@@ -12,6 +14,8 @@ interface TableOrderModalProps {
   onServiceAdd?: () => void;
   table: TableResponse | null;
 }
+
+const MEMO_MAX_LENGTH = 100;
 
 const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 
@@ -31,6 +35,21 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
+  const { mutateAsync: updateTableMemo, isPending: isSavingMemo } = useUpdateTableMemo();
+  const [memoDraft, setMemoDraft] = useState<{ tableId: number | null; value: string }>({
+    tableId: null,
+    value: '',
+  });
+
+  const handleModalOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) {
+      setMemoDraft({
+        tableId: null,
+        value: '',
+      });
+    }
+    onOpenChange(nextOpen);
+  };
 
   if (!table) return null;
 
@@ -39,6 +58,56 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
   const canClearTable = isTableClearable(table.orderStatus);
   const isClosedTable = table.status === 'CLOSED';
   const isEmpty = table.orderStatus === null;
+  const memo = memoDraft.tableId === table.id ? memoDraft.value : (table.memo ?? '');
+  const originalMemo = table.memo ?? '';
+  const isMemoTooLong = memo.length > MEMO_MAX_LENGTH;
+  const isMemoDirty = memo !== originalMemo;
+
+  const handleMemoChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setMemoDraft({
+      tableId: table.id,
+      value: event.target.value,
+    });
+  };
+
+  const handleSaveMemo = async () => {
+    if (isSavingMemo || !isMemoDirty || isMemoTooLong) return;
+
+    try {
+      const updatedTable = await updateTableMemo({
+        tableId: table.id,
+        body: {
+          memo,
+        },
+      });
+      await queryClient.invalidateQueries({ queryKey: ['tables', table.storeId] });
+      setMemoDraft({
+        tableId: table.id,
+        value: updatedTable.memo ?? '',
+      });
+      toast({
+        message: '메모를 저장했습니다.',
+        variant: 'info',
+      });
+    } catch (error) {
+      const status = (error as { status?: number })?.status;
+      const message =
+        status === 400
+          ? '메모는 100자 이하로 입력해 주세요.'
+          : status === 401
+            ? '로그인이 필요한 기능입니다.'
+            : status === 403
+              ? '본인 매장 테이블만 수정할 수 있습니다.'
+              : status === 404
+                ? '테이블을 찾을 수 없습니다.'
+                : '메모 저장에 실패했습니다.';
+      toast({
+        message,
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+    }
+  };
 
   const handleClearTable = async () => {
     if (!canClearTable) {
@@ -68,7 +137,7 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
   };
 
   return (
-    <Modal open={open} onOpenChange={onOpenChange}>
+    <Modal open={open} onOpenChange={handleModalOpenChange}>
       <ModalContent className={styles.modalContent}>
         <ModalHeader>
           <ModalTitle className={styles.tableTitle}>{formatTableLabel(table.tableNum)}</ModalTitle>
@@ -111,6 +180,34 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
             ) : (
               <div className={styles.qrPlaceholder}>QR코드가 존재하지 않습니다.</div>
             )}
+          </div>
+
+          <div className={styles.memoSection}>
+            <div className={styles.memoHeader}>
+              <span className={styles.memoTitle}>테이블 메모</span>
+              <span className={`${styles.memoCount} ${isMemoTooLong ? styles.memoCountError : ''}`}>
+                {memo.length}/{MEMO_MAX_LENGTH}
+              </span>
+            </div>
+            <textarea
+              className={styles.memoInput}
+              value={memo}
+              onChange={handleMemoChange}
+              maxLength={MEMO_MAX_LENGTH}
+              placeholder="손님 요청사항을 입력해 주세요."
+              aria-label="테이블 메모"
+            />
+            <div className={styles.memoActions}>
+              <Button
+                type="button"
+                className={styles.memoSaveButton}
+                onClick={handleSaveMemo}
+                disabled={isSavingMemo || !isMemoDirty || isMemoTooLong}
+                isLoading={isSavingMemo}
+              >
+                메모 저장
+              </Button>
+            </div>
           </div>
 
           <div className={styles['summary-group']}>

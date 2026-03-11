@@ -19,6 +19,7 @@ export interface TableResponse {
   tableNum: number;
   status: TableStatus;
   qrImageUrl: string;
+  memo?: string;
   orderMenus?: TableOrderMenu[];
   serviceMenus?: TableOrderMenu[];
   totalOrderAmount?: number;
@@ -48,6 +49,10 @@ export interface UpdateTableQrImagesRequest {
 
 export interface UpdateTableQrImageRequest {
   qrImageUrl: string;
+}
+
+export interface UpdateTableMemoRequest {
+  memo: string;
 }
 
 export interface TableQrItem {

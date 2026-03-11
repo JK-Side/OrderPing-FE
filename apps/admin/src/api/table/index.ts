@@ -8,6 +8,7 @@ import type {
   TableListResponse,
   TableResponse,
   TableStatus,
+  UpdateTableMemoRequest,
   UpdateTableQrImageRequest,
   UpdateTableQrImagesRequest,
 } from './entity';
@@ -57,6 +58,13 @@ export const patchTableQrImage = async (tableId: number, body: UpdateTableQrImag
 // POST /api/tables/{id}/clear 테이블 비우기
 export const postClearTable = async (tableId: number) => {
   return await apiClient.post<TableResponse>(`/api/tables/${tableId}/clear`);
+};
+
+// PUT /api/tables/{id}/memo 테이블 메모 수정
+export const putTableMemo = async (tableId: number, body: UpdateTableMemoRequest) => {
+  return await apiClient.put<TableResponse>(`/api/tables/${tableId}/memo`, {
+    body,
+  });
 };
 
 // PATCH /api/tables/{id} 테이블 수정
