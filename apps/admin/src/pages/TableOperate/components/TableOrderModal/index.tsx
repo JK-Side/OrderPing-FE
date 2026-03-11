@@ -173,14 +173,14 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
               ))}
           </div>
 
-          <div className={styles.qrSection}>
+          {/* <div className={styles.qrSection}>
             <div className={styles.qrTitle}>테이블 QR</div>
             {table.qrImageUrl ? (
               <img src={table.qrImageUrl} className={styles.qrImg} alt="qr 이미지" />
             ) : (
               <div className={styles.qrPlaceholder}>QR코드가 존재하지 않습니다.</div>
             )}
-          </div>
+          </div> */}
 
           <div className={styles.memoSection}>
             <div className={styles.memoHeader}>
