@@ -17,6 +17,7 @@ interface AccoutInfoProps {
   control: Control<StoreCreateForm>;
   errors: FieldErrors<StoreCreateForm>;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
+  isSubmitting?: boolean;
   qrPreviewUrl?: string | null;
   onQrCodeImageChange?: (file: File | null) => void;
 }
@@ -26,6 +27,7 @@ export default function AccoutInfo({
   control,
   errors,
   onSubmit,
+  isSubmitting = false,
   // qrPreviewUrl,
   // onQrCodeImageChange,
 }: AccoutInfoProps) {
@@ -121,7 +123,7 @@ export default function AccoutInfo({
           </div> */}
         </div>
 
-        <Button type="submit" size="lg" className={styles.nextButton}>
+        <Button type="submit" size="lg" className={styles.nextButton} disabled={isSubmitting} isLoading={isSubmitting}>
           다음
         </Button>
       </form>
