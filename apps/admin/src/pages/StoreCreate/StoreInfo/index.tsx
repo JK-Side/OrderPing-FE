@@ -103,7 +103,7 @@ export default function StoreInfo({ register, errors, onSubmit, storePreviewUrl,
               placeholder="주점명을 입력해 주세요."
               {...register('storeName', {
                 required: '주점명을 입력해 주세요.',
-                maxLength: { value: 50, message: '주점명은 최대 50자입니다.' },
+                maxLength: { value: 10, message: '주점명은 최대 10자입니다.' },
               })}
             />
           </Input>
