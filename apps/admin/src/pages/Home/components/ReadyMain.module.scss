@@ -51,6 +51,26 @@
   flex-direction: column;
   align-items: center;
   gap: 30px;
+  transition: transform 0.28s ease;
+  will-change: transform;
+}
+
+.storeCard:hover {
+  animation: store-card-float 1.2s ease-in-out infinite alternate;
+}
+
+.storeCard:focus-within {
+  transform: translateY(-6px);
+}
+
+@keyframes store-card-float {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-6px);
+  }
 }
 
 .storeTitle {
@@ -149,5 +169,16 @@
 
   .guide {
     text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storeCard {
+    transition: transform 0.2s ease;
+  }
+
+  .storeCard:hover {
+    animation: none;
+    transform: translateY(-6px);
   }
 }
