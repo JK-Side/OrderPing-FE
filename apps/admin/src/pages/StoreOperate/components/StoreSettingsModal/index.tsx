@@ -174,6 +174,7 @@ export default function StoreSettingsModal({
                   placeholder="주점명을 입력해 주세요."
                   {...register('name', {
                     required: '주점명을 입력해 주세요.',
+                    maxLength: { value: 10, message: '주점명은 최대 10자입니다.' },
                   })}
                 />
               </Input>
@@ -188,6 +189,7 @@ export default function StoreSettingsModal({
                   placeholder="주점 설명을 입력해 주세요."
                   {...register('description', {
                     required: '주점 설명을 입력해 주세요.',
+                    maxLength: { value: 100, message: '주점 설명은 최대 100자입니다.' },
                   })}
                 />
               </Input>
