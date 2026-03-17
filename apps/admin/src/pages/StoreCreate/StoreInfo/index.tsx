@@ -11,11 +11,19 @@ interface StoreInfoProps {
   register: UseFormRegister<StoreCreateForm>;
   errors: FieldErrors<StoreCreateForm>;
   onSubmit: React.FormEventHandler<HTMLFormElement>;
+  isNextDisabled: boolean;
   storePreviewUrl?: string | null;
   onStoreImageChange?: (file: File | null) => void;
 }
 
-export default function StoreInfo({ register, errors, onSubmit, storePreviewUrl, onStoreImageChange }: StoreInfoProps) {
+export default function StoreInfo({
+  register,
+  errors,
+  onSubmit,
+  isNextDisabled,
+  storePreviewUrl,
+  onStoreImageChange,
+}: StoreInfoProps) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const storeImageField = register('storeImage');
@@ -100,7 +108,7 @@ export default function StoreInfo({ register, errors, onSubmit, storePreviewUrl,
             messageState={errors.storeName ? 'error' : undefined}
           >
             <Input.Text
-              placeholder="주점명을 입력해 주세요."
+              placeholder="주점명을 입력해 주세요. (최대 10자)"
               {...register('storeName', {
                 required: '주점명을 입력해 주세요.',
                 maxLength: { value: 10, message: '주점명은 최대 10자입니다.' },
@@ -115,7 +123,7 @@ export default function StoreInfo({ register, errors, onSubmit, storePreviewUrl,
             messageState={errors.storeDescription ? 'error' : undefined}
           >
             <Input.TextArea
-              placeholder={`주점 설명을 입력해 주세요.\n예시) 어서오세요, 컴퓨터공학부 주점입니다!`}
+              placeholder={`주점 설명을 입력해 주세요. (최대 100자) \n예시) 어서오세요, 컴퓨터공학부 주점입니다!`}
               {...register('storeDescription', {
                 required: '주점 설명을 입력해 주세요.',
                 maxLength: { value: 100, message: '주점 설명은 최대 100자입니다.' },
@@ -173,7 +181,7 @@ export default function StoreInfo({ register, errors, onSubmit, storePreviewUrl,
         </div>
 
         <div className={styles.buttonContainer}>
-          <Button type="submit" size="lg" className={styles.nextButton}>
+          <Button type="submit" size="lg" className={styles.nextButton} disabled={isNextDisabled}>
             다음
           </Button>
         </div>
