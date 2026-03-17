@@ -1,5 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
-import SettingIcon from '@/assets/icons/setting-1.svg?react';
+import { useNavigate } from 'react-router-dom';
 import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
 import styles from './ReadyMain.module.scss';
@@ -31,30 +30,30 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
       </div>
 
       <div className={styles.panel}>
-        <div className={styles.cardColumn}>
-          <div className={styles.storeCard}>
-            <h3 className={styles.storeTitle}>
-              <span className={styles.storeName}>{storeName}</span>
-            </h3>
-            <div className={styles.storeImageWrap}>
-              <img className={styles.storeImage} src={storeImage} alt={`${storeName} 주점`} />
-            </div>
-            <Button className={styles.storeButton} size="md" onClick={() => navigate(`/store/${store!.id}/start`)}>
-              주점 시작
-            </Button>
+        {/* <div className={styles.cardColumn}> */}
+        <div className={styles.storeCard}>
+          <h3 className={styles.storeTitle}>
+            <span className={styles.storeName}>{storeName}</span>
+          </h3>
+          <div className={styles.storeImageWrap}>
+            <img className={styles.storeImage} src={storeImage} alt={`${storeName} 주점`} />
           </div>
+          <Button className={styles.storeButton} size="md" onClick={() => navigate(`/store/operate/${store!.id}`)}>
+            주점 시작
+          </Button>
+        </div>
 
-          <Link
+        {/* <Link
             to={`/store/operate/${store!.id}`}
             className={styles.settingsLink}
             onClick={() => navigate(`/store/operate/${store!.id}`)}
           >
             <SettingIcon />
             <span className={styles.settingsText}>주점 설정</span>
-          </Link>
-        </div>
+          </Link> */}
+      </div>
 
-        <aside className={styles.guide}>
+      {/* <aside className={styles.guide}>
           <h3 className={styles.guideTitle}>HOW TO USE?</h3>
 
           <div className={styles.guideItems}>
@@ -67,8 +66,8 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
               <div className={styles.guideText}>주점 정보를 등록하고 운영 설정을 확인할 수 있어요.</div>
             </div>
           </div>
-        </aside>
-      </div>
+        </aside> */}
+      {/* </div> */}
     </section>
   );
 }
