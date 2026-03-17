@@ -117,8 +117,10 @@ export default function StoreInfo({ register, errors, onSubmit, storePreviewUrl,
           >
             <Input.TextArea
               placeholder={`주점 설명을 입력해 주세요.\n예시) 어서오세요, 컴퓨터공학부 주점입니다!`}
+              maxLength={100}
               {...register('storeDescription', {
                 required: '주점 설명을 입력해 주세요.',
+                maxLength: { value: 100, message: '주점 설명은 최대 100자입니다.' },
               })}
             />
           </Input>
