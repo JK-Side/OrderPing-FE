@@ -38,7 +38,8 @@ export default function MenuCreate() {
     control,
     formState: { errors, isSubmitting },
   } = useForm<MenuCreateForm>({
-    mode: 'onBlur',
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       categoryId: CATEGORY_MAIN,
     },
@@ -175,6 +176,7 @@ export default function MenuCreate() {
                 placeholder="내용을 입력해 주세요."
                 {...register('name', {
                   required: '메뉴명을 입력해 주세요.',
+                  maxLength: { value: 20, message: '메뉴명은 최대 20자입니다.' },
                 })}
               />
             </Input>
@@ -256,10 +258,16 @@ export default function MenuCreate() {
               {errors.categoryId?.message && <span className={styles.categoryError}>{errors.categoryId.message}</span>}
             </div>
 
-            <Input label="메뉴 설명 (선택)">
+            <Input
+              label="메뉴 설명 (선택)"
+              message={errors.description?.message}
+              messageState={errors.description ? 'error' : undefined}
+            >
               <Input.TextArea
                 placeholder={`예시) 사랑의 티니핑 월드에 빠져버린 맛,\n둘이 먹다 죽어도 난 몰라요.\n저는 그저 티니핑 월드에 갈 것이에요.`}
-                {...register('description')}
+                {...register('description', {
+                  maxLength: { value: 30, message: '메뉴 설명은 최대 30자입니다.' },
+                })}
               />
             </Input>
           </div>

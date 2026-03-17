@@ -47,7 +47,8 @@ export default function MenuEdit() {
     control,
     formState: { errors, isSubmitting },
   } = useForm<MenuEditForm>({
-    mode: 'onBlur',
+    mode: 'onChange',
+    reValidateMode: 'onChange',
     defaultValues: {
       categoryId: CATEGORY_MAIN,
     },
@@ -263,6 +264,7 @@ export default function MenuEdit() {
                 placeholder="내용을 입력해 주세요."
                 {...register('name', {
                   required: '메뉴명을 입력해 주세요.',
+                  maxLength: { value: 20, message: '\uba54\ub274\uba85\uc740 \ucd5c\ub300 20\uc790\uc785\ub2c8\ub2e4.' },
                 })}
               />
             </Input>
@@ -344,10 +346,16 @@ export default function MenuEdit() {
               {errors.categoryId?.message && <span className={styles.categoryError}>{errors.categoryId.message}</span>}
             </div>
 
-            <Input label="메뉴 설명 (선택)">
+            <Input
+              label="메뉴 설명 (선택)"
+              message={errors.description?.message}
+              messageState={errors.description ? 'error' : undefined}
+            >
               <Input.TextArea
                 placeholder={`예시) 사랑의 티니핑 월드에 빠져버린 맛,\n둘이 먹다 죽어도 난 몰라요.\n저는 그저 티니핑 월드에 갈 것이에요.`}
-                {...register('description')}
+                {...register('description', {
+                  maxLength: { value: 30, message: '\uba54\ub274 \uc124\uba85\uc740 \ucd5c\ub300 30\uc790\uc785\ub2c8\ub2e4.' },
+                })}
               />
             </Input>
           </div>
