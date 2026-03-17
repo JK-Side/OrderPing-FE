@@ -118,13 +118,23 @@
 }
 
 .orderPreview {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   gap: 30px;
 }
 
+.orderPreviewScroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .orderPreviewGrid {
   display: grid;
+  width: max-content;
+  min-width: 100%;
   gap: 30px;
   grid-auto-flow: row;
   justify-content: flex-start;
