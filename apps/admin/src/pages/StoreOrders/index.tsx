@@ -331,11 +331,11 @@ export default function StoreOrders() {
 
             <div className={styles.sectionDivider} />
 
-            <div className={styles.cardGrid}>
-              {section.orders.length === 0 ? (
-                <div className={styles.emptyState}>No {section.emptyLabel} orders.</div>
-              ) : (
-                section.orders.map((order) => {
+            {section.orders.length === 0 ? (
+              <div className={styles.emptyState}>No {section.emptyLabel} orders.</div>
+            ) : (
+              <div className={styles.cardGrid}>
+                {section.orders.map((order) => {
                   const isServiceOrder = order.depositorName === '서비스';
                   return (
                     <OrderLookupCard
@@ -357,9 +357,9 @@ export default function StoreOrders() {
                       stat={order.status}
                     />
                   );
-                })
-              )}
-            </div>
+                })}
+              </div>
+            )}
           </div>
         ))}
       </div>

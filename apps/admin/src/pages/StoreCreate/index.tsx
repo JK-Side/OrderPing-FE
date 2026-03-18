@@ -23,6 +23,7 @@ export default function StoreCreate() {
     control,
     handleSubmit,
     getValues,
+    watch,
     formState: { errors },
   } = useForm<StoreCreateForm>({
     mode: 'onBlur',
@@ -147,6 +148,18 @@ export default function StoreCreate() {
 
   const isStep1Completed = step > 1;
   const isStep2Completed = step > 2;
+  const storeNameValue = watch('storeName') ?? '';
+  const storeDescriptionValue = watch('storeDescription') ?? '';
+  const bankCodeValue = watch('bankCode') ?? '';
+  const accountHolderValue = watch('accountHolder') ?? '';
+  const accountNumberValue = watch('accountNumber') ?? '';
+  const hasStoreName = storeNameValue.trim().length > 0 && storeNameValue.length <= 10;
+  const hasStoreDescription = storeDescriptionValue.trim().length > 0 && storeDescriptionValue.length <= 100;
+  const isStoreInfoValid = hasStoreName && hasStoreDescription;
+  const hasBankCode = bankCodeValue.trim().length > 0;
+  const hasAccountHolder = accountHolderValue.trim().length > 0 && accountHolderValue.length <= 6;
+  const hasAccountNumber = /^[0-9]+$/.test(accountNumberValue) && accountNumberValue.length <= 20;
+  const isAccountInfoValid = hasBankCode && hasAccountHolder && hasAccountNumber;
 
   return (
     <section className={styles.storeCreate}>
@@ -185,6 +198,7 @@ export default function StoreCreate() {
             register={register}
             errors={errors}
             onSubmit={handleSubmit(handleStoreInfoSubmit)}
+            isNextDisabled={!isStoreInfoValid}
             storePreviewUrl={storePreviewUrl}
             onStoreImageChange={handleStoreImageChange}
           />
@@ -195,6 +209,7 @@ export default function StoreCreate() {
             control={control}
             errors={errors}
             isSubmitting={isAccountSubmitting}
+            isNextDisabled={!isAccountInfoValid}
             onSubmit={handleSubmit(handleAccountInfoSubmit)}
             // qrPreviewUrl={qrPreviewUrl}
             // onQrCodeImageChange={handleQrCodeImageChange}

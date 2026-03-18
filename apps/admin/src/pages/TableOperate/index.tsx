@@ -351,39 +351,41 @@ export default function TableOperate() {
         <div className={styles.sectionDivider} />
 
         {hasTables ? (
-          <div
-            className={`${styles.orderPreview} ${useGridLayout ? styles.orderPreviewGrid : ''}`}
-            style={tableGridStyle}
-          >
-            {sortedTables.map((table: TableResponse) => {
-              const hasOrders = hasOrdersForTable(table);
-              const isEmpty = !hasOrders;
-              const resolvedOrderStatus = resolvePriorityOrderStatus(table.orderStatus);
-              const status = hasOrders && resolvedOrderStatus ? resolvedOrderStatus : undefined;
-              const items = table.orderMenus?.map((menu) => ({
-                name: menu.menuName,
-                quantity: menu.quantity,
-              }));
-              const serviceMenus = table.serviceMenus?.map((menu) => ({
-                name: menu.menuName,
-                quantity: menu.quantity,
-              }));
+          <div className={styles.orderPreviewScroll}>
+            <div
+              className={`${styles.orderPreview} ${useGridLayout ? styles.orderPreviewGrid : ''}`}
+              style={tableGridStyle}
+            >
+              {sortedTables.map((table: TableResponse) => {
+                const hasOrders = hasOrdersForTable(table);
+                const isEmpty = !hasOrders;
+                const resolvedOrderStatus = resolvePriorityOrderStatus(table.orderStatus);
+                const status = hasOrders && resolvedOrderStatus ? resolvedOrderStatus : undefined;
+                const items = table.orderMenus?.map((menu) => ({
+                  name: menu.menuName,
+                  quantity: menu.quantity,
+                }));
+                const serviceMenus = table.serviceMenus?.map((menu) => ({
+                  name: menu.menuName,
+                  quantity: menu.quantity,
+                }));
 
-              return (
-                <OrderCard
-                  key={table.id}
-                  tableName={formatTableName(table.tableNum)}
-                  isEmpty={isEmpty}
-                  status={status}
-                  items={items}
-                  serviceMenus={serviceMenus}
-                  totalPrice={table.totalOrderAmount}
-                  isSelected={selectedTableIds.includes(table.id)}
-                  onToggleSelect={() => handleToggleSelect(table.id)}
-                  onOpenDetail={() => handleOpenDetail(table)}
-                />
-              );
-            })}
+                return (
+                  <OrderCard
+                    key={table.id}
+                    tableName={formatTableName(table.tableNum)}
+                    isEmpty={isEmpty}
+                    status={status}
+                    items={items}
+                    serviceMenus={serviceMenus}
+                    totalPrice={table.totalOrderAmount}
+                    isSelected={selectedTableIds.includes(table.id)}
+                    onToggleSelect={() => handleToggleSelect(table.id)}
+                    onOpenDetail={() => handleOpenDetail(table)}
+                  />
+                );
+              })}
+            </div>
           </div>
         ) : (
           <div className={styles.emptyState}>

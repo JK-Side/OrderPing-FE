@@ -164,15 +164,16 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
               </Input>
 
               <Input
-                label="입금자명"
+                label="예금주명"
                 required
                 message={errors.accountHolder?.message}
                 messageState={errors.accountHolder ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="입금자명을 입력해 주세요."
+                  placeholder="예금주명을 입력해 주세요. (최대 6글자)"
                   {...register('accountHolder', {
-                    required: '입금자명을 입력해 주세요.',
+                    required: '예금주명을 입력해 주세요.',
+                    maxLength: { value: 6, message: '예금주명은 최대 6자입니다.' },
                   })}
                 />
               </Input>
@@ -184,10 +185,15 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
                 messageState={errors.accountNumber ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="계좌번호를 입력해 주세요."
+                  placeholder="계좌번호를 입력해 주세요. (최대 20글자)"
                   inputMode="numeric"
                   {...register('accountNumber', {
                     required: '계좌번호를 입력해 주세요.',
+                    maxLength: { value: 20, message: '계좌번호는 최대 20자입니다.' },
+                    onChange: (e) => {
+                      const value = e.target.value;
+                      e.target.value = value.replace(/[^0-9]/g, '');
+                    },
                   })}
                 />
               </Input>

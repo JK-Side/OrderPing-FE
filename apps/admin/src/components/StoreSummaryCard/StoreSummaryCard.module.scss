@@ -1,15 +1,15 @@
 @use '@order-ping/shared/styles/colors' as *;
 
 .summaryCard {
-  width: 850px;
-  padding: 20px 30px;
-  background-color: $background;
-  border: 1px solid $gray-10;
-  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
+  // width: 850px;
+  // padding: 20px 30px;
+  // background-color: $background;
+  // border: 1px solid $gray-10;
+  // box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: 60px;
 }
 
 .summaryInfo {
@@ -20,8 +20,8 @@
 }
 
 .summaryImageWrap {
-  width: 84px;
-  height: 84px;
+  width: var(--summary-image-size, 84px);
+  height: var(--summary-image-size, 84px);
   border-radius: 12px;
   overflow: hidden;
   background-color: $gray-10;
@@ -32,6 +32,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .summaryText {
@@ -90,8 +91,8 @@
   }
 
   .summaryImageWrap {
-    width: 72px;
-    height: 72px;
+    width: var(--summary-image-size, 72px);
+    height: var(--summary-image-size, 72px);
   }
 
   .summaryActions {
