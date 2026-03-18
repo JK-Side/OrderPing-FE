@@ -65,9 +65,7 @@ const formatMenus = (
 ) => {
   if (menus.length === 0) return '-';
 
-  return menus
-    .map((menu) => `${menu.menuName}${menu.isService ? ' (서비스)' : ''} × ${menu.quantity}`)
-    .join(', ');
+  return menus.map((menu) => `${menu.menuName}${menu.isService ? ' (서비스)' : ''} × ${menu.quantity}`).join(', ');
 };
 
 export default function StoreStatistics() {
@@ -87,17 +85,19 @@ export default function StoreStatistics() {
   const [periodPreset, setPeriodPreset] = useState<PeriodPreset>('TODAY');
   const [fromDate, setFromDate] = useState(today);
   const [toDate, setToDate] = useState(today);
+  const resolvedFromDate = periodPreset === 'ALL' ? (storeCreatedAt ?? fromDate) : fromDate;
+  const resolvedToDate = periodPreset === 'ALL' ? today : toDate;
 
   const selectedPreset = PERIOD_PRESET_OPTIONS.find((option) => option.value === periodPreset)?.label ?? '오늘';
 
   const queryParams = useMemo(() => {
-    if (!storeId || !fromDate || !toDate) return undefined;
+    if (!storeId || !resolvedFromDate || !resolvedToDate) return undefined;
     return {
       storeId,
-      from: fromDate,
-      to: toDate,
+      from: resolvedFromDate,
+      to: resolvedToDate,
     };
-  }, [fromDate, storeId, toDate]);
+  }, [resolvedFromDate, resolvedToDate, storeId]);
 
   const { data: statistics, isPending: isStatisticsPending, isError: isStatisticsError } = useStatistics(queryParams);
   const {
@@ -106,7 +106,7 @@ export default function StoreStatistics() {
     isError: isMenuStatisticsError,
   } = useMenuStatistics(queryParams, tab === 'menus');
 
-  const isSingleDay = fromDate === toDate;
+  const isSingleDay = resolvedFromDate === resolvedToDate;
   const orderRows = statistics?.orders ?? [];
   const menuRows = menuStatistics?.menus ?? [];
 
@@ -147,13 +147,6 @@ export default function StoreStatistics() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isPresetOpen]);
-
-  useEffect(() => {
-    if (periodPreset === 'ALL' && storeCreatedAt) {
-      setFromDate(storeCreatedAt);
-      setToDate(today);
-    }
-  }, [periodPreset, storeCreatedAt, today]);
 
   const handlePresetClick = (preset: PeriodPreset) => {
     applyPreset(preset);
@@ -223,31 +216,31 @@ export default function StoreStatistics() {
           </div>
         ) : (
           <>
-            <span className={styles.dateText}>{fromDate}</span>
+            <span className={styles.dateText}>{resolvedFromDate}</span>
             <span className={styles.dateRangeMark}>~</span>
-            <span className={styles.dateText}>{toDate}</span>
+            <span className={styles.dateText}>{resolvedToDate}</span>
           </>
         )}
       </div>
 
       <div className={styles.summaryGrid}>
         <article className={styles.summaryCard}>
-          <h2 className={styles.summaryLabel}>총 매출</h2>
-          <p className={styles.summaryValue}>{formatCurrency(statistics?.totalRevenue ?? 0)}</p>
+          <div className={styles.summaryLabel}>총 매출</div>
+          <div className={styles.summaryValue}>{formatCurrency(statistics?.totalRevenue ?? 0)}</div>
         </article>
         <article className={styles.summaryCard}>
-          <h2 className={styles.summaryLabel}>계좌 입금</h2>
-          <p className={`${styles.summaryValue} ${styles.summaryValueAccent}`}>
+          <div className={styles.summaryLabel}>계좌 입금</div>
+          <div className={`${styles.summaryValue} ${styles.summaryValueAccent}`}>
             {formatCurrency(statistics?.transferRevenue ?? 0)}
-          </p>
+          </div>
         </article>
         <article className={styles.summaryCard}>
-          <h2 className={styles.summaryLabel}>쿠폰 사용</h2>
-          <p className={styles.summaryValue}>{formatCurrency(statistics?.couponRevenue ?? 0)}</p>
+          <div className={styles.summaryLabel}>쿠폰 사용</div>
+          <div className={styles.summaryValue}>{formatCurrency(statistics?.couponRevenue ?? 0)}</div>
         </article>
         <article className={styles.summaryCard}>
-          <h2 className={styles.summaryLabel}>주문 수</h2>
-          <p className={styles.summaryValue}>{(statistics?.orderCount ?? 0).toLocaleString('ko-KR')}건</p>
+          <div className={styles.summaryLabel}>주문 수</div>
+          <div className={styles.summaryValue}>{(statistics?.orderCount ?? 0).toLocaleString('ko-KR')}건</div>
         </article>
       </div>
 

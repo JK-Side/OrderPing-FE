@@ -92,7 +92,7 @@
 }
 
 .dateRangeMark {
-  font-size: 26px;
+  font-size: 20px;
   color: $black;
 }
 
@@ -134,13 +134,13 @@
 .summaryLabel {
   margin: 0;
   color: $black;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .summaryValue {
   margin: 0;
   color: $black;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
 }
 
@@ -183,9 +183,10 @@
   display: grid;
   gap: 12px;
   padding: 18px 28px 12px;
+  border-bottom: 1px solid $gray-20;
   color: $black;
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .tableHeadOrders {
@@ -197,13 +198,15 @@
 }
 
 .tableBody {
-  padding: 0 28px 28px;
+  padding: 4px 28px 28px;
 }
 
 .orderRow {
   display: grid;
   grid-template-columns: 120px 120px 160px minmax(360px, 1fr) 150px 140px;
   gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid $gray-10;
   color: $black;
   font-size: 16px;
   line-height: 1.45;
@@ -213,6 +216,8 @@
   display: grid;
   grid-template-columns: minmax(360px, 1fr) 140px 140px;
   gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid $gray-10;
   color: $black;
   font-size: 16px;
   line-height: 1.45;
@@ -232,7 +237,7 @@
   font-size: 16px;
 }
 
-@media (max-width: 1700px) {
+@media (max-width: 640px) {
   .storeStatistics {
     padding: 46px 48px 72px;
   }
@@ -240,7 +245,7 @@
   .periodButton,
   .dateText,
   .dateRangeMark {
-    font-size: 22px;
+    font-size: 18px;
   }
 
   .summaryLabel {
