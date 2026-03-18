@@ -238,18 +238,6 @@
   white-space: normal;
 }
 
-.menuChartPlaceholder {
-  min-height: 500px;
-  border: 1px dashed $gray-20;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: $gray-50;
-  font-size: 16px;
-}
-
 .emptyState {
   min-height: 430px;
   display: flex;

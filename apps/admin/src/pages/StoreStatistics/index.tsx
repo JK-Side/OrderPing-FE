@@ -3,12 +3,22 @@ import { useParams } from 'react-router-dom';
 import ArrowDownIcon from '@/assets/icons/arrow-down.svg?react';
 import Button from '@/components/Button';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
+import MenuStatsChart from '@/pages/StoreStatistics/components/MenuStatsChart';
 import { useMenuStatistics } from '@/pages/StoreStatistics/hooks/useMenuStatistics';
 import { useStatistics } from '@/pages/StoreStatistics/hooks/useStatistics';
 import styles from './StoreStatistics.module.scss';
 
 type StatisticsTab = 'orders' | 'menus';
 type PeriodPreset = 'ALL' | 'TODAY' | 'YESTERDAY' | 'CUSTOM';
+type NormalizedMenuStat = {
+  menuId: number;
+  menuName: string;
+  stock: number;
+  soldQuantity: number;
+  maxValue: number;
+  stockRatio: number;
+  soldRatio: number;
+};
 
 const PERIOD_PRESET_OPTIONS: { value: PeriodPreset; label: string }[] = [
   { value: 'ALL', label: '전체' },
@@ -16,6 +26,7 @@ const PERIOD_PRESET_OPTIONS: { value: PeriodPreset; label: string }[] = [
   { value: 'YESTERDAY', label: '어제' },
   { value: 'CUSTOM', label: '직접 선택' },
 ];
+const CHART_INTERVALS = 5;
 
 const formatDate = (date: Date) => {
   const year = date.getFullYear();
@@ -69,6 +80,14 @@ const formatMenus = (
   return menus.map((menu) => `${menu.menuName}${menu.isService ? ' (서비스)' : ''} × ${menu.quantity}`).join(', ');
 };
 
+const resolveRoundedAxisMax = (rawMaxValue: number, intervals: number) => {
+  if (rawMaxValue <= 0) return 10;
+
+  const safeIntervals = Math.max(1, intervals);
+  const roundedByTen = Math.ceil(rawMaxValue / 10) * 10;
+  return Math.ceil(roundedByTen / safeIntervals) * safeIntervals;
+};
+
 export default function StoreStatistics() {
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
@@ -108,8 +127,29 @@ export default function StoreStatistics() {
   } = useMenuStatistics(queryParams, tab === 'menus');
 
   const isSingleDay = resolvedFromDate === resolvedToDate;
-  const orderRows = statistics?.orders ?? [];
-  const menuRows = menuStatistics?.menus ?? [];
+  const orderRows = useMemo(() => statistics?.orders ?? [], [statistics?.orders]);
+  const menuRows = useMemo(() => menuStatistics?.menus ?? [], [menuStatistics?.menus]);
+  const menuChartMaxValue = useMemo(() => {
+    const rawMaxValue = menuRows.reduce((acc, menu) => {
+      const currentMax = Math.max(menu.stock, menu.soldQuantity);
+      return currentMax > acc ? currentMax : acc;
+    }, 0);
+
+    return resolveRoundedAxisMax(rawMaxValue, CHART_INTERVALS);
+  }, [menuRows]);
+  const normalizedMenuRows = useMemo<NormalizedMenuStat[]>(
+    () =>
+      menuRows.map((menu) => ({
+        menuId: menu.menuId,
+        menuName: menu.menuName,
+        stock: menu.stock,
+        soldQuantity: menu.soldQuantity,
+        maxValue: Math.max(menu.stock, menu.soldQuantity),
+        stockRatio: menu.stock / menuChartMaxValue,
+        soldRatio: menu.soldQuantity / menuChartMaxValue,
+      })),
+    [menuChartMaxValue, menuRows],
+  );
 
   const applyPreset = useCallback(
     (nextPreset: PeriodPreset) => {
@@ -302,10 +342,10 @@ export default function StoreStatistics() {
             <div className={styles.emptyState}>메뉴 통계를 불러오지 못했어요!</div>
           ) : isMenuStatisticsPending ? (
             <div className={styles.emptyState}>메뉴 통계를 불러오는 중입니다.</div>
-          ) : menuRows.length === 0 ? (
+          ) : normalizedMenuRows.length === 0 ? (
             <div className={styles.emptyState}>해당 기간에 판매된 메뉴가 없어요!</div>
           ) : (
-            <div className={styles.menuChartPlaceholder}>메뉴별 차트 영역</div>
+            <MenuStatsChart items={normalizedMenuRows} maxValue={menuChartMaxValue} />
           )}
         </section>
       )}
