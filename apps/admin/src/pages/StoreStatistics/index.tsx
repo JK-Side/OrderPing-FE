@@ -264,67 +264,51 @@ export default function StoreStatistics() {
         </Button>
       </div>
 
-      <section className={styles.tablePanel}>
-        {tab === 'orders' ? (
-          <>
-            <div className={`${styles.tableHead} ${styles.tableHeadOrders}`}>
-              <span>주문번호</span>
-              <span>테이블</span>
-              <span>주문일시</span>
-              <span>메뉴</span>
-              <span>총금액</span>
-              <span>입금자명</span>
-            </div>
+      {tab === 'orders' ? (
+        <section className={styles.tablePanel}>
+          <div className={`${styles.tableHead} ${styles.tableHeadOrders}`}>
+            <span>주문번호</span>
+            <span>테이블</span>
+            <span>주문일시</span>
+            <span>메뉴</span>
+            <span>총금액</span>
+            <span>입금자명</span>
+          </div>
 
-            <div className={styles.tableBody}>
-              {!storeId || isStatisticsError ? (
-                <div className={styles.emptyState}>통계를 불러오지 못했어요!</div>
-              ) : isStatisticsPending ? (
-                <div className={styles.emptyState}>통계를 불러오는 중입니다.</div>
-              ) : orderRows.length === 0 ? (
-                <div className={styles.emptyState}>해당 기간에 주문이 없어요!</div>
-              ) : (
-                orderRows.map((order) => (
-                  <div key={order.orderNumber} className={styles.orderRow}>
-                    <span>{formatOrderNumber(order.orderNumber)}</span>
-                    <span>{order.tableNum}번</span>
-                    <span>{formatOrderedAt(order.orderedAt, isSingleDay)}</span>
-                    <span className={styles.menuCell}>{formatMenus(order.menus)}</span>
-                    <span>{formatCurrency(order.totalPrice)}</span>
-                    <span>{order.depositorName}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={`${styles.tableHead} ${styles.tableHeadMenus}`}>
-              <span>메뉴명</span>
-              <span>재고</span>
-              <span>판매량</span>
-            </div>
-
-            <div className={styles.tableBody}>
-              {!storeId || isMenuStatisticsError ? (
-                <div className={styles.emptyState}>메뉴 통계를 불러오지 못했어요!</div>
-              ) : isMenuStatisticsPending ? (
-                <div className={styles.emptyState}>메뉴 통계를 불러오는 중입니다.</div>
-              ) : menuRows.length === 0 ? (
-                <div className={styles.emptyState}>해당 기간에 판매된 메뉴가 없어요!</div>
-              ) : (
-                menuRows.map((menu) => (
-                  <div key={menu.menuId} className={styles.menuRow}>
-                    <span>{menu.menuName}</span>
-                    <span>{menu.stock.toLocaleString('ko-KR')}</span>
-                    <span>{menu.soldQuantity.toLocaleString('ko-KR')}</span>
-                  </div>
-                ))
-              )}
-            </div>
-          </>
-        )}
-      </section>
+          <div className={styles.tableBody}>
+            {!storeId || isStatisticsError ? (
+              <div className={styles.emptyState}>통계를 불러오지 못했어요!</div>
+            ) : isStatisticsPending ? (
+              <div className={styles.emptyState}>통계를 불러오는 중입니다.</div>
+            ) : orderRows.length === 0 ? (
+              <div className={styles.emptyState}>해당 기간에 주문이 없어요!</div>
+            ) : (
+              orderRows.map((order) => (
+                <div key={order.orderNumber} className={styles.orderRow}>
+                  <span>{formatOrderNumber(order.orderNumber)}</span>
+                  <span>{order.tableNum}번</span>
+                  <span>{formatOrderedAt(order.orderedAt, isSingleDay)}</span>
+                  <span className={styles.menuCell}>{formatMenus(order.menus)}</span>
+                  <span>{formatCurrency(order.totalPrice)}</span>
+                  <span>{order.depositorName}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      ) : (
+        <section className={styles.menuChartPanel}>
+          {!storeId || isMenuStatisticsError ? (
+            <div className={styles.emptyState}>메뉴 통계를 불러오지 못했어요!</div>
+          ) : isMenuStatisticsPending ? (
+            <div className={styles.emptyState}>메뉴 통계를 불러오는 중입니다.</div>
+          ) : menuRows.length === 0 ? (
+            <div className={styles.emptyState}>해당 기간에 판매된 메뉴가 없어요!</div>
+          ) : (
+            <div className={styles.menuChartPlaceholder}>메뉴별 차트 영역</div>
+          )}
+        </section>
+      )}
     </section>
   );
 }
