@@ -1,6 +1,7 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ArrowDownIcon from '@/assets/icons/arrow-down.svg?react';
+import Button from '@/components/Button';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import { useMenuStatistics } from '@/pages/StoreStatistics/hooks/useMenuStatistics';
 import { useStatistics } from '@/pages/StoreStatistics/hooks/useStatistics';
@@ -245,20 +246,22 @@ export default function StoreStatistics() {
       </div>
 
       <div className={styles.tabGroup}>
-        <button
+        <Button
           type="button"
-          className={`${styles.tabButton} ${tab === 'orders' ? styles.tabButtonActive : ''}`}
+          size="md"
+          className={`${styles.tabButton} ${tab === 'orders' ? styles.tabButtonActive : styles.tabButtonInactive}`}
           onClick={() => setTab('orders')}
         >
           전체 주문 조회
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
-          className={`${styles.tabButton} ${tab === 'menus' ? styles.tabButtonActive : ''}`}
+          size="md"
+          className={`${styles.tabButton} ${tab === 'menus' ? styles.tabButtonActive : styles.tabButtonInactive}`}
           onClick={() => setTab('menus')}
         >
           메뉴별 주문
-        </button>
+        </Button>
       </div>
 
       <section className={styles.tablePanel}>
@@ -325,3 +328,5 @@ export default function StoreStatistics() {
     </section>
   );
 }
+
+
