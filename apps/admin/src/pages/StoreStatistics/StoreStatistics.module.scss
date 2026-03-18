@@ -198,7 +198,10 @@
 }
 
 .tableHeadOrders {
-  grid-template-columns: 120px 120px 160px minmax(360px, 1fr) 150px 140px;
+  grid-template-columns: minmax(80px, 0.9fr) minmax(80px, 0.9fr) minmax(100px, 1.1fr) minmax(260px, 3fr) minmax(
+      100px,
+      1.1fr
+    ) minmax(100px, 1.1fr);
 }
 
 .tableHeadMenus {
@@ -207,17 +210,33 @@
 
 .tableBody {
   padding: 4px 28px 28px;
+  overflow-x: auto;
 }
 
 .orderRow {
   display: grid;
-  grid-template-columns: 120px 120px 160px minmax(360px, 1fr) 150px 140px;
+  grid-template-columns: minmax(80px, 0.9fr) minmax(80px, 0.9fr) minmax(100px, 1.1fr) minmax(260px, 3fr) minmax(
+      100px,
+      1.1fr
+    ) minmax(100px, 1.1fr);
   gap: 12px;
   padding: 10px 0;
   border-bottom: 1px solid $gray-10;
   color: $black;
   font-size: 16px;
   line-height: 1.45;
+  min-width: 0;
+  align-items: center;
+}
+
+.tableHeadOrders > span {
+  text-align: center;
+  justify-self: center;
+}
+
+.orderRow > span:not(:nth-child(4)) {
+  text-align: center;
+  justify-self: center;
 }
 
 .menuChartPanel {
@@ -230,6 +249,10 @@
 
 .menuCell {
   white-space: normal;
+  min-width: 0;
+  text-align: left;
+  justify-self: stretch;
+  overflow-wrap: anywhere;
 }
 
 .emptyState {
@@ -321,18 +344,10 @@
     font-size: 16px;
   }
 
-  .tablePanel {
-    overflow-x: auto;
-  }
-
   .menuChartPanel {
     min-height: 420px;
     padding: 20px 14px;
     overflow-x: auto;
   }
 
-  .tableHeadOrders,
-  .orderRow {
-    width: 970px;
-  }
 }
