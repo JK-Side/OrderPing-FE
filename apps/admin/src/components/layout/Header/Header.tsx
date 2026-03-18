@@ -15,12 +15,14 @@ export default function Header() {
   const isAuthHeaderPage = isHomePage || isMyPage || isStoreCreatePage;
   const storeId =
     pathname.match(/^\/store\/operate\/([^/]+)/)?.[1] ??
-    pathname.match(/^\/store\/([^/]+)\/(start|orders|menu|qr-print)/)?.[1];
+    pathname.match(/^\/store\/([^/]+)\/(start|orders|menu|qr-print|statistics)/)?.[1];
   const isStoreStartPage = /^\/store\/[^/]+\/(start|qr-print)/.test(pathname);
   const isStoreOrdersPage = /^\/store\/[^/]+\/orders/.test(pathname);
+  const isStoreStatisticsPage = /^\/store\/[^/]+\/statistics/.test(pathname);
   const menuManagePath = storeId ? `/store/operate/${storeId}` : '/';
   const orderManagePath = storeId ? `/store/${storeId}/orders` : '/';
   const tableManagePath = storeId ? `/store/${storeId}/start` : '/';
+  const statisticsPath = storeId ? `/store/${storeId}/statistics` : '/';
 
   const handleKakaoLogin = () => {
     window.location.href = `${BASE_URL}`;
@@ -56,7 +58,9 @@ export default function Header() {
             <Link to={tableManagePath} className={`${styles.navItem} ${isStoreStartPage ? styles.navItemActive : ''}`}>
               테이블 관리
             </Link>
-            <span className={styles.navItem}>주문 통계</span>
+            <Link to={statisticsPath} className={`${styles.navItem} ${isStoreStatisticsPage ? styles.navItemActive : ''}`}>
+              주문 통계
+            </Link>
           </>
         ) : isLoggedIn ? (
           <>

@@ -1,0 +1,183 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.chart {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 22px;
+  margin-bottom: 12px;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: $gray-70;
+}
+
+.legendDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.legendDotStock {
+  background: #e4e6eb;
+}
+
+.legendDotSold {
+  background: $primary-50;
+}
+
+.chartViewport {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.chartBody {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.yAxis {
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 2px;
+}
+
+.yAxisTick {
+  font-size: 12px;
+  color: $gray-50;
+  line-height: 1;
+}
+
+.chartCanvas {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plotArea {
+  height: 380px;
+  border-left: 1px solid $gray-20;
+  border-bottom: 1px solid $gray-20;
+  position: relative;
+}
+
+.gridLines {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.gridLine {
+  border-top: 1px dashed $gray-20;
+}
+
+.barsGroups {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(96px, 120px);
+  gap: 14px;
+  align-items: end;
+  padding: 0 14px;
+}
+
+.barGroup {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.bar {
+  width: 34px;
+  border-radius: 2px 2px 0 0;
+  transition: height 0.24s ease;
+}
+
+.stockBar {
+  background: #e4e6eb;
+}
+
+.soldBar {
+  background: $primary-50;
+}
+
+.labelsRow {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(96px, 120px);
+  gap: 14px;
+  padding: 0 14px;
+}
+
+.label {
+  font-size: 16px;
+  color: $black;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1100px) {
+  .chart {
+    min-height: 420px;
+  }
+
+  .chartBody {
+    gap: 6px;
+  }
+
+  .yAxis {
+    width: 34px;
+    height: 320px;
+  }
+
+  .yAxisTick {
+    font-size: 11px;
+  }
+
+  .plotArea {
+    height: 320px;
+  }
+
+  .legend {
+    justify-content: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .legendItem,
+  .label {
+    font-size: 14px;
+  }
+
+  .bar {
+    width: 28px;
+  }
+
+  .barsGroups,
+  .labelsRow {
+    grid-auto-columns: minmax(84px, 102px);
+    gap: 10px;
+    padding: 0 10px;
+  }
+}

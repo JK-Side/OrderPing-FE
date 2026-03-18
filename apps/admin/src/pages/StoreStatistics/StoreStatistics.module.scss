@@ -1,0 +1,351 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.storeStatistics {
+  padding: 46px 80px 96px;
+}
+
+.filterBar {
+  width: 100%;
+  border: 1px solid $gray-20;
+  min-height: 60px;
+  border-radius: 12px;
+  background: $white;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 32px;
+}
+
+.periodButton {
+  border: 0;
+  background: transparent;
+  color: $black;
+  font-size: 18px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.periodIcon {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.2s ease;
+}
+
+.periodIconOpen {
+  transform: rotate(180deg);
+}
+
+.periodSelect {
+  position: relative;
+  display: inline-flex;
+}
+
+.periodOptions {
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 132px;
+  border: 1px solid $gray-20;
+  border-radius: 10px;
+  background: $white;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  z-index: 10;
+}
+
+.periodOption {
+  width: 100%;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: $black;
+  font-size: 16px;
+  text-align: left;
+  padding: 8px 10px;
+  cursor: pointer;
+
+  &:hover {
+    background: $gray-10;
+  }
+}
+
+.periodOptionActive {
+  background: $primary-10;
+  color: $primary-70;
+}
+
+.periodDivider {
+  width: 1px;
+  height: 30px;
+  background: $gray-40;
+}
+
+.dateText {
+  font-size: 18px;
+  color: $black;
+}
+
+.dateRangeMark {
+  font-size: 20px;
+  color: $black;
+}
+
+.customDateRange {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.dateInput {
+  height: 40px;
+  border: 1px solid $gray-20;
+  border-radius: 8px;
+  padding: 0 12px;
+  color: $black;
+  font-size: 16px;
+  font-family: inherit;
+  background: $white;
+}
+
+.summaryGrid {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.summaryCard {
+  border: 1px solid $gray-20;
+  border-radius: 12px;
+  background: $white;
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.summaryLabel {
+  margin: 0;
+  color: $black;
+  font-size: 18px;
+}
+
+.summaryValue {
+  margin: 0;
+  color: $black;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.summaryValueAccent {
+  color: $primary-50;
+}
+
+.tabGroup {
+  margin-top: 18px;
+  display: inline-flex;
+  gap: 12px;
+}
+
+.tabButton {
+  border-radius: 10px;
+  padding: 0 20px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.tabButtonActive {
+  background: $primary-50;
+  color: $white;
+}
+
+.tabButtonInactive {
+  background: $gray-10;
+  color: $gray-60;
+  border: 1px solid transparent;
+}
+
+.tabButtonInactive:hover:not(:disabled) {
+  background: $gray-20;
+  color: $gray-70;
+}
+
+.tabButtonInactive:active:not(:disabled) {
+  background: $gray-30;
+  color: $gray-80;
+}
+
+.tablePanel {
+  margin-top: 18px;
+  border: 1px solid $gray-20;
+  border-radius: 12px;
+  background: $white;
+  min-height: 560px;
+}
+
+.tableHead {
+  display: grid;
+  gap: 12px;
+  padding: 18px 28px 12px;
+  border-bottom: 1px solid $gray-20;
+  color: $black;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tableHeadOrders {
+  grid-template-columns:
+    minmax(80px, 0.9fr) minmax(80px, 0.9fr) minmax(100px, 1.1fr) minmax(260px, 3fr) minmax(100px, 1.1fr)
+    minmax(100px, 1.1fr);
+}
+
+.tableHeadMenus {
+  grid-template-columns: minmax(360px, 1fr) 140px 140px;
+}
+
+.tableBody {
+  padding: 4px 28px 28px;
+  overflow-x: auto;
+}
+
+.orderRow {
+  display: grid;
+  grid-template-columns:
+    minmax(80px, 0.9fr) minmax(80px, 0.9fr) minmax(100px, 1.1fr) minmax(260px, 3fr) minmax(100px, 1.1fr)
+    minmax(100px, 1.1fr);
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid $gray-10;
+  color: $black;
+  font-size: 16px;
+  line-height: 1.45;
+  min-width: 0;
+  align-items: center;
+}
+
+.tableHeadOrders > span {
+  text-align: center;
+  justify-self: center;
+}
+
+.orderRow > span:not(:nth-child(4)) {
+  text-align: center;
+  justify-self: center;
+}
+
+.menuChartPanel {
+  margin-top: 18px;
+  // border: 1px solid $gray-20;
+  border-radius: 12px;
+  background: $white;
+  padding: 30px 0 40px 0;
+}
+
+.menuCell {
+  white-space: normal;
+  min-width: 0;
+  text-align: left;
+  justify-self: stretch;
+  overflow-wrap: anywhere;
+}
+
+.emptyState {
+  min-height: 430px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: $gray-60;
+  font-size: 16px;
+}
+
+@media (max-width: 640px) {
+  .storeStatistics {
+    padding: 46px 48px 72px;
+  }
+
+  .periodButton,
+  .dateText,
+  .dateRangeMark {
+    font-size: 18px;
+  }
+
+  .summaryLabel {
+    font-size: 16px;
+  }
+
+  .summaryValue {
+    font-size: 34px;
+  }
+
+  .tabButton {
+    font-size: 16px;
+  }
+
+  .tableHead,
+  .orderRow {
+    font-size: 16px;
+  }
+
+  .emptyState {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .storeStatistics {
+    padding: 40px 20px 64px;
+  }
+
+  .filterBar {
+    min-height: 62px;
+    padding: 0 14px;
+    gap: 10px;
+    overflow-x: auto;
+  }
+
+  .customDateRange {
+    gap: 8px;
+  }
+
+  .dateInput {
+    height: 36px;
+    min-width: 140px;
+  }
+
+  .periodDivider {
+    height: 20px;
+  }
+
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .summaryCard {
+    min-height: 128px;
+  }
+
+  .tabGroup {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tabButton {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .menuChartPanel {
+    min-height: 420px;
+    padding: 20px 14px;
+    overflow-x: auto;
+  }
+}
