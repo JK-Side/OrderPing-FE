@@ -185,29 +185,31 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
           <div className={styles.memoSection}>
             <div className={styles.memoHeader}>
               <span className={styles.memoTitle}>테이블 메모</span>
-              <span className={`${styles.memoCount} ${isMemoTooLong ? styles.memoCountError : ''}`}>
-                {memo.length}/{MEMO_MAX_LENGTH}
-              </span>
+              <div className={styles.memoHeader}>
+                <span className={`${styles.memoCount} ${isMemoTooLong ? styles.memoCountError : ''}`}>
+                  {memo.length}/{MEMO_MAX_LENGTH}
+                </span>
+                <div className={styles.memoActions}>
+                  <Button
+                    type="button"
+                    className={styles.memoSaveButton}
+                    onClick={handleSaveMemo}
+                    disabled={isSavingMemo || !isMemoDirty || isMemoTooLong}
+                    isLoading={isSavingMemo}
+                  >
+                    저장
+                  </Button>
+                </div>
+              </div>
             </div>
             <textarea
               className={styles.memoInput}
               value={memo}
               onChange={handleMemoChange}
               maxLength={MEMO_MAX_LENGTH}
-              placeholder="손님 요청사항을 입력해 주세요."
+              placeholder="손님의 요청사항을 입력해 주세요."
               aria-label="테이블 메모"
             />
-            <div className={styles.memoActions}>
-              <Button
-                type="button"
-                className={styles.memoSaveButton}
-                onClick={handleSaveMemo}
-                disabled={isSavingMemo || !isMemoDirty || isMemoTooLong}
-                isLoading={isSavingMemo}
-              >
-                메모 저장
-              </Button>
-            </div>
           </div>
 
           <div className={styles['summary-group']}>
