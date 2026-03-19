@@ -1,4 +1,4 @@
-﻿import type { OrderDetailResponse, OrderLookupResponse, OrderMenuItem } from '@/api/order/entity';
+﻿import type { OrderDetailResponse, OrderLookupResponse, OrderMenuItem, OrderStatus } from '@/api/order/entity';
 import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import styles from './OrderDetailModal.module.scss';
@@ -9,10 +9,39 @@ interface OrderDetailModalProps {
   order: OrderLookupResponse | OrderDetailResponse | null;
   menus: OrderMenuItem[];
   onReject?: () => void;
+  onPrev?: () => void;
   onAccept?: () => void;
   isAccepting?: boolean;
+  isReverting?: boolean;
   isAcceptDisabled?: boolean;
 }
+
+type StatusActionConfig = {
+  prevLabel: string;
+  prevVariant: 'danger' | 'secondary';
+  prevAction: 'reject' | 'prev';
+  nextLabel?: string;
+};
+
+const STATUS_ACTION_CONFIG: Record<OrderStatus, StatusActionConfig> = {
+  PENDING: {
+    prevLabel: '거절',
+    prevVariant: 'danger',
+    prevAction: 'reject',
+    nextLabel: '수락',
+  },
+  COOKING: {
+    prevLabel: '이전',
+    prevVariant: 'secondary',
+    prevAction: 'prev',
+    nextLabel: '다음',
+  },
+  COMPLETE: {
+    prevLabel: '이전',
+    prevVariant: 'secondary',
+    prevAction: 'prev',
+  },
+};
 
 const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 
@@ -36,11 +65,17 @@ export default function OrderDetailModal({
   order,
   menus,
   onReject,
+  onPrev,
   onAccept,
   isAccepting = false,
+  isReverting = false,
   isAcceptDisabled = false,
 }: OrderDetailModalProps) {
   if (!order) return null;
+
+  const actionConfig = STATUS_ACTION_CONFIG[order.status];
+  const handlePrevClick = actionConfig.prevAction === 'reject' ? onReject : onPrev;
+  const isPrevAction = actionConfig.prevAction === 'prev';
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
@@ -108,18 +143,27 @@ export default function OrderDetailModal({
         </ModalBody>
         <ModalFooter className={styles.footer}>
           <div className={styles.footerButtons}>
-            <Button type="button" variant="danger" className={styles.footerButton} onClick={onReject}>
-              거절
-            </Button>
             <Button
               type="button"
+              variant={actionConfig.prevVariant}
               className={styles.footerButton}
-              onClick={onAccept}
-              disabled={isAcceptDisabled || isAccepting}
-              isLoading={isAccepting}
+              onClick={handlePrevClick}
+              isLoading={isPrevAction && isReverting}
+              disabled={isPrevAction && isReverting}
             >
-              수락
+              {actionConfig.prevLabel}
             </Button>
+            {!!actionConfig.nextLabel && (
+              <Button
+                type="button"
+                className={styles.footerButton}
+                onClick={onAccept}
+                disabled={isAcceptDisabled || isAccepting}
+                isLoading={isAccepting}
+              >
+                {actionConfig.nextLabel}
+              </Button>
+            )}
           </div>
         </ModalFooter>
       </ModalContent>
