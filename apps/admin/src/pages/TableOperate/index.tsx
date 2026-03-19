@@ -63,13 +63,7 @@ const resolveOrderStatuses = (rawStatus: TableResponse['orderStatus']) => {
 
 const hasIncompleteOrderOnTable = (table: TableResponse) => {
   const statuses = resolveOrderStatuses(table.orderStatus);
-  if (statuses.length > 0) {
-    return statuses.some((status) => status !== 'COMPLETE');
-  }
-
-  return (
-    (table.orderMenus?.length ?? 0) > 0 || (table.serviceMenus?.length ?? 0) > 0 || (table.totalOrderAmount ?? 0) > 0
-  );
+  return statuses.some((status) => status === 'PENDING' || status === 'COOKING');
 };
 
 const hasOrdersForTable = (table: TableResponse) =>
@@ -92,6 +86,7 @@ export default function TableOperate() {
 
   const { data: tables = [] } = useTablesByStore(storeId);
   const { mutateAsync: clearTables, isPending: isClearing } = useClearTables();
+  const { mutateAsync: clearTablesForDelete } = useClearTables();
   const { mutateAsync: deleteTables, isPending: isDeleting } = useDeleteTables();
   const { toast } = useToast();
 
@@ -199,8 +194,28 @@ export default function TableOperate() {
 
     const selectedTables = tables.filter((table) => selectedTableIds.includes(table.id));
     if (selectedTables.length === 0) return;
+    const hasOrderTables = selectedTables.some(hasIncompleteOrderOnTable);
+
+    if (hasOrderTables) {
+      toast({
+        message: 'PENDING 또는 COOKING 주문이 있는 테이블은 삭제할 수 없습니다.',
+        variant: 'error',
+      });
+      return;
+    }
 
     try {
+      const tablesNeedClearBeforeDelete = selectedTables.filter(
+        (table) => table.status !== 'CLOSED' && hasOrdersForTable(table),
+      );
+
+      if (tablesNeedClearBeforeDelete.length > 0) {
+        await clearTablesForDelete({
+          storeId,
+          tableNums: tablesNeedClearBeforeDelete.map((table) => table.tableNum),
+        });
+      }
+
       await deleteTables({
         storeId,
         tableNums: selectedTables.map((table) => table.tableNum),
@@ -216,7 +231,7 @@ export default function TableOperate() {
 
       const message =
         status === 400
-          ? '주문이 존재하는 테이블은 삭제할 수 없습니다.'
+          ? 'PENDING 또는 COOKING 주문이 있는 테이블은 삭제할 수 없습니다.'
           : status === 401
             ? '로그인이 필요한 기능입니다.'
             : status === 403
