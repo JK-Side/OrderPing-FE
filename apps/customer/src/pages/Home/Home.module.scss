@@ -20,7 +20,7 @@
     background-color: $primary-50;
     align-items: center;
     color: $white;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     cursor: pointer;
   }
@@ -116,9 +116,14 @@
 
   &__descriptionText {
     margin: 0;
+    min-width: 0;
+    flex: 1;
     color: $gray-70;
     font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-line;
     word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   &__tabStickyWrap {
@@ -155,7 +160,7 @@
     padding: 0 10px;
     color: $gray-60;
     border-bottom: 2px solid transparent;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
@@ -180,8 +185,8 @@
   &__sectionTitle {
     margin: 0 24px 8px;
     color: $black;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 600;
   }
 
   &__sectionDivider {
@@ -218,16 +223,21 @@
 
   &__menuTitleRow {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
   }
 
   &__menuName {
     margin: 0;
+    min-width: 0;
+    flex: 1;
     color: $black;
     font-size: 16px;
     font-weight: 600;
+    line-height: 1.4;
+    white-space: normal;
     word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   &__soldOutBadge {

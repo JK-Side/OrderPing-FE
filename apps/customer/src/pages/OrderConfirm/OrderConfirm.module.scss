@@ -62,7 +62,7 @@
       padding: 2px 10px;
       border-radius: 4px;
       background-color: $gray-10;
-      font-size: 14px;
+      font-size: 16px;
       align-items: center;
       text-align: center;
     }
@@ -84,11 +84,11 @@
     align-items: center;
     justify-content: space-between;
     color: $black;
-    font-size: 14px;
+    font-size: 16px;
   }
 
   &__summaryFinal {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     color: $red-50;
   }

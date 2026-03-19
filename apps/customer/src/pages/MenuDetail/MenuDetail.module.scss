@@ -59,13 +59,19 @@
     color: $black;
     font-size: 22px;
     font-weight: 700;
+    line-height: 1.4;
+    white-space: normal;
     word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   &__description {
     color: $gray-60;
     font-size: 16px;
+    line-height: 1.5;
+    white-space: pre-line;
     word-break: keep-all;
+    overflow-wrap: anywhere;
   }
 
   &__priceRow {
