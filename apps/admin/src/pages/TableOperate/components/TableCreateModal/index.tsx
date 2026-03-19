@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form';
-import type { AllTableListResponse, TableResponse } from '@/api/table/entity';
+import type { TableResponse } from '@/api/table/entity';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -33,6 +33,15 @@ type QrUploadEntry = QrUploadTarget & {
 
 type QrUploadEntryWithImage = QrUploadEntry & {
   qrImageUrl: string;
+};
+
+type ProgressPhase = 'idle' | 'creating' | 'qrGenerating' | 'qrSaving' | 'finalizing';
+
+const PROGRESS_PHASE_LABEL: Record<Exclude<ProgressPhase, 'idle'>, string> = {
+  creating: '테이블 생성 중입니다.',
+  qrGenerating: 'QR 코드 생성 중입니다.',
+  qrSaving: 'QR 정보를 저장 중입니다.',
+  finalizing: '거의 다 됐어요, 조금만 기다려 주세요!',
 };
 
 const createQrSvgMarkup = (value: string) => {
@@ -104,28 +113,22 @@ const resolveErrorMessage = (error: unknown) => {
 
 interface TableCreateModalProps {
   storeId?: number;
-  onCreated?: (tables: AllTableListResponse, layout: { columns: number; rows: number }) => void;
-  onLayoutSaved?: (layout: { columns: number; rows: number }) => void;
   name: string;
   hasActiveOrders?: boolean;
   onReset?: () => void;
   mode?: 'create' | 'edit';
   tables?: TableResponse[];
   initialValues?: {
-    tableColumns: number;
-    tableRows: number;
+    tableCount: number;
   } | null;
 }
 
 interface TableCreateForm {
-  tableColumns: string;
-  tableRows: string;
+  tableCount: string;
 }
 
 export default function TableCreateModal({
   storeId,
-  onCreated,
-  onLayoutSaved,
   name,
   hasActiveOrders = false,
   onReset,
@@ -134,6 +137,7 @@ export default function TableCreateModal({
   initialValues = null,
 }: TableCreateModalProps) {
   const [open, setOpen] = useState(false);
+  const [progressPhase, setProgressPhase] = useState<ProgressPhase>('idle');
   const [isUploadingQr, setIsUploadingQr] = useState(false);
   // const [isResettingTables, setIsResettingTables] = useState(false);
   const [retryEntries, setRetryEntries] = useState<QrUploadEntry[]>([]);
@@ -155,50 +159,45 @@ export default function TableCreateModal({
   } = useForm<TableCreateForm>({
     mode: 'onChange',
     defaultValues: {
-      tableColumns: '',
-      tableRows: '',
+      tableCount: '',
     },
   });
 
   const getInitialFormValues = (): TableCreateForm => {
     if (!initialValues) {
       return {
-        tableColumns: '',
-        tableRows: '',
+        tableCount: '',
       };
     }
 
     return {
-      tableColumns: String(initialValues.tableColumns),
-      tableRows: String(initialValues.tableRows),
+      tableCount: String(initialValues.tableCount),
     };
   };
 
-  const watchedTableColumns = useWatch({ control, name: 'tableColumns' });
-  const watchedTableRows = useWatch({ control, name: 'tableRows' });
-  const parsedTableColumns = Number(watchedTableColumns);
-  const parsedTableRows = Number(watchedTableRows);
-  const derivedTableCount =
-    Number.isFinite(parsedTableColumns) &&
-    Number.isFinite(parsedTableRows) &&
-    parsedTableColumns > 0 &&
-    parsedTableRows > 0
-      ? parsedTableColumns * parsedTableRows
-      : 0;
+  const watchedTableCount = useWatch({ control, name: 'tableCount' });
+  const parsedTableCount = Number(watchedTableCount);
+  const normalizedTableCount = Number.isFinite(parsedTableCount) && parsedTableCount > 0 ? parsedTableCount : 0;
   const isEditMode = mode === 'edit';
+  const isProgressActive = progressPhase !== 'idle';
+  const progressMessage = progressPhase === 'idle' ? '' : PROGRESS_PHASE_LABEL[progressPhase];
   const isLayoutUnchanged =
-    isEditMode &&
-    !!initialValues &&
-    Number(watchedTableColumns) === initialValues.tableColumns &&
-    Number(watchedTableRows) === initialValues.tableRows;
+    isEditMode && !!initialValues && Number(watchedTableCount) === initialValues.tableCount;
+
+  const closeModal = () => {
+    setProgressPhase('idle');
+    setOpen(false);
+  };
 
   const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen && isProgressActive) return;
     setOpen(nextOpen);
     if (nextOpen) {
       reset(getInitialFormValues());
       setRetryEntries([]);
       setRetryMessage(null);
       setIsUploadingQr(false);
+      setProgressPhase('idle');
     }
   };
 
@@ -284,11 +283,9 @@ export default function TableCreateModal({
     if (retryEntries.length > 0) return;
 
     try {
-      const tableColumns = Number(data.tableColumns);
-      const tableRows = Number(data.tableRows);
-      const tableCount = tableColumns * tableRows;
+      const tableCount = Number(data.tableCount);
 
-      if (!Number.isFinite(tableColumns) || !Number.isFinite(tableRows) || tableColumns <= 0 || tableRows <= 0) {
+      if (!Number.isFinite(tableCount) || tableCount <= 0) {
         toast({
           message: '테이블 수를 다시 확인해 주세요.',
           variant: 'error',
@@ -316,6 +313,7 @@ export default function TableCreateModal({
         }
 
         setIsUploadingQr(true);
+        setProgressPhase('qrGenerating');
         const targets = sortedTables.map((table) => ({
           id: table.id,
           storeId: table.storeId,
@@ -323,11 +321,12 @@ export default function TableCreateModal({
         }));
 
         const { succeeded, failed } = await uploadQrImages(targets);
+        setProgressPhase('qrSaving');
         const updateFailures = await updateQrImagesByTable(succeeded);
         const pendingRetries = [...failed, ...updateFailures];
 
+        setProgressPhase('finalizing');
         await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
-        onLayoutSaved?.({ columns: tableColumns, rows: tableRows });
 
         if (pendingRetries.length > 0) {
           const message = buildRetryMessage(failed.length, updateFailures.length);
@@ -344,17 +343,19 @@ export default function TableCreateModal({
             message: '테이블이 업데이트 되었습니다.',
             variant: 'info',
           });
-          setOpen(false);
+          closeModal();
         }
         return;
       }
 
       setIsUploadingQr(true);
+      setProgressPhase('creating');
       const createdTables = await createAllTables({
         storeId,
         count: tableCount,
       });
 
+      setProgressPhase('qrGenerating');
       const targets = createdTables.map((table) => ({
         id: table.id,
         storeId: table.storeId,
@@ -362,12 +363,12 @@ export default function TableCreateModal({
       }));
 
       const { succeeded, failed } = await uploadQrImages(targets);
+      setProgressPhase('qrSaving');
       const updateFailures = await updateQrImages(succeeded);
       const pendingRetries = [...failed, ...updateFailures];
 
+      setProgressPhase('finalizing');
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
-      onCreated?.(createdTables, { columns: tableColumns, rows: tableRows });
-      onLayoutSaved?.({ columns: tableColumns, rows: tableRows });
 
       if (pendingRetries.length > 0) {
         const message = buildRetryMessage(failed.length, updateFailures.length);
@@ -384,7 +385,7 @@ export default function TableCreateModal({
           message: '테이블이 생성되었습니다.',
           variant: 'info',
         });
-        setOpen(false);
+        closeModal();
       }
     } catch (error) {
       toast({
@@ -394,6 +395,7 @@ export default function TableCreateModal({
       console.error('Failed to create table', error);
     } finally {
       setIsUploadingQr(false);
+      setProgressPhase('idle');
     }
   };
 
@@ -405,14 +407,19 @@ export default function TableCreateModal({
 
       const alreadyUploaded = retryEntries.filter((entry) => entry.qrImageUrl) as QrUploadEntryWithImage[];
       const needsUpload = retryEntries.filter((entry) => !entry.qrImageUrl);
+      if (needsUpload.length > 0) {
+        setProgressPhase('qrGenerating');
+      }
       const { succeeded, failed } =
         needsUpload.length > 0 ? await uploadQrImages(needsUpload) : { succeeded: [], failed: [] };
 
       const updateTargets = [...alreadyUploaded, ...succeeded];
+      setProgressPhase('qrSaving');
       const updateFailures = await (isEditMode ? updateQrImagesByTable(updateTargets) : updateQrImages(updateTargets));
       const pendingRetries = [...failed, ...updateFailures];
 
       if (updateTargets.length > 0) {
+        setProgressPhase('finalizing');
         await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       }
 
@@ -431,7 +438,7 @@ export default function TableCreateModal({
           message: 'QR 업로드가 완료되었습니다.',
           variant: 'info',
         });
-        setOpen(false);
+        closeModal();
       }
     } catch (error) {
       toast({
@@ -441,6 +448,7 @@ export default function TableCreateModal({
       console.error('Failed to retry QR upload', error);
     } finally {
       setIsUploadingQr(false);
+      setProgressPhase('idle');
     }
   };
 
@@ -540,109 +548,89 @@ export default function TableCreateModal({
           {name}
         </Button>
       </ModalTrigger>
-      <ModalContent>
-        <ModalHeader>
+      <ModalContent
+        onEscapeKeyDown={(event) => {
+          if (isProgressActive) event.preventDefault();
+        }}
+        onInteractOutside={(event) => {
+          if (isProgressActive) event.preventDefault();
+        }}
+      >
+        <ModalHeader showClose={!isProgressActive}>
           <ModalTitle>{name}</ModalTitle>
         </ModalHeader>
         <form onSubmit={handleSubmit(handleSubmitForm)}>
           <ModalBody>
-            <div className={styles.form}>
-              {/* <Input
-                label="테이블 수"
-                required
-                message={errors.tableCount?.message}
-                messageState={errors.tableCount ? 'error' : undefined}
-              >
-                <Input.Text
-                  type="text"
-                  inputMode="numeric"
-                  readOnly={isEditMode}
-                  aria-readonly={isEditMode}
-                  tabIndex={isEditMode ? -1 : undefined}
-                  className={isEditMode ? styles.readonlyInput : undefined}
-                  onFocus={isEditMode ? (event) => event.currentTarget.blur() : undefined}
-                  placeholder="숫자만 입력하세요."
-                  {...register('tableCount', {
-                    required: '테이블 수를 입력해 주세요.',
-                    pattern: {
-                      value: REGEX.NUMBER_ONLY,
-                      message: MESSAGES.MENU.NUMBER_ONLY,
-                    },
-                  })}
-                />
-              </Input> */}
-              <Input
-                label="테이블 열 (가로)"
-                required
-                message={errors.tableColumns?.message}
-                messageState={errors.tableColumns ? 'error' : undefined}
-              >
-                <Input.Text
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="숫자만 입력하세요."
-                  {...register('tableColumns', {
-                    required: '테이블 열을 입력해 주세요.',
-                    pattern: {
-                      value: REGEX.NUMBER_ONLY,
-                      message: MESSAGES.MENU.NUMBER_ONLY,
-                    },
-                  })}
-                />
-              </Input>
-              <Input
-                label="테이블 행 (세로)"
-                required
-                message={errors.tableRows?.message}
-                messageState={errors.tableRows ? 'error' : undefined}
-              >
-                <Input.Text
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="숫자만 입력하세요."
-                  {...register('tableRows', {
-                    required: '테이블 행을 입력해 주세요.',
-                    pattern: {
-                      value: REGEX.NUMBER_ONLY,
-                      message: MESSAGES.MENU.NUMBER_ONLY,
-                    },
-                  })}
-                />
-              </Input>
-            </div>
-            {retryMessage ? (
-              <div className={styles.retryNotice} role="status" aria-live="polite">
-                <span className={styles.retryText}>{retryMessage}</span>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className={styles.retryButton}
-                  disabled={isUploadingQr}
-                  onClick={handleRetry}
-                >
-                  재시도
-                </Button>
+            {isProgressActive ? (
+              <div className={styles.progressPanel} role="status" aria-live="polite">
+                <div className={styles.progressSpinner} aria-hidden="true" />
+                <p className={styles.progressTitle}>{progressMessage}</p>
+                <p className={styles.progressDescription}>작업 중에는 창을 닫지 말고 잠시 기다려 주세요.</p>
               </div>
-            ) : null}
+            ) : (
+              <>
+                <div className={styles.form}>
+                  <Input
+                    label="테이블 수"
+                    required
+                    message={errors.tableCount?.message}
+                    messageState={errors.tableCount ? 'error' : undefined}
+                  >
+                    <Input.Text
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="숫자만 입력하세요."
+                      {...register('tableCount', {
+                        required: '테이블 수를 입력해 주세요.',
+                        pattern: {
+                          value: REGEX.NUMBER_ONLY,
+                          message: MESSAGES.MENU.NUMBER_ONLY,
+                        },
+                      })}
+                    />
+                  </Input>
+                </div>
+                {retryMessage ? (
+                  <div className={styles.retryNotice} role="status" aria-live="polite">
+                    <span className={styles.retryText}>{retryMessage}</span>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className={styles.retryButton}
+                      disabled={isUploadingQr}
+                      onClick={handleRetry}
+                    >
+                      재시도
+                    </Button>
+                  </div>
+                ) : null}
+              </>
+            )}
           </ModalBody>
           <ModalFooter>
-            <Button
-              type="submit"
-              size="md"
-              fullWidth
-              disabled={
-                !isValid ||
-                isSubmitting ||
-                isUploadingQr ||
-                retryEntries.length > 0 ||
-                isLayoutUnchanged ||
-                derivedTableCount <= 0
-              }
-              isLoading={isPending || isUploadingQr || isUpdatingTableQrImage}
-            >
-              {`테이블 ${derivedTableCount}개 ${isEditMode ? '수정' : '생성'}`}
-            </Button>
+            {isProgressActive ? (
+              <Button type="button" size="md" fullWidth disabled isLoading>
+                {progressMessage}
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                size="md"
+                fullWidth
+                disabled={
+                  !isValid ||
+                  isSubmitting ||
+                  isUploadingQr ||
+                  retryEntries.length > 0 ||
+                  isLayoutUnchanged ||
+                  normalizedTableCount <= 0
+                }
+                isLoading={isPending || isUploadingQr || isUpdatingTableQrImage}
+              >
+                {`테이블 ${normalizedTableCount}개 ${isEditMode ? '수정' : '생성'}`}
+              </Button>
+            )}
             {/* {!isEditMode ? (
             <Button
               type="button"

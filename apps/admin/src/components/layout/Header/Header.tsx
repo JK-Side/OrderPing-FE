@@ -19,6 +19,7 @@ export default function Header() {
   const isStoreStartPage = /^\/store\/[^/]+\/(start|qr-print)/.test(pathname);
   const isStoreOrdersPage = /^\/store\/[^/]+\/orders/.test(pathname);
   const isStoreStatisticsPage = /^\/store\/[^/]+\/statistics/.test(pathname);
+  const isStoreMenuPage = /^\/store\/operate\/[^/]+/.test(pathname);
   const menuManagePath = storeId ? `/store/operate/${storeId}` : '/';
   const orderManagePath = storeId ? `/store/${storeId}/orders` : '/';
   const tableManagePath = storeId ? `/store/${storeId}/start` : '/';
@@ -49,7 +50,7 @@ export default function Header() {
       <nav className={styles.nav}>
         {!isAuthHeaderPage ? (
           <>
-            <Link to={menuManagePath} className={styles.navItem}>
+            <Link to={menuManagePath} className={`${styles.navItem} ${isStoreMenuPage ? styles.navItemActive : ''}`}>
               메뉴 관리
             </Link>
             <Link to={orderManagePath} className={`${styles.navItem} ${isStoreOrdersPage ? styles.navItemActive : ''}`}>

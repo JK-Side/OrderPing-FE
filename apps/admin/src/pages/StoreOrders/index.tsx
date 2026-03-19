@@ -348,7 +348,7 @@ export default function StoreOrders() {
             <div className={styles.sectionDivider} />
 
             {section.orders.length === 0 ? (
-              <div className={styles.emptyState}>No {section.emptyLabel} orders.</div>
+              <div className={styles.emptyState}>주문이 없습니다.</div>
             ) : (
               <div className={styles.cardGrid}>
                 {section.orders.map((order) => {

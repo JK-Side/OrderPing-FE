@@ -24,5 +24,6 @@ export const useOrdersByStore = (storeId?: number) => {
       }));
     },
     enabled: !!token && !!storeId,
+    refetchInterval: 5000,
   });
 };

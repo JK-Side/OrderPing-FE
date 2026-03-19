@@ -23,21 +23,11 @@ function getValue(value?: string | number | null) {
 
 interface StoreInfoCardProps {
   store: MyPageStore;
-  showWithdrawButton: boolean;
-  canWithdraw: boolean;
-  onWithdrawClick: () => void;
   onStoreDeleteClick: (store: MyPageStore) => void;
   isActionPending: boolean;
 }
 
-function StoreInfoCard({
-  store,
-  showWithdrawButton,
-  canWithdraw,
-  onWithdrawClick,
-  onStoreDeleteClick,
-  isActionPending,
-}: StoreInfoCardProps) {
+function StoreInfoCard({ store, onStoreDeleteClick, isActionPending }: StoreInfoCardProps) {
   return (
     <>
       <article className={styles.card}>
@@ -69,7 +59,18 @@ function StoreInfoCard({
       <article className={styles.card}>
         <div className={styles.cardHeader}>
           <h2 className={styles.cardTitle}>주점 정보</h2>
-          <StoreSettingsModal store={store} className={styles.infoFixButton} />
+          <div className={styles.cardSetting}>
+            <StoreSettingsModal store={store} className={styles.infoFixButton} />
+            <Button
+              type="button"
+              variant="danger"
+              className={styles.dangerActionButton}
+              onClick={() => onStoreDeleteClick(store)}
+              disabled={isActionPending}
+            >
+              주점 삭제
+            </Button>
+          </div>
         </div>
 
         <div className={styles.cardBody}>
@@ -87,28 +88,6 @@ function StoreInfoCard({
           </section>
         </div>
       </article>
-      <div className={styles.dangerActions}>
-        {showWithdrawButton ? (
-          <Button
-            type="button"
-            variant="ghost"
-            className={styles.dangerActionButton}
-            onClick={onWithdrawClick}
-            disabled={isActionPending || !canWithdraw}
-          >
-            회원 탈퇴
-          </Button>
-        ) : null}
-        <Button
-          type="button"
-          variant="danger"
-          className={styles.dangerActionButton}
-          onClick={() => onStoreDeleteClick(store)}
-          disabled={isActionPending}
-        >
-          주점 삭제
-        </Button>
-      </div>
     </>
   );
 }
@@ -290,18 +269,26 @@ export default function MyPage() {
           {!isPending && isError ? <ErrorState error={error} /> : null}
           {!isPending && !isError && stores.length === 0 ? <EmptyState /> : null}
           {!isPending && !isError
-            ? stores.map((store, index) => (
+            ? stores.map((store) => (
                 <StoreInfoCard
                   key={store.storeId}
                   store={store}
-                  showWithdrawButton={index === 0}
-                  canWithdraw={!!userId}
-                  onWithdrawClick={() => setIsDeleteUserModalOpen(true)}
                   onStoreDeleteClick={setDeleteTargetStore}
                   isActionPending={isDangerActionPending}
                 />
               ))
             : null}
+          <div className={styles.dangerActions}>
+            <Button
+              type="button"
+              variant="danger"
+              className={styles.dangerActionButton}
+              onClick={() => setIsDeleteUserModalOpen(true)}
+              disabled={isDangerActionPending || !userId}
+            >
+              회원 탈퇴
+            </Button>
+          </div>
         </section>
       </div>
 
