@@ -83,7 +83,7 @@ export default function OrderDetailModal({
         <ModalHeader>
           <div className={styles.headerContent}>
             <span className={styles.orderBadge}>주문번호 {order.id}</span>
-            <ModalTitle className={styles.tableTitle}>{formatTableLabel(order.tableId)}</ModalTitle>
+            <ModalTitle className={styles.tableTitle}>{formatTableLabel(order.tableNum)}</ModalTitle>
           </div>
         </ModalHeader>
         <ModalBody className={styles.body}>
