@@ -38,6 +38,7 @@
   padding: 4px 12px;
   background-color: $gray-10;
   border-radius: 999px;
+  max-width: 120px;
 }
 
 .title {
@@ -107,6 +108,11 @@
   font-weight: 700;
 }
 
+.cardSetting {
+  display: flex;
+  gap: 8px;
+}
+
 .storeMeta {
   color: $gray-50;
   font-size: 14px;
@@ -131,7 +137,7 @@
 }
 
 .dangerActionButton {
-  min-width: 120px;
+  min-width: 104px;
 }
 
 .infoGroup {
