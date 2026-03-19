@@ -69,6 +69,8 @@ export default function MenuEdit() {
   const menuPrice = useWatch({ control, name: 'price' });
   const menuStock = useWatch({ control, name: 'stock' });
   const categoryId = useWatch({ control, name: 'categoryId' });
+  const menuDescription = useWatch({ control, name: 'description' });
+  const menuImage = useWatch({ control, name: 'menuImage' });
 
   const isPriceFormatError = errors.price?.message === MESSAGES.MENU.NUMBER_ONLY;
   const isStockFormatError = errors.stock?.message === MESSAGES.MENU.NUMBER_ONLY;
@@ -91,6 +93,14 @@ export default function MenuEdit() {
     isStockValid &&
     isCategoryValid &&
     !hasErrors;
+  const isFormChanged =
+    !!menuDetail &&
+    (menuName?.trim() !== menuDetail.name.trim() ||
+      Number(menuPrice) !== menuDetail.price ||
+      Number(menuStock) !== menuDetail.stock ||
+      categoryId !== menuDetail.categoryId ||
+      (menuDescription ?? '').trim() !== (menuDetail.description ?? '').trim() ||
+      !!menuImage?.length);
 
   const handleCancel = () => {
     if (storeId) {
@@ -129,7 +139,6 @@ export default function MenuEdit() {
         message: errorMessage,
         variant: 'error',
       });
-      console.error('Failed to delete menu', error);
     } finally {
       setIsDeleteOpen(false);
     }
@@ -154,7 +163,7 @@ export default function MenuEdit() {
         directory: 'menus',
         fileName: file.name,
         file,
-        errorMessage: 'Failed to upload menu image.',
+        errorMessage: '메뉴 이미지 업로드에 실패했습니다.',
       });
     },
     [menuDetail?.imageUrl, upload],
@@ -264,7 +273,7 @@ export default function MenuEdit() {
                 placeholder="내용을 입력해 주세요."
                 {...register('name', {
                   required: '메뉴명을 입력해 주세요.',
-                  maxLength: { value: 20, message: '\uba54\ub274\uba85\uc740 \ucd5c\ub300 20\uc790\uc785\ub2c8\ub2e4.' },
+                  maxLength: { value: 20, message: '메뉴명은 최대 20자입니다.' },
                 })}
               />
             </Input>
@@ -354,7 +363,7 @@ export default function MenuEdit() {
               <Input.TextArea
                 placeholder={`예시) 사랑의 티니핑 월드에 빠져버린 맛,\n둘이 먹다 죽어도 난 몰라요.\n저는 그저 티니핑 월드에 갈 것이에요.`}
                 {...register('description', {
-                  maxLength: { value: 30, message: '\uba54\ub274 \uc124\uba85\uc740 \ucd5c\ub300 30\uc790\uc785\ub2c8\ub2e4.' },
+                  maxLength: { value: 30, message: '메뉴 설명은 최대 30자입니다.' },
                 })}
               />
             </Input>
@@ -365,7 +374,12 @@ export default function MenuEdit() {
           <Button type="button" variant="ghost" className={styles.cancelButton} onClick={handleCancel}>
             취소
           </Button>
-          <Button type="submit" size="md" className={styles.submitButton} disabled={!canSubmit || isSubmitting}>
+          <Button
+            type="submit"
+            size="md"
+            className={styles.submitButton}
+            disabled={!canSubmit || isSubmitting || !isFormChanged}
+          >
             수정 완료
           </Button>
         </div>
