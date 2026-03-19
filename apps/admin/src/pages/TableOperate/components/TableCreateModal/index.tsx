@@ -112,14 +112,12 @@ interface TableCreateModalProps {
   mode?: 'create' | 'edit';
   tables?: TableResponse[];
   initialValues?: {
-    tableColumns: number;
-    tableRows: number;
+    tableCount: number;
   } | null;
 }
 
 interface TableCreateForm {
-  tableColumns: string;
-  tableRows: string;
+  tableCount: string;
 }
 
 export default function TableCreateModal({
@@ -155,42 +153,28 @@ export default function TableCreateModal({
   } = useForm<TableCreateForm>({
     mode: 'onChange',
     defaultValues: {
-      tableColumns: '',
-      tableRows: '',
+      tableCount: '',
     },
   });
 
   const getInitialFormValues = (): TableCreateForm => {
     if (!initialValues) {
       return {
-        tableColumns: '',
-        tableRows: '',
+        tableCount: '',
       };
     }
 
     return {
-      tableColumns: String(initialValues.tableColumns),
-      tableRows: String(initialValues.tableRows),
+      tableCount: String(initialValues.tableCount),
     };
   };
 
-  const watchedTableColumns = useWatch({ control, name: 'tableColumns' });
-  const watchedTableRows = useWatch({ control, name: 'tableRows' });
-  const parsedTableColumns = Number(watchedTableColumns);
-  const parsedTableRows = Number(watchedTableRows);
-  const derivedTableCount =
-    Number.isFinite(parsedTableColumns) &&
-    Number.isFinite(parsedTableRows) &&
-    parsedTableColumns > 0 &&
-    parsedTableRows > 0
-      ? parsedTableColumns * parsedTableRows
-      : 0;
+  const watchedTableCount = useWatch({ control, name: 'tableCount' });
+  const parsedTableCount = Number(watchedTableCount);
+  const normalizedTableCount = Number.isFinite(parsedTableCount) && parsedTableCount > 0 ? parsedTableCount : 0;
   const isEditMode = mode === 'edit';
   const isLayoutUnchanged =
-    isEditMode &&
-    !!initialValues &&
-    Number(watchedTableColumns) === initialValues.tableColumns &&
-    Number(watchedTableRows) === initialValues.tableRows;
+    isEditMode && !!initialValues && Number(watchedTableCount) === initialValues.tableCount;
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -284,11 +268,11 @@ export default function TableCreateModal({
     if (retryEntries.length > 0) return;
 
     try {
-      const tableColumns = Number(data.tableColumns);
-      const tableRows = Number(data.tableRows);
-      const tableCount = tableColumns * tableRows;
+      const tableCount = Number(data.tableCount);
+      const tableColumns = 1;
+      const tableRows = tableCount;
 
-      if (!Number.isFinite(tableColumns) || !Number.isFinite(tableRows) || tableColumns <= 0 || tableRows <= 0) {
+      if (!Number.isFinite(tableCount) || tableCount <= 0) {
         toast({
           message: '테이블 수를 다시 확인해 주세요.',
           variant: 'error',
@@ -547,7 +531,7 @@ export default function TableCreateModal({
         <form onSubmit={handleSubmit(handleSubmitForm)}>
           <ModalBody>
             <div className={styles.form}>
-              {/* <Input
+              <Input
                 label="테이블 수"
                 required
                 message={errors.tableCount?.message}
@@ -556,52 +540,9 @@ export default function TableCreateModal({
                 <Input.Text
                   type="text"
                   inputMode="numeric"
-                  readOnly={isEditMode}
-                  aria-readonly={isEditMode}
-                  tabIndex={isEditMode ? -1 : undefined}
-                  className={isEditMode ? styles.readonlyInput : undefined}
-                  onFocus={isEditMode ? (event) => event.currentTarget.blur() : undefined}
                   placeholder="숫자만 입력하세요."
                   {...register('tableCount', {
                     required: '테이블 수를 입력해 주세요.',
-                    pattern: {
-                      value: REGEX.NUMBER_ONLY,
-                      message: MESSAGES.MENU.NUMBER_ONLY,
-                    },
-                  })}
-                />
-              </Input> */}
-              <Input
-                label="테이블 열 (가로)"
-                required
-                message={errors.tableColumns?.message}
-                messageState={errors.tableColumns ? 'error' : undefined}
-              >
-                <Input.Text
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="숫자만 입력하세요."
-                  {...register('tableColumns', {
-                    required: '테이블 열을 입력해 주세요.',
-                    pattern: {
-                      value: REGEX.NUMBER_ONLY,
-                      message: MESSAGES.MENU.NUMBER_ONLY,
-                    },
-                  })}
-                />
-              </Input>
-              <Input
-                label="테이블 행 (세로)"
-                required
-                message={errors.tableRows?.message}
-                messageState={errors.tableRows ? 'error' : undefined}
-              >
-                <Input.Text
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="숫자만 입력하세요."
-                  {...register('tableRows', {
-                    required: '테이블 행을 입력해 주세요.',
                     pattern: {
                       value: REGEX.NUMBER_ONLY,
                       message: MESSAGES.MENU.NUMBER_ONLY,
@@ -637,11 +578,11 @@ export default function TableCreateModal({
                 isUploadingQr ||
                 retryEntries.length > 0 ||
                 isLayoutUnchanged ||
-                derivedTableCount <= 0
+                normalizedTableCount <= 0
               }
               isLoading={isPending || isUploadingQr || isUpdatingTableQrImage}
             >
-              {`테이블 ${derivedTableCount}개 ${isEditMode ? '수정' : '생성'}`}
+              {`테이블 ${normalizedTableCount}개 ${isEditMode ? '수정' : '생성'}`}
             </Button>
             {/* {!isEditMode ? (
             <Button

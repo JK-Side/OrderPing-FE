@@ -18,37 +18,8 @@ import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
 
 const ORDER_STATUS_PRIORITY = ['PENDING', 'COOKING', 'COMPLETE'] as const;
-type TableLayout = { columns: number; rows: number };
 
 const formatTableName = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
-const getLayoutStorageKey = (storeId: number) => `table-layout:${storeId}`;
-const parseStoredLayout = (value: string | null) => {
-  if (!value) return null;
-  try {
-    const parsed = JSON.parse(value) as { columns?: number; rows?: number };
-    if (
-      typeof parsed?.columns === 'number' &&
-      typeof parsed?.rows === 'number' &&
-      parsed.columns > 0 &&
-      parsed.rows > 0
-    ) {
-      return { columns: parsed.columns, rows: parsed.rows };
-    }
-  } catch {
-    return null;
-  }
-  return null;
-};
-
-const createFallbackLayout = (tableCount: number): TableLayout | null => {
-  if (tableCount <= 0) return null;
-  const columns = Math.ceil(Math.sqrt(tableCount));
-  const rows = Math.ceil(tableCount / columns);
-  return { columns, rows };
-};
-
-const isLayoutMatchedToTableCount = (layout: TableLayout | null, tableCount: number) =>
-  !!layout && layout.columns > 0 && layout.rows > 0 && layout.columns * layout.rows === tableCount;
 
 const resolvePriorityOrderStatus = (rawStatus: TableResponse['orderStatus']) => {
   if (!rawStatus) return undefined;
@@ -82,8 +53,6 @@ export default function TableOperate() {
   const parsedId = id ? Number(id) : undefined;
   const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
 
-  const [layoutOverride, setLayoutOverride] = useState<{ storeId?: number; layout: TableLayout | null } | null>(null);
-
   const { data: tables = [] } = useTablesByStore(storeId);
   const { mutateAsync: clearTables, isPending: isClearing } = useClearTables();
   const { mutateAsync: clearTablesForDelete } = useClearTables();
@@ -103,31 +72,6 @@ export default function TableOperate() {
   const selectableTableIds = sortedTables.map((table) => table.id);
   const isAllSelected =
     selectableTableIds.length > 0 && selectableTableIds.every((tableId) => selectedTableIds.includes(tableId));
-
-  const storedTableLayout =
-    storeId && typeof window !== 'undefined'
-      ? parseStoredLayout(localStorage.getItem(getLayoutStorageKey(storeId)))
-      : null;
-  const hasLayoutOverrideForStore = layoutOverride !== null && layoutOverride.storeId === storeId;
-  const tableLayout = hasLayoutOverrideForStore ? layoutOverride.layout : storedTableLayout;
-
-  const fallbackLayout = createFallbackLayout(tables.length);
-  const resolvedTableLayout = isLayoutMatchedToTableCount(tableLayout, tables.length) ? tableLayout : fallbackLayout;
-
-  const useGridLayout =
-    !!resolvedTableLayout && resolvedTableLayout.columns > 0 && resolvedTableLayout.rows > 0 && tables.length > 0;
-  const tableGridStyle = useGridLayout
-    ? {
-        gridTemplateColumns: `repeat(${resolvedTableLayout.columns}, minmax(220px, 300px))`,
-        gridTemplateRows: `repeat(${resolvedTableLayout.rows}, 222px)`,
-      }
-    : undefined;
-
-  const handleLayoutSave = (layout: { columns: number; rows: number }) => {
-    if (!storeId || typeof window === 'undefined') return;
-    setLayoutOverride({ storeId, layout });
-    localStorage.setItem(getLayoutStorageKey(storeId), JSON.stringify(layout));
-  };
 
   const handleToggleSelect = (tableId: number) => {
     setSelectedTableIds((prev) => (prev.includes(tableId) ? prev.filter((id) => id !== tableId) : [...prev, tableId]));
@@ -344,16 +288,14 @@ export default function TableOperate() {
               </Button>
               <TableCreateModal
                 storeId={storeId}
-                onLayoutSaved={handleLayoutSave}
                 hasActiveOrders={hasActiveOrders}
                 name={tableButtonLabel}
                 mode={hasTables ? 'edit' : 'create'}
                 tables={sortedTables}
                 initialValues={
-                  hasTables && resolvedTableLayout
+                  hasTables
                     ? {
-                        tableColumns: resolvedTableLayout.columns,
-                        tableRows: resolvedTableLayout.rows,
+                        tableCount: tables.length,
                       }
                     : null
                 }
@@ -366,10 +308,7 @@ export default function TableOperate() {
 
         {hasTables ? (
           <div className={styles.orderPreviewScroll}>
-            <div
-              className={`${styles.orderPreview} ${useGridLayout ? styles.orderPreviewGrid : ''}`}
-              style={tableGridStyle}
-            >
+            <div className={styles.orderPreview}>
               {sortedTables.map((table: TableResponse) => {
                 const hasOrders = hasOrdersForTable(table);
                 const isEmpty = !hasOrders;
