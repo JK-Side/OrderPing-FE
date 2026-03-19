@@ -80,7 +80,7 @@
   &__itemName {
     color: $black;
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -88,8 +88,8 @@
 
   &__itemPrice {
     color: $black;
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 20px;
+    font-weight: 600;
   }
 
   &__quantityControl {
@@ -104,7 +104,6 @@
     color: $primary-50;
     background-color: $white;
     font-size: 16px;
-    font-weight: 600;
     cursor: pointer;
   }
 

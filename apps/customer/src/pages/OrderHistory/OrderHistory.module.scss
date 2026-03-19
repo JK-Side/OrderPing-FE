@@ -13,21 +13,22 @@
   }
 
   &__hero {
-    padding: 12px 4px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 20px;
   }
 
   &__title {
-    margin: 0;
     color: $black;
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 600;
   }
 
   &__summary {
-    margin: 16px 0 0;
     color: $black;
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
   }
 
   &__status {
@@ -41,8 +42,11 @@
   }
 
   &__orderCard {
-    padding: 22px 4px 18px;
+    padding: 18px 4px;
     border-top: 1px solid $gray-10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   &__orderHeader {
@@ -50,11 +54,12 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    margin-bottom: 4px;
   }
 
   &__orderNumber {
     color: $gray-50;
-    font-size: 14px;
+    font-size: 15px;
   }
 
   &__orderMeta {
@@ -70,7 +75,6 @@
   }
 
   &__menuList {
-    margin-top: 8px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -78,17 +82,29 @@
 
   &__menuLine {
     color: $black;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 500;
     line-height: 1.45;
     word-break: keep-all;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__menuName {
+    align-content: center;
+  }
+
+  &__menuQuantity {
+    padding: 1px 8px;
+    background-color: $gray-10;
+    border-radius: 4px;
+    font-size: 14px;
   }
 
   &__orderPrice {
-    margin-top: 8px;
     color: $primary-50;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
   }
 
   &__menuButton {

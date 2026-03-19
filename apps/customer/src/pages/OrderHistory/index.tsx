@@ -88,10 +88,10 @@ export default function OrderHistoryPage() {
 
       <section className={styles.orderHistory__content}>
         <header className={styles.orderHistory__hero}>
-          <h1 className={styles.orderHistory__title}>주문 내역</h1>
-          <p className={styles.orderHistory__summary}>
+          <div className={styles.orderHistory__title}>주문 내역</div>
+          <div className={styles.orderHistory__summary}>
             {`총 ${totalMenuCount}개 | ${formatPrice(totalPaidAmount)}`}
-          </p>
+          </div>
         </header>
 
         {!hasTableContext ? (
@@ -146,7 +146,13 @@ export default function OrderHistoryPage() {
                         key={`${order.id}-${menu.menuId}`}
                         className={styles.orderHistory__menuLine}
                       >
-                        {`${menu.menuName} x ${menu.quantity}`}
+                        <span className={styles.orderHistory__menuName}>
+                          {menu.menuName}
+                        </span>
+                        <span
+                          className={styles.orderHistory__menuQuantity}
+                        >{`${menu.quantity}개`}</span>
+                        {/* {`${menu.menuName} x ${menu.quantity}`} */}
                       </div>
                     ))}
                   </div>

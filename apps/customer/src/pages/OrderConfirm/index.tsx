@@ -49,15 +49,22 @@ export default function OrderConfirmPage() {
 
     const parsed = Number(digits);
     if (!Number.isFinite(parsed) || parsed < 0) return 0;
-    return Math.min(parsed, totalPrice);
-  }, [couponAmountInput, totalPrice]);
+    return parsed;
+  }, [couponAmountInput]);
 
-  const paymentAmount = Math.max(totalPrice - couponAmount, 0);
+  const isCouponAmountExceeded = couponAmount > totalPrice;
+  const couponAmountError = isCouponAmountExceeded
+    ? "주문 금액을 초과하는 쿠폰은 사용할 수 없어요."
+    : undefined;
+  const appliedCouponAmount = isCouponAmountExceeded ? 0 : couponAmount;
+
+  const paymentAmount = Math.max(totalPrice - appliedCouponAmount, 0);
+  const isDepositorNameInvalid = !depositorName.trim();
   const backToCartPath = hasTableContext
     ? buildCartPath(storeId, tableNum)
     : "/cart";
   const depositorNameError =
-    isDepositorNameTouched && !depositorName.trim()
+    isDepositorNameTouched && isDepositorNameInvalid
       ? "입금자명을 입력해 주세요."
       : undefined;
 
@@ -78,8 +85,12 @@ export default function OrderConfirmPage() {
       return;
     }
 
-    if (!depositorName.trim()) {
+    if (isDepositorNameInvalid) {
       setIsDepositorNameTouched(true);
+      return;
+    }
+
+    if (isCouponAmountExceeded) {
       return;
     }
 
@@ -95,7 +106,7 @@ export default function OrderConfirmPage() {
     try {
       setIsPreparingPayment(true);
       const normalizedCouponAmount =
-        couponAmountInput.trim() === "" ? 0 : couponAmount;
+        couponAmountInput.trim() === "" ? 0 : appliedCouponAmount;
       const normalizedPaymentAmount = Math.max(
         totalPrice - normalizedCouponAmount,
         0,
@@ -243,7 +254,11 @@ export default function OrderConfirmPage() {
             </section>
 
             <section className={styles.orderConfirm__section}>
-              <Input label="쿠폰 적용">
+              <Input
+                label="쿠폰 적용"
+                message={couponAmountError}
+                messageState="error"
+              >
                 <Input.Text
                   id="couponAmount"
                   inputMode="numeric"
@@ -263,7 +278,7 @@ export default function OrderConfirmPage() {
               </div>
               <div className={styles.orderConfirm__summaryRow}>
                 <span>쿠폰 사용</span>
-                <div>{formatPrice(couponAmount)}</div>
+                <div>{formatPrice(appliedCouponAmount)}</div>
               </div>
               <div className={styles.orderConfirm__summaryFinal}>
                 <span>최종 결제 금액</span>
@@ -279,7 +294,11 @@ export default function OrderConfirmPage() {
           type="button"
           className={styles.orderConfirm__submitButton}
           disabled={
-            !hasTableContext || items.length === 0 || isPreparingPayment
+            !hasTableContext ||
+            items.length === 0 ||
+            isPreparingPayment ||
+            isDepositorNameInvalid ||
+            isCouponAmountExceeded
           }
           onClick={handleProceedPayment}
         >

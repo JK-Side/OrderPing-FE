@@ -128,14 +128,16 @@
 
   &__stepLabel {
     color: $gray-60;
-    font-size: 12px;
-    font-weight: 400;
+    font-size: 14px;
     word-break: keep-all;
   }
 
   &__orderCard {
     padding: 22px 4px 18px;
     border-top: 1px solid $gray-10;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   &__orderHeader {
@@ -157,25 +159,35 @@
   }
 
   &__menuList {
-    margin-top: 8px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
   }
 
   &__menuLine {
     color: $black;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.45;
+    font-size: 16px;
     word-break: keep-all;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__menuName {
+    align-content: center;
+  }
+
+  &__menuQuantity {
+    background-color: $gray-10;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    align-content: center;
   }
 
   &__orderPrice {
-    margin-top: 8px;
     color: $primary-50;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
   }
 
   &__buttonGroup {

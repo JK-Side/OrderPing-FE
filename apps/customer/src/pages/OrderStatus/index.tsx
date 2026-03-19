@@ -217,7 +217,13 @@ export default function OrderStatusPage() {
                     key={`${currentOrder.id}-${menu.menuId}`}
                     className={styles.orderStatus__menuLine}
                   >
-                    {`${menu.menuName} x ${menu.quantity}`}
+                    <span className={styles.orderStatus__menuName}>
+                      {menu.menuName}
+                    </span>
+                    <span
+                      className={styles.orderStatus__menuQuantity}
+                    >{`${menu.quantity}개`}</span>
+                    {/* {`${menu.menuName} x ${menu.quantity}`} */}
                   </div>
                 ))}
               </div>
