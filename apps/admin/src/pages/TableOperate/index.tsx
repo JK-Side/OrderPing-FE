@@ -337,7 +337,6 @@ export default function TableOperate() {
                 initialValues={
                   hasTables && resolvedTableLayout
                     ? {
-                        tableCount: tables.length,
                         tableColumns: resolvedTableLayout.columns,
                         tableRows: resolvedTableLayout.rows,
                       }
