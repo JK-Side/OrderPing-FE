@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { useForm, useWatch, type SubmitHandler } from 'react-hook-form';
-import type { AllTableListResponse, TableResponse } from '@/api/table/entity';
+import type { TableResponse } from '@/api/table/entity';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -113,8 +113,6 @@ const resolveErrorMessage = (error: unknown) => {
 
 interface TableCreateModalProps {
   storeId?: number;
-  onCreated?: (tables: AllTableListResponse, layout: { columns: number; rows: number }) => void;
-  onLayoutSaved?: (layout: { columns: number; rows: number }) => void;
   name: string;
   hasActiveOrders?: boolean;
   onReset?: () => void;
@@ -131,8 +129,6 @@ interface TableCreateForm {
 
 export default function TableCreateModal({
   storeId,
-  onCreated,
-  onLayoutSaved,
   name,
   hasActiveOrders = false,
   onReset,
@@ -288,8 +284,6 @@ export default function TableCreateModal({
 
     try {
       const tableCount = Number(data.tableCount);
-      const tableColumns = 1;
-      const tableRows = tableCount;
 
       if (!Number.isFinite(tableCount) || tableCount <= 0) {
         toast({
@@ -333,7 +327,6 @@ export default function TableCreateModal({
 
         setProgressPhase('finalizing');
         await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
-        onLayoutSaved?.({ columns: tableColumns, rows: tableRows });
 
         if (pendingRetries.length > 0) {
           const message = buildRetryMessage(failed.length, updateFailures.length);
@@ -376,8 +369,6 @@ export default function TableCreateModal({
 
       setProgressPhase('finalizing');
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
-      onCreated?.(createdTables, { columns: tableColumns, rows: tableRows });
-      onLayoutSaved?.({ columns: tableColumns, rows: tableRows });
 
       if (pendingRetries.length > 0) {
         const message = buildRetryMessage(failed.length, updateFailures.length);
