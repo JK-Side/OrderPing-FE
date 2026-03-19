@@ -24,7 +24,10 @@ type OrderCardData = {
   status: OrderStatus;
 };
 
-type OrderActionTarget = Pick<OrderLookupResponse | OrderDetailResponse, 'id' | 'tableId' | 'status' | 'depositorName'> & {
+type OrderActionTarget = Pick<
+  OrderLookupResponse | OrderDetailResponse,
+  'id' | 'tableId' | 'status' | 'depositorName'
+> & {
   cashAmount: number;
   couponAmount?: number;
 };
@@ -276,6 +279,21 @@ export default function StoreOrders() {
     });
   };
 
+  const handlePrevFromDetail = async () => {
+    const targetOrder = (orderDetail ?? selectedOrder) as OrderActionTarget | null;
+    if (!targetOrder) return;
+
+    await handlePrev({
+      id: `detail-${targetOrder.id}`,
+      orderId: targetOrder.id,
+      tableNumber: targetOrder.tableId,
+      depositorName: targetOrder.depositorName,
+      depositAmount: targetOrder.cashAmount,
+      couponAmount: targetOrder.couponAmount,
+      status: targetOrder.status,
+    });
+  };
+
   const handlePrev = async (order: OrderCardData) => {
     if (order.status === 'PENDING') return;
     if (revertingOrderId === order.orderId) return;
@@ -296,7 +314,7 @@ export default function StoreOrders() {
     } catch (error) {
       toast({
         message: '주문 상태 업데이트에 실패했습니다.',
-        description: error instanceof Error ? error.message : undefined,
+        // description: error instanceof Error ? error.message : undefined,
         variant: 'error',
       });
       console.error('주문 상태 업데이트에 실패했습니다.', error);
@@ -308,11 +326,9 @@ export default function StoreOrders() {
   const selectedOrder = selectedOrderId ? (visibleOrders.find((order) => order.id === selectedOrderId) ?? null) : null;
   const detailOrder = orderDetail ?? selectedOrder;
   const isDetailAccepting = detailOrder ? acceptingOrderId === detailOrder.id : false;
+  const isDetailReverting = detailOrder ? revertingOrderId === detailOrder.id : false;
   const isDetailAcceptDisabled =
-    !storeId ||
-    !detailOrder ||
-    detailOrder.status === 'COMPLETE' ||
-    detailOrder.depositorName === '서비스';
+    !storeId || !detailOrder || detailOrder.status === 'COMPLETE' || detailOrder.depositorName === '서비스';
 
   return (
     <section className={styles.storeOrders}>
@@ -369,8 +385,10 @@ export default function StoreOrders() {
         order={detailOrder}
         menus={orderDetail?.menus ?? []}
         onReject={handleOpenRejectFromDetail}
+        onPrev={handlePrevFromDetail}
         onAccept={handleAcceptFromDetail}
         isAccepting={isDetailAccepting}
+        isReverting={isDetailReverting}
         isAcceptDisabled={isDetailAcceptDisabled}
       />
       <OrderRejectModal

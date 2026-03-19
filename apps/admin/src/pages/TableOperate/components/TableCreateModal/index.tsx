@@ -112,14 +112,12 @@ interface TableCreateModalProps {
   mode?: 'create' | 'edit';
   tables?: TableResponse[];
   initialValues?: {
-    tableCount: number;
     tableColumns: number;
     tableRows: number;
   } | null;
 }
 
 interface TableCreateForm {
-  tableCount: string;
   tableColumns: string;
   tableRows: string;
 }
@@ -157,7 +155,6 @@ export default function TableCreateModal({
   } = useForm<TableCreateForm>({
     mode: 'onChange',
     defaultValues: {
-      tableCount: '',
       tableColumns: '',
       tableRows: '',
     },
@@ -166,14 +163,12 @@ export default function TableCreateModal({
   const getInitialFormValues = (): TableCreateForm => {
     if (!initialValues) {
       return {
-        tableCount: '',
         tableColumns: '',
         tableRows: '',
       };
     }
 
     return {
-      tableCount: String(initialValues.tableCount),
       tableColumns: String(initialValues.tableColumns),
       tableRows: String(initialValues.tableRows),
     };
@@ -181,6 +176,15 @@ export default function TableCreateModal({
 
   const watchedTableColumns = useWatch({ control, name: 'tableColumns' });
   const watchedTableRows = useWatch({ control, name: 'tableRows' });
+  const parsedTableColumns = Number(watchedTableColumns);
+  const parsedTableRows = Number(watchedTableRows);
+  const derivedTableCount =
+    Number.isFinite(parsedTableColumns) &&
+    Number.isFinite(parsedTableRows) &&
+    parsedTableColumns > 0 &&
+    parsedTableRows > 0
+      ? parsedTableColumns * parsedTableRows
+      : 0;
   const isEditMode = mode === 'edit';
   const isLayoutUnchanged =
     isEditMode &&
@@ -280,11 +284,11 @@ export default function TableCreateModal({
     if (retryEntries.length > 0) return;
 
     try {
-      const tableCount = Number(data.tableCount);
       const tableColumns = Number(data.tableColumns);
       const tableRows = Number(data.tableRows);
+      const tableCount = tableColumns * tableRows;
 
-      if (tableCount <= 0 || tableColumns <= 0 || tableRows <= 0 || tableColumns * tableRows !== tableCount) {
+      if (!Number.isFinite(tableColumns) || !Number.isFinite(tableRows) || tableColumns <= 0 || tableRows <= 0) {
         toast({
           message: '테이블 수를 다시 확인해 주세요.',
           variant: 'error',
@@ -543,7 +547,7 @@ export default function TableCreateModal({
         <form onSubmit={handleSubmit(handleSubmitForm)}>
           <ModalBody>
             <div className={styles.form}>
-              <Input
+              {/* <Input
                 label="테이블 수"
                 required
                 message={errors.tableCount?.message}
@@ -566,7 +570,7 @@ export default function TableCreateModal({
                     },
                   })}
                 />
-              </Input>
+              </Input> */}
               <Input
                 label="테이블 열 (가로)"
                 required
@@ -627,10 +631,17 @@ export default function TableCreateModal({
               type="submit"
               size="md"
               fullWidth
-              disabled={!isValid || isSubmitting || isUploadingQr || retryEntries.length > 0 || isLayoutUnchanged}
+              disabled={
+                !isValid ||
+                isSubmitting ||
+                isUploadingQr ||
+                retryEntries.length > 0 ||
+                isLayoutUnchanged ||
+                derivedTableCount <= 0
+              }
               isLoading={isPending || isUploadingQr || isUpdatingTableQrImage}
             >
-              {name}
+              {`테이블 ${derivedTableCount}개 ${isEditMode ? '수정' : '생성'}`}
             </Button>
             {/* {!isEditMode ? (
             <Button
