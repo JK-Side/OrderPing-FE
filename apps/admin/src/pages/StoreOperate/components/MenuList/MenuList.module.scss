@@ -91,6 +91,20 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
+.menuStockBadge {
+  position: absolute;
+  top: 10px;
+  left: 8px;
+  z-index: 11;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background-color: $primary-50;
+  color: $white;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
 .menuActionIcon {
   width: 16px;
   height: 16px;
