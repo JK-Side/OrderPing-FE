@@ -61,7 +61,10 @@ export default function Header() {
             <Link to={tableManagePath} className={`${styles.navItem} ${isStoreStartPage ? styles.navItemActive : ''}`}>
               테이블 관리
             </Link>
-            <Link to={statisticsPath} className={`${styles.navItem} ${isStoreStatisticsPage ? styles.navItemActive : ''}`}>
+            <Link
+              to={statisticsPath}
+              className={`${styles.navItem} ${isStoreStatisticsPage ? styles.navItemActive : ''}`}
+            >
               주문 통계
             </Link>
           </>
