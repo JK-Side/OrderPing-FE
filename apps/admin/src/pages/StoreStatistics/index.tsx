@@ -88,6 +88,17 @@ const resolveRoundedAxisMax = (rawMaxValue: number, intervals: number) => {
   return Math.ceil(roundedByTen / safeIntervals) * safeIntervals;
 };
 
+const resolveMenuStock = (menu: { stock?: number; initialStock?: number }) => {
+  if (typeof menu.stock === 'number') return menu.stock;
+  if (typeof menu.initialStock === 'number') return menu.initialStock;
+  return 0;
+};
+
+const resolveSoldQuantity = (menu: { soldQuantity?: number }) => {
+  if (typeof menu.soldQuantity === 'number') return menu.soldQuantity;
+  return 0;
+};
+
 export default function StoreStatistics() {
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
@@ -131,7 +142,9 @@ export default function StoreStatistics() {
   const menuRows = useMemo(() => menuStatistics?.menus ?? [], [menuStatistics?.menus]);
   const menuChartMaxValue = useMemo(() => {
     const rawMaxValue = menuRows.reduce((acc, menu) => {
-      const currentMax = Math.max(menu.stock, menu.soldQuantity);
+      const stock = resolveMenuStock(menu);
+      const soldQuantity = resolveSoldQuantity(menu);
+      const currentMax = Math.max(stock, soldQuantity);
       return currentMax > acc ? currentMax : acc;
     }, 0);
 
@@ -139,15 +152,20 @@ export default function StoreStatistics() {
   }, [menuRows]);
   const normalizedMenuRows = useMemo<NormalizedMenuStat[]>(
     () =>
-      menuRows.map((menu) => ({
+      menuRows.map((menu) => {
+        const stock = resolveMenuStock(menu);
+        const soldQuantity = resolveSoldQuantity(menu);
+
+        return {
         menuId: menu.menuId,
         menuName: menu.menuName,
-        stock: menu.stock,
-        soldQuantity: menu.soldQuantity,
-        maxValue: Math.max(menu.stock, menu.soldQuantity),
-        stockRatio: menu.stock / menuChartMaxValue,
-        soldRatio: menu.soldQuantity / menuChartMaxValue,
-      })),
+        stock,
+        soldQuantity,
+        maxValue: Math.max(stock, soldQuantity),
+        stockRatio: stock / menuChartMaxValue,
+        soldRatio: soldQuantity / menuChartMaxValue,
+      };
+      }),
     [menuChartMaxValue, menuRows],
   );
 

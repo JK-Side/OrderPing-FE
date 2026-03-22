@@ -1,0 +1,30 @@
+.stateSection {
+  min-height: 24rem;
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stateCard {
+  width: min(30rem, 100%);
+  border: 1px solid #e4e4e7;
+  border-radius: 1rem;
+  background: #ffffff;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #27272a;
+}
+
+.description {
+  margin: 0.75rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: #52525b;
+}

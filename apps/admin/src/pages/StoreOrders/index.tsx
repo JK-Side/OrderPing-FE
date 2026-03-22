@@ -267,6 +267,7 @@ export default function StoreOrders() {
     const targetOrder = (orderDetail ?? selectedOrder) as OrderActionTarget | null;
     if (!targetOrder) return;
     if (targetOrder.depositorName === '서비스') return;
+    handleDetailOpenChange(false);
 
     await handleAccept({
       id: `detail-${targetOrder.id}`,
@@ -282,6 +283,7 @@ export default function StoreOrders() {
   const handlePrevFromDetail = async () => {
     const targetOrder = (orderDetail ?? selectedOrder) as OrderActionTarget | null;
     if (!targetOrder) return;
+    handleDetailOpenChange(false);
 
     await handlePrev({
       id: `detail-${targetOrder.id}`,

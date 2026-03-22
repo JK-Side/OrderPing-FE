@@ -31,7 +31,7 @@ export interface StatisticsResponse {
 export interface MenuStatisticsItem {
   menuId: number;
   menuName: string;
-  stock: number;
+  initialStock: number;
   soldQuantity: number;
 }
 
