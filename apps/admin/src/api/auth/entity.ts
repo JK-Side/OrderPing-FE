@@ -1,9 +1,9 @@
 export interface UserInfoResponse {
   userName: string;
-  stores: Store[];
+  stores: UserStore[];
 }
 
-interface Store {
+export interface UserStore {
   id: number;
   name: string;
   imageUrl: string;

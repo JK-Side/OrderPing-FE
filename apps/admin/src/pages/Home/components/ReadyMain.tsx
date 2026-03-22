@@ -1,23 +1,18 @@
 import { useNavigate } from 'react-router-dom';
+import type { UserStore } from '@/api/auth/entity';
 import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
 import styles from './ReadyMain.module.scss';
 
-type StoreInfo = {
-  id: number;
-  name: string;
-  imageUrl: string;
-};
-
 interface ReadyMainProps {
   userName?: string;
-  store?: StoreInfo;
+  store: UserStore;
 }
 
 export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) {
   const navigate = useNavigate();
-  const storeName = store?.name ?? '주점';
-  const storeImageUrl = store?.imageUrl ?? '';
+  const storeName = store.name || '주점';
+  const storeImageUrl = store.imageUrl || '';
   const storeImage = storeImageUrl || StoreDefault;
 
   return (
@@ -38,15 +33,15 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
           <div className={styles.storeImageWrap}>
             <img className={styles.storeImage} src={storeImage} alt={`${storeName} 주점`} />
           </div>
-          <Button className={styles.storeButton} size="md" onClick={() => navigate(`/store/operate/${store!.id}`)}>
+          <Button className={styles.storeButton} size="md" onClick={() => navigate(`/store/operate/${store.id}`)}>
             주점 시작
           </Button>
         </div>
 
         {/* <Link
-            to={`/store/operate/${store!.id}`}
+            to={`/store/operate/${store.id}`}
             className={styles.settingsLink}
-            onClick={() => navigate(`/store/operate/${store!.id}`)}
+            onClick={() => navigate(`/store/operate/${store.id}`)}
           >
             <SettingIcon />
             <span className={styles.settingsText}>주점 설정</span>

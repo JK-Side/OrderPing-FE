@@ -1,4 +1,4 @@
-﻿import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { postLogout } from '@/api/auth/';
 import OrderPingLogo from '@/assets/logo/ORDERPING_LOGO_TEXT.png';
 import { useAuth } from '@/utils/hooks/useAuth';
@@ -8,7 +8,7 @@ const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;
 
 export default function Header() {
   const { pathname } = useLocation();
-  const { isLoggedIn, clearAccessToken } = useAuth();
+  const { isBootstrapping, isLoggedIn, clearAccessToken } = useAuth();
   const isHomePage = pathname === '/';
   const isMyPage = pathname === '/mypage';
   const isStoreCreatePage = pathname.startsWith('/store/create');
@@ -36,7 +36,6 @@ export default function Header() {
       console.error('logout error', e);
     } finally {
       clearAccessToken();
-
       window.location.href = '/';
     }
   };
@@ -51,30 +50,30 @@ export default function Header() {
         {!isAuthHeaderPage ? (
           <>
             <Link to={menuManagePath} className={`${styles.navItem} ${isStoreMenuPage ? styles.navItemActive : ''}`}>
-              메뉴 관리
+              {'\uBA54\uB274 \uAD00\uB9AC'}
             </Link>
             <Link to={orderManagePath} className={`${styles.navItem} ${isStoreOrdersPage ? styles.navItemActive : ''}`}>
-              주문 조회
+              {'\uC8FC\uBB38 \uC870\uD68C'}
             </Link>
             <Link to={tableManagePath} className={`${styles.navItem} ${isStoreStartPage ? styles.navItemActive : ''}`}>
-              테이블 관리
+              {'\uD14C\uC774\uBE14 \uAD00\uB9AC'}
             </Link>
             <Link to={statisticsPath} className={`${styles.navItem} ${isStoreStatisticsPage ? styles.navItemActive : ''}`}>
-              주문 통계
+              {'\uC8FC\uBB38 \uD1B5\uACC4'}
             </Link>
           </>
-        ) : isLoggedIn ? (
+        ) : isBootstrapping ? null : isLoggedIn ? (
           <>
             <Link to="/mypage" className={`${styles.navItem} ${isMyPage ? styles.navItemActive : ''}`}>
-              마이페이지
+              {'\uB9C8\uC774\uD398\uC774\uC9C0'}
             </Link>
             <button type="button" className={styles.navItem} onClick={handleLogout}>
-              로그아웃
+              {'\uB85C\uADF8\uC544\uC6C3'}
             </button>
           </>
         ) : (
           <button type="button" className={styles.navItem} onClick={handleKakaoLogin}>
-            로그인
+            {'\uB85C\uADF8\uC778'}
           </button>
         )}
       </nav>
