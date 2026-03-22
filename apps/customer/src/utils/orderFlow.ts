@@ -2,7 +2,6 @@ import type { CustomerPaymentDeeplinkAccount } from '../api/customer/entity';
 import type { CartItem } from '../stores/cart';
 
 const TOSS_ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=viva.republica.toss';
-const TOSS_IOS_STORE_URL = 'https://apps.apple.com/us/app/%ED%86%A0%EC%8A%A4/id839333328?l=ko';
 const APP_OPEN_FALLBACK_DELAY_MS = 1200;
 const ORDER_DRAFT_STORAGE_KEY = 'order-ping:customer-order-draft:v1';
 
@@ -187,7 +186,7 @@ export const openTossWithStoreFallback = async (
       }
 
       if (platform === 'ios') {
-        window.location.href = TOSS_IOS_STORE_URL;
+        onUnsupportedDevice?.();
         finish();
         return;
       }
