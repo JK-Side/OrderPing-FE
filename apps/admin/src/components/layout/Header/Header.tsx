@@ -5,6 +5,7 @@ import { useAuth } from '@/utils/hooks/useAuth';
 import styles from './Header.module.scss';
 
 const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;
+const REFRESH_BLOCKED_KEY = 'auth:refresh-blocked';
 
 export default function Header() {
   const { pathname } = useLocation();
@@ -30,8 +31,10 @@ export default function Header() {
   };
 
   const handleLogout = async () => {
+    sessionStorage.setItem(REFRESH_BLOCKED_KEY, '1');
+
     try {
-      await postLogout();
+      await postLogout({ skipRefresh: true });
     } catch (e) {
       console.error('logout error', e);
     } finally {
@@ -50,30 +53,30 @@ export default function Header() {
         {!isAuthHeaderPage ? (
           <>
             <Link to={menuManagePath} className={`${styles.navItem} ${isStoreMenuPage ? styles.navItemActive : ''}`}>
-              {'\uBA54\uB274 \uAD00\uB9AC'}
+              메뉴 관리
             </Link>
             <Link to={orderManagePath} className={`${styles.navItem} ${isStoreOrdersPage ? styles.navItemActive : ''}`}>
-              {'\uC8FC\uBB38 \uC870\uD68C'}
+              주문 조회
             </Link>
             <Link to={tableManagePath} className={`${styles.navItem} ${isStoreStartPage ? styles.navItemActive : ''}`}>
-              {'\uD14C\uC774\uBE14 \uAD00\uB9AC'}
+              테이블 관리
             </Link>
             <Link to={statisticsPath} className={`${styles.navItem} ${isStoreStatisticsPage ? styles.navItemActive : ''}`}>
-              {'\uC8FC\uBB38 \uD1B5\uACC4'}
+              주문 통계
             </Link>
           </>
         ) : isBootstrapping ? null : isLoggedIn ? (
           <>
             <Link to="/mypage" className={`${styles.navItem} ${isMyPage ? styles.navItemActive : ''}`}>
-              {'\uB9C8\uC774\uD398\uC774\uC9C0'}
+              마이페이지
             </Link>
             <button type="button" className={styles.navItem} onClick={handleLogout}>
-              {'\uB85C\uADF8\uC544\uC6C3'}
+              로그아웃
             </button>
           </>
         ) : (
           <button type="button" className={styles.navItem} onClick={handleKakaoLogin}>
-            {'\uB85C\uADF8\uC778'}
+            로그인
           </button>
         )}
       </nav>

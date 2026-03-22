@@ -6,14 +6,22 @@ interface EmptyMainProps {
   userName?: string;
 }
 
-export default function EmptyMain({ userName = 'User' }: EmptyMainProps) {
+export default function EmptyMain({ userName }: EmptyMainProps) {
   const navigate = useNavigate();
+  const trimmedUserName = userName?.trim();
+  const displayName = trimmedUserName && trimmedUserName.toLowerCase() !== 'user' ? trimmedUserName : undefined;
 
   return (
     <section className={styles.emptyMain}>
       <div className={styles.greeting}>
         <h2 className={styles.title}>
-          <span className={styles.highlight}>{userName}</span> 님 안녕하세요.
+          {displayName ? (
+            <>
+              <span className={styles.highlight}>{displayName}</span>님, 안녕하세요.
+            </>
+          ) : (
+            '안녕하세요.'
+          )}
         </h2>
         <p className={styles.subtitle}>주점을 클릭해 운영을 시작해 보세요!</p>
       </div>
