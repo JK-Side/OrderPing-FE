@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+﻿import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/Toast/useToast';
 import { useAuthStore } from '@/stores/auth';
@@ -8,7 +8,6 @@ export default function OAuthCallback() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
-  const clearAccessToken = useAuthStore((state) => state.clearAccessToken);
   const hasHandled = useRef(false);
   const REFRESH_BLOCKED_KEY = 'auth:refresh-blocked';
 
@@ -29,7 +28,6 @@ export default function OAuthCallback() {
     }
 
     if (error) {
-      clearAccessToken();
       toast({
         variant: 'error',
         message: '로그인에 실패했습니다.',
@@ -39,14 +37,13 @@ export default function OAuthCallback() {
       return;
     }
 
-    clearAccessToken();
     toast({
       variant: 'error',
       message: '로그인 응답이 올바르지 않습니다.',
       description: '다시 로그인해주세요.',
     });
     navigate('/', { replace: true });
-  }, [clearAccessToken, navigate, setAccessToken, toast]);
+  }, [navigate, setAccessToken, toast]);
 
   return <div className={styles.content}>로그인 처리 중...</div>;
 }

@@ -11,7 +11,6 @@ export const useAuthInit = () => {
   const { pathname } = useLocation();
   const accessToken = useAuthStore((state) => state.accessToken);
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
-  const setAuthStatus = useAuthStore((state) => state.setAuthStatus);
   const clearAccessToken = useAuthStore((state) => state.clearAccessToken);
 
   useEffect(() => {
@@ -24,17 +23,14 @@ export const useAuthInit = () => {
     if (accessToken) {
       hasInitialized = true;
       sessionStorage.removeItem(REFRESH_BLOCKED_KEY);
-      setAuthStatus('authed');
       return;
     }
     if (pathname === '/callback') {
       hasInitialized = true;
-      setAuthStatus('guest');
       return;
     }
 
     hasInitialized = true;
-    setAuthStatus('bootstrapping');
     initPromise = (async () => {
       try {
         const response = await postRefresh();
@@ -65,7 +61,6 @@ export const useAuthInit = () => {
     accessToken,
     clearAccessToken,
     pathname,
-    setAuthStatus,
     setAccessToken,
   ]);
 };
