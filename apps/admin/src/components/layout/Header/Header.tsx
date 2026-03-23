@@ -1,15 +1,14 @@
-import { Link, useLocation } from 'react-router-dom';
+﻿import { Link, useLocation } from 'react-router-dom';
 import { postLogout } from '@/api/auth/';
 import OrderPingLogo from '@/assets/logo/ORDERPING_LOGO_TEXT.png';
 import { useAuth } from '@/utils/hooks/useAuth';
 import styles from './Header.module.scss';
 
 const BASE_URL = import.meta.env.VITE_KAKAO_LOGIN;
-const REFRESH_BLOCKED_KEY = 'auth:refresh-blocked';
 
 export default function Header() {
   const { pathname } = useLocation();
-  const { isBootstrapping, isLoggedIn, clearAccessToken } = useAuth();
+  const { isLoggedIn, clearAccessToken } = useAuth();
   const isHomePage = pathname === '/';
   const isMyPage = pathname === '/mypage';
   const isStoreCreatePage = pathname.startsWith('/store/create');
@@ -31,14 +30,13 @@ export default function Header() {
   };
 
   const handleLogout = async () => {
-    sessionStorage.setItem(REFRESH_BLOCKED_KEY, '1');
-
     try {
-      await postLogout({ skipRefresh: true });
+      await postLogout();
     } catch (e) {
       console.error('logout error', e);
     } finally {
       clearAccessToken();
+
       window.location.href = '/';
     }
   };
@@ -61,14 +59,11 @@ export default function Header() {
             <Link to={tableManagePath} className={`${styles.navItem} ${isStoreStartPage ? styles.navItemActive : ''}`}>
               테이블 관리
             </Link>
-            <Link
-              to={statisticsPath}
-              className={`${styles.navItem} ${isStoreStatisticsPage ? styles.navItemActive : ''}`}
-            >
+            <Link to={statisticsPath} className={`${styles.navItem} ${isStoreStatisticsPage ? styles.navItemActive : ''}`}>
               주문 통계
             </Link>
           </>
-        ) : isBootstrapping ? null : isLoggedIn ? (
+        ) : isLoggedIn ? (
           <>
             <Link to="/mypage" className={`${styles.navItem} ${isMyPage ? styles.navItemActive : ''}`}>
               마이페이지
