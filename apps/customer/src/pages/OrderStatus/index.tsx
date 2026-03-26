@@ -61,8 +61,10 @@ export default function OrderStatusPage() {
       const orders = query.state.data as
         | CustomerOrderLookupResponse[]
         | undefined;
+      if (!orders) return 5000;
+
       const targetOrder = orders?.find((order) => order.id === orderId);
-      if (targetOrder?.orderStatus === "COMPLETE") return false;
+      if (!targetOrder || targetOrder.orderStatus === "COMPLETE") return false;
 
       return 5000;
     },
@@ -89,6 +91,12 @@ export default function OrderStatusPage() {
 
   const hasNotFoundError =
     (error as { status?: number } | null)?.status === 404;
+  const isCanceledOrMissingOrder =
+    hasTableContext &&
+    orderId !== null &&
+    !isLoading &&
+    !error &&
+    !currentOrder;
   const currentStatus = currentOrder?.orderStatus ?? "PENDING";
   const currentStatusMeta = getOrderStatusMeta(currentStatus);
   const title = currentOrder ? currentStatusMeta.label : "주문 상태";
@@ -159,6 +167,12 @@ export default function OrderStatusPage() {
         error ? (
           <div className={styles.orderStatus__status}>
             주문 상태를 불러오지 못했어요.
+          </div>
+        ) : null}
+
+        {isCanceledOrMissingOrder ? (
+          <div className={styles.orderStatus__status}>
+            주문이 취소되었을 수 있어요. 카운터에 문의하세요.
           </div>
         ) : null}
 
