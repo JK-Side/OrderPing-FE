@@ -41,7 +41,7 @@ export default function OrderHistoryPage() {
     queryFn: () =>
       getCustomerOrdersByTableId(storeId as number, tableNum as number),
     enabled: hasTableContext,
-    refetchInterval: hasTableContext ? 10000 : false,
+    refetchInterval: hasTableContext ? 5000 : false,
   });
 
   useEffect(() => {
