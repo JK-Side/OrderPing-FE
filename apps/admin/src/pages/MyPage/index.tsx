@@ -143,14 +143,13 @@ export default function MyPage() {
   const { clearAccessToken } = useAuth();
   const { data: userInfo } = useUserInfo();
   const { data: myPage, isPending, isError, error } = useMyPage();
-  const { mutateAsync: deleteUserById, isPending: isUserDeleting } = useDeleteUser();
+  const { mutateAsync: deleteUser, isPending: isUserDeleting } = useDeleteUser();
   const { mutateAsync: deleteStoreById, isPending: isStoreDeleting } = useDeleteStore();
   const [isDeleteUserModalOpen, setIsDeleteUserModalOpen] = useState(false);
   const [deleteTargetStore, setDeleteTargetStore] = useState<MyPageStore | null>(null);
 
   const stores = myPage?.stores ?? [];
   const userName = userInfo?.userName?.trim() || 'User';
-  const userId = myPage?.userId ?? stores.find((store) => store.userId !== undefined)?.userId;
   const isDangerActionPending = isUserDeleting || isStoreDeleting;
 
   const handleDeleteUserOpenChange = (open: boolean) => {
@@ -166,26 +165,16 @@ export default function MyPage() {
   };
 
   const handleConfirmDeleteUser = async () => {
-    if (!userId) {
-      toast({
-        message: '회원 아이디를 가져오는 데 실패했습니다.',
-        variant: 'error',
-      });
-      return;
-    }
-
     try {
-      await deleteUserById(userId);
+      await deleteUser();
       clearAccessToken();
       window.location.href = '/';
     } catch (error) {
       const status = (error as { status?: number })?.status;
       const message =
-        status === 404
-          ? '회원을 찾을 수 없습니다.'
-          : status === 401
-            ? '로그인이 필요합니다.'
-            : '회원 탈퇴에 실패했습니다.';
+        status === 401
+          ? '로그인이 필요합니다.'
+          : '회원 탈퇴에 실패했습니다.';
 
       toast({
         message,
@@ -284,7 +273,7 @@ export default function MyPage() {
               variant="danger"
               className={styles.dangerActionButton}
               onClick={() => setIsDeleteUserModalOpen(true)}
-              disabled={isDangerActionPending || !userId}
+              disabled={isDangerActionPending}
             >
               회원 탈퇴
             </Button>
@@ -320,7 +309,7 @@ export default function MyPage() {
               className={styles.dangerModalButton}
               onClick={handleConfirmDeleteUser}
               isLoading={isUserDeleting}
-              disabled={isUserDeleting || !userId}
+              disabled={isUserDeleting}
               loadingText="탈퇴 중..."
             >
               탈퇴하기
