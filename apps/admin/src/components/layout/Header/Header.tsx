@@ -22,7 +22,7 @@ export default function Header() {
   const isStoreStartPage = /^\/store\/[^/]+\/(start|qr-print)/.test(pathname);
   const isStoreOrdersPage = /^\/store\/[^/]+\/orders/.test(pathname);
   const isStoreStatisticsPage = /^\/store\/[^/]+\/statistics/.test(pathname);
-  const isStoreMenuPage = /^\/store\/operate\/[^/]+/.test(pathname);
+  const isStoreMenuPage = /^\/store\/operate\/[^/]+/.test(pathname) || /^\/store\/[^/]+\/menu(?:\/|$)/.test(pathname);
   const menuManagePath = storeId ? `/store/operate/${storeId}` : '/';
   const orderManagePath = storeId ? `/store/${storeId}/orders` : '/';
   const tableManagePath = storeId ? `/store/${storeId}/start` : '/';
