@@ -122,8 +122,8 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
     <Modal open={open} onOpenChange={handleOpenChange}>
       <ModalTrigger asChild>
         <Button
-          type="button"
-          variant="ghost"
+          type='button'
+          variant='ghost'
           className={clsx(styles.triggerButton, className)}
           disabled={!store.account}
         >
@@ -140,13 +140,13 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
           <ModalBody>
             <div className={styles.form}>
               <Input
-                label="은행명"
+                label='은행명'
                 required
                 message={errors.bankCode?.message}
                 messageState={errors.bankCode ? 'error' : undefined}
               >
                 <Controller
-                  name="bankCode"
+                  name='bankCode'
                   control={control}
                   rules={{ required: '은행명을 선택해 주세요.' }}
                   render={({ field }) => (
@@ -155,7 +155,7 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
                       value={field.value ?? ''}
                       onValueChange={field.onChange}
                       options={bankOptions}
-                      placeholder="Select bank"
+                      placeholder='Select bank'
                       disabled={isLoading || isSubmitting}
                       required
                     />
@@ -164,13 +164,13 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
               </Input>
 
               <Input
-                label="예금주명"
+                label='예금주명'
                 required
                 message={errors.accountHolder?.message}
                 messageState={errors.accountHolder ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="예금주명을 입력해 주세요. (최대 6글자)"
+                  placeholder='예금주명을 입력해 주세요. (최대 6글자)'
                   {...register('accountHolder', {
                     required: '예금주명을 입력해 주세요.',
                     maxLength: { value: 6, message: '예금주명은 최대 6자입니다.' },
@@ -179,14 +179,14 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
               </Input>
 
               <Input
-                label="계좌번호"
+                label='계좌번호'
                 required
                 message={errors.accountNumber?.message}
                 messageState={errors.accountNumber ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="계좌번호를 입력해 주세요. (최대 20글자)"
-                  inputMode="numeric"
+                  placeholder='계좌번호를 입력해 주세요. (최대 20글자)'
+                  inputMode='numeric'
                   {...register('accountNumber', {
                     required: '계좌번호를 입력해 주세요.',
                     maxLength: { value: 20, message: '계좌번호는 최대 20자입니다.' },
@@ -202,12 +202,12 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
 
           <ModalFooter>
             <Button
-              type="submit"
-              size="md"
+              type='submit'
+              size='md'
               className={styles.footerButton}
               isLoading={isSubmitting}
               disabled={!isValid || isSubmitting || isStoreAccountsPending || !accountId}
-              loadingText="수정 중..."
+              loadingText='수정 중...'
             >
               수정하기
             </Button>

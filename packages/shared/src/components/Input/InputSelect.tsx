@@ -22,13 +22,13 @@ type InputSelectProps = {
 
 function ChevronDownIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <svg className={className} viewBox='0 0 16 16' fill='none' aria-hidden='true'>
       <path
-        d="M4 6.5 8 10.5l4-4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d='M4 6.5 8 10.5l4-4'
+        stroke='currentColor'
+        strokeWidth='1.5'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
     </svg>
   );
@@ -55,7 +55,7 @@ export default function InputSelect({
   return (
     <div ref={handleWrapperRef} className={[styles.selectWrapper, className ?? ''].join(' ')}>
       {name ? (
-        <input type="hidden" name={name} value={value ?? ''} required={required} />
+        <input type='hidden' name={name} value={value ?? ''} required={required} />
       ) : null}
 
       <Select.Root
@@ -76,7 +76,7 @@ export default function InputSelect({
         </Select.Trigger>
 
         <Select.Portal container={portalContainer ?? undefined}>
-          <Select.Content className={styles.selectContent} position="popper" sideOffset={6}>
+          <Select.Content className={styles.selectContent} position='popper' sideOffset={6}>
             <Select.Viewport className={styles.selectViewport}>
               {options.map((opt) => (
                 <Select.Item

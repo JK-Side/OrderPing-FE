@@ -145,7 +145,7 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
   return (
     <Modal open={open} onOpenChange={handleOpenChange}>
       <ModalTrigger asChild>
-        <Button type="button" variant="ghost" className={clsx(styles.triggerButton, className)}>
+        <Button type='button' variant='ghost' className={clsx(styles.triggerButton, className)}>
           수정하기
         </Button>
       </ModalTrigger>
@@ -159,13 +159,13 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
           <ModalBody>
             <div className={styles.form}>
               <Input
-                label="주점명"
+                label='주점명'
                 required
                 message={errors.name?.message}
                 messageState={errors.name ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="주점명을 입력해 주세요."
+                  placeholder='주점명을 입력해 주세요.'
                   {...register('name', {
                     required: '주점명을 입력해 주세요.',
                     maxLength: { value: 10, message: '주점명은 최대 10자입니다.' },
@@ -174,13 +174,13 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
               </Input>
 
               <Input
-                label="주점 설명"
+                label='주점 설명'
                 required
                 message={errors.description?.message}
                 messageState={errors.description ? 'error' : undefined}
               >
                 <Input.TextArea
-                  placeholder="주점 설명을 입력해 주세요."
+                  placeholder='주점 설명을 입력해 주세요.'
                   {...register('description', {
                     required: '주점 설명을 입력해 주세요.',
                     maxLength: { value: 100, message: '주점 설명은 최대 100자입니다.' },
@@ -199,9 +199,9 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
                 <div className={styles.imageColumn}>
                   <div className={styles.imageLabel}>새 이미지</div>
                   <label className={styles.imageUpload}>
-                    <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+                    <input type='file' accept='image/*' hidden onChange={handleImageChange} />
                     {previewUrl ? (
-                      <img className={styles.imagePreviewImage} src={previewUrl} alt="새 이미지" />
+                      <img className={styles.imagePreviewImage} src={previewUrl} alt='새 이미지' />
                     ) : (
                       <span className={styles.uploadHint}>클릭하여 이미지 업로드</span>
                     )}
@@ -213,12 +213,12 @@ export default function StoreSettingsModal({ store, className }: StoreSettingsMo
 
           <ModalFooter>
             <Button
-              type="submit"
-              size="md"
+              type='submit'
+              size='md'
               className={styles.footerButton}
               isLoading={isSubmitting}
               disabled={!isValid || isSubmitting}
-              loadingText="수정 중..."
+              loadingText='수정 중...'
             >
               수정하기
             </Button>

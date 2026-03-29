@@ -1,23 +1,23 @@
-import { getCustomerOrdersByTableId } from "../../api/customer";
-import type { CustomerOrderLookupResponse } from "../../api/customer/entity";
-import BottomActionBar from "../../components/BottomActionBar";
-import OrderStatusBadge from "../../components/OrderStatusBadge";
-import PageHeader from "../../components/PageHeader";
-import { useCart } from "../../stores/cart";
-import { buildStoreHomePath, parsePositiveInt } from "../../utils/orderFlow";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "./OrderHistory.module.scss";
+import { getCustomerOrdersByTableId } from '../../api/customer';
+import type { CustomerOrderLookupResponse } from '../../api/customer/entity';
+import BottomActionBar from '../../components/BottomActionBar';
+import OrderStatusBadge from '../../components/OrderStatusBadge';
+import PageHeader from '../../components/PageHeader';
+import { useCart } from '../../stores/cart';
+import { buildStoreHomePath, parsePositiveInt } from '../../utils/orderFlow';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styles from './OrderHistory.module.scss';
 
-const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
+const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
 const formatOrderTime = (value: string) => {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "--:--";
+  if (Number.isNaN(date.getTime())) return '--:--';
 
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 };
 
@@ -31,13 +31,13 @@ export default function OrderHistoryPage() {
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
   const tableNum = useMemo(
-    () => parsePositiveInt(searchParams.get("tableNum")),
+    () => parsePositiveInt(searchParams.get('tableNum')),
     [searchParams],
   );
   const hasTableContext = storeId !== null && tableNum !== null;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["customer", "orders", "history", storeId, tableNum],
+    queryKey: ['customer', 'orders', 'history', storeId, tableNum],
     queryFn: () =>
       getCustomerOrdersByTableId(storeId as number, tableNum as number),
     enabled: hasTableContext,
@@ -78,10 +78,10 @@ export default function OrderHistoryPage() {
   return (
     <main className={styles.orderHistory}>
       <PageHeader
-        title="주문 내역"
+        title='주문 내역'
         onBack={() =>
           navigate(
-            hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/",
+            hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/',
           )
         }
       />
@@ -131,7 +131,7 @@ export default function OrderHistoryPage() {
                   <div className={styles.orderHistory__orderHeader}>
                     <div className={styles.orderHistory__orderMeta}>
                       <span className={styles.orderHistory__orderNumber}>
-                        {`주문 번호 ${String(order.id).padStart(2, "0")}`}
+                        {`주문 번호 ${String(order.id).padStart(2, '0')}`}
                       </span>
                       <OrderStatusBadge status={order.orderStatus} />
                     </div>
@@ -169,11 +169,11 @@ export default function OrderHistoryPage() {
 
       <BottomActionBar>
         <button
-          type="button"
+          type='button'
           className={styles.orderHistory__menuButton}
           onClick={() =>
             navigate(
-              hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/",
+              hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/',
             )
           }
         >

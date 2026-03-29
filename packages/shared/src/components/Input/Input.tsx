@@ -1,11 +1,11 @@
-import ErrorCircleIcon from "../../assets/icons/error-circle.svg?react";
-import InfoCircleIcon from "../../assets/icons/info-circle.svg?react";
-import WarningCircleIcon from "../../assets/icons/warning-circle.svg?react";
-import clsx from "clsx";
-import type { ReactNode, SVGProps } from "react";
-import styles from "./Input.module.scss";
+import ErrorCircleIcon from '../../assets/icons/error-circle.svg?react';
+import InfoCircleIcon from '../../assets/icons/info-circle.svg?react';
+import WarningCircleIcon from '../../assets/icons/warning-circle.svg?react';
+import clsx from 'clsx';
+import type { ReactNode, SVGProps } from 'react';
+import styles from './Input.module.scss';
 
-export type InputMessageState = "error" | "warning" | "success" | "info";
+export type InputMessageState = 'error' | 'warning' | 'success' | 'info';
 
 interface InputProps {
   label?: string;
@@ -17,15 +17,15 @@ interface InputProps {
 
 function SuccessCircleIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" {...props}>
-      <circle cx="8" cy="8" r="7" fill="#11B76B" />
+    <svg viewBox='0 0 16 16' fill='none' aria-hidden='true' {...props}>
+      <circle cx='8' cy='8' r='7' fill='#11B76B' />
       <path
-        d="m5.1 8.2 1.8 1.8 4-4"
-        fill="none"
-        stroke="#fff"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        d='m5.1 8.2 1.8 1.8 4-4'
+        fill='none'
+        stroke='#fff'
+        strokeWidth='1.4'
+        strokeLinecap='round'
+        strokeLinejoin='round'
       />
     </svg>
   );
@@ -39,11 +39,11 @@ export function InputRoot({
   children,
 }: InputProps) {
   const MessageIcon =
-    messageState === "warning"
+    messageState === 'warning'
       ? WarningCircleIcon
-      : messageState === "info"
+      : messageState === 'info'
         ? InfoCircleIcon
-        : messageState === "success"
+        : messageState === 'success'
           ? SuccessCircleIcon
           : ErrorCircleIcon;
 

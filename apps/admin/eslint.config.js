@@ -91,4 +91,11 @@ export default defineConfig([
     },
   },
   prettier,
+  {
+    files: ['**/*.{js,mjs,cjs,ts,tsx,jsx}'],
+    rules: {
+      quotes: ['error', 'single', { avoidEscape: true }],
+      'jsx-quotes': ['error', 'prefer-single'],
+    },
+  },
 ]);

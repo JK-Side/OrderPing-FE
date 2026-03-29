@@ -39,10 +39,10 @@ export default function StoreOperate() {
             <>
               <Button
                 className={summaryStyles.actionButton}
-                size="md"
+                size='md'
                 onClick={() => id && navigate(`/store/${id}/menu/create`)}
               >
-                <AddMenuIcon className={summaryStyles.actionIcon} aria-hidden="true" />
+                <AddMenuIcon className={summaryStyles.actionIcon} aria-hidden='true' />
                 메뉴 추가
               </Button>
               {storeId ? (
@@ -59,7 +59,7 @@ export default function StoreOperate() {
 
         {hasMenuError ? (
           <div className={styles.emptyState}>
-            <WarningIcon className={styles.errorIcon} aria-hidden="true" />
+            <WarningIcon className={styles.errorIcon} aria-hidden='true' />
             <p className={styles.errorText}>메뉴를 불러오지 못했어요.</p>
           </div>
         ) : hasMenus ? (
@@ -67,7 +67,7 @@ export default function StoreOperate() {
         ) : (
           <div className={styles.emptyState}>
             <button className={styles.emptyState__title} onClick={() => id && navigate(`/store/${id}/menu/create`)}>
-              <AddMenuIcon className={styles.emptyIcon} aria-hidden="true" />
+              <AddMenuIcon className={styles.emptyIcon} aria-hidden='true' />
               <p className={styles.emptyText}>메뉴를 추가해 보세요!</p>
             </button>
           </div>

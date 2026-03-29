@@ -31,10 +31,10 @@ export default function TableQrPrint() {
         </div>
 
         <div className={styles.actions}>
-          <Button type="button" variant="secondary" size="md" onClick={() => navigate(-1)}>
+          <Button type='button' variant='secondary' size='md' onClick={() => navigate(-1)}>
             돌아가기
           </Button>
-          <Button type="button" size="md" onClick={() => window.print()} disabled={isPending || isError}>
+          <Button type='button' size='md' onClick={() => window.print()} disabled={isPending || isError}>
             인쇄하기
           </Button>
         </div>
@@ -44,7 +44,7 @@ export default function TableQrPrint() {
         <div className={styles.stateCard}>QR 목록을 불러오는 중입니다.</div>
       ) : isError ? (
         <div className={styles.stateCard}>
-          <WarningIcon className={styles.stateIcon} aria-hidden="true" />
+          <WarningIcon className={styles.stateIcon} aria-hidden='true' />
           <p className={styles.stateTitle}>QR 출력 정보를 불러오지 못했습니다.</p>
           <p className={styles.stateDescription}>매장 접근 권한과 QR 목록 API 응답을 확인해 주세요.</p>
         </div>

@@ -341,7 +341,7 @@ export default function StoreOrders() {
               <div className={styles.sectionTitle}>{section.title}</div>
               {section.hint ? (
                 <span className={styles.sectionHint}>
-                  <InfoIcon width={16} height={16} aria-hidden="true" />
+                  <InfoIcon width={16} height={16} aria-hidden='true' />
                   {section.hint}
                 </span>
               ) : null}

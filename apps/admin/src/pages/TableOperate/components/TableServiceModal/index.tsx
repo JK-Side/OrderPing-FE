@@ -146,13 +146,13 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
           <ModalBody className={styles.body}>
             <div className={styles.form}>
               <Input
-                label="메뉴"
+                label='메뉴'
                 required
                 message={errors.menuId?.message}
                 messageState={errors.menuId ? 'error' : undefined}
               >
                 <Controller
-                  name="menuId"
+                  name='menuId'
                   control={control}
                   rules={{ required: '메뉴를 선택해 주세요.' }}
                   render={({ field }) => (
@@ -170,15 +170,15 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
               </Input>
 
               <Input
-                label="수량"
+                label='수량'
                 required
                 message={errors.quantity?.message}
                 messageState={errors.quantity ? 'error' : undefined}
               >
                 <Input.Text
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="수량을 숫자로 입력해 주세요. ex) 1"
+                  type='text'
+                  inputMode='numeric'
+                  placeholder='수량을 숫자로 입력해 주세요. ex) 1'
                   disabled={!isOrderableTable}
                   {...register('quantity', {
                     required: '수량을 입력해 주세요.',
@@ -194,7 +194,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
           <ModalFooter className={styles.footer}>
             <div className={styles.footerButtons}>
               <Button
-                type="submit"
+                type='submit'
                 className={styles.footerButton}
                 disabled={!isValid || isSubmitting || isPending || !hasSelectableMenu || !isOrderableTable}
                 isLoading={isSubmitting || isPending}
@@ -202,8 +202,8 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
                 서비스 추가
               </Button>
               <Button
-                type="button"
-                variant="danger"
+                type='button'
+                variant='danger'
                 className={styles.footerButton}
                 onClick={() => handleModalOpenChange(false)}
               >

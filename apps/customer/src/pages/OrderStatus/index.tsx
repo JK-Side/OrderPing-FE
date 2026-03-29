@@ -1,30 +1,30 @@
-﻿import { getCustomerOrdersByTableId } from "../../api/customer";
-import type { CustomerOrderLookupResponse } from "../../api/customer/entity";
-import BottomActionBar from "../../components/BottomActionBar";
-import PageHeader from "../../components/PageHeader";
-import { useCart } from "../../stores/cart";
+﻿import { getCustomerOrdersByTableId } from '../../api/customer';
+import type { CustomerOrderLookupResponse } from '../../api/customer/entity';
+import BottomActionBar from '../../components/BottomActionBar';
+import PageHeader from '../../components/PageHeader';
+import { useCart } from '../../stores/cart';
 import {
   buildOrderHistoryPath,
   buildStoreHomePath,
   parsePositiveInt,
-} from "../../utils/orderFlow";
+} from '../../utils/orderFlow';
 import {
   ORDER_STATUS_STEPS,
   getOrderStatusMeta,
-} from "../../utils/orderStatus";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "./OrderStatus.module.scss";
+} from '../../utils/orderStatus';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styles from './OrderStatus.module.scss';
 
-const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
+const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
 const formatOrderTime = (value: string) => {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "--:--";
+  if (Number.isNaN(date.getTime())) return '--:--';
 
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 };
 
@@ -41,17 +41,17 @@ export default function OrderStatusPage() {
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
   const tableNum = useMemo(
-    () => parsePositiveInt(searchParams.get("tableNum")),
+    () => parsePositiveInt(searchParams.get('tableNum')),
     [searchParams],
   );
   const orderId = useMemo(
-    () => parsePositiveInt(searchParams.get("orderId")),
+    () => parsePositiveInt(searchParams.get('orderId')),
     [searchParams],
   );
   const hasTableContext = storeId !== null && tableNum !== null;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["customer", "orders", storeId, tableNum],
+    queryKey: ['customer', 'orders', storeId, tableNum],
     queryFn: () =>
       getCustomerOrdersByTableId(storeId as number, tableNum as number),
     enabled: hasTableContext && orderId !== null,
@@ -64,7 +64,7 @@ export default function OrderStatusPage() {
       if (!orders) return 5000;
 
       const targetOrder = orders?.find((order) => order.id === orderId);
-      if (!targetOrder || targetOrder.orderStatus === "COMPLETE") return false;
+      if (!targetOrder || targetOrder.orderStatus === 'COMPLETE') return false;
 
       return 5000;
     },
@@ -97,23 +97,23 @@ export default function OrderStatusPage() {
     !isLoading &&
     !error &&
     !currentOrder;
-  const currentStatus = currentOrder?.orderStatus ?? "PENDING";
+  const currentStatus = currentOrder?.orderStatus ?? 'PENDING';
   const currentStatusMeta = getOrderStatusMeta(currentStatus);
-  const title = currentOrder ? currentStatusMeta.label : "주문 상태";
-  const titleDescription = currentOrder ? currentStatusMeta.description : "";
+  const title = currentOrder ? currentStatusMeta.label : '주문 상태';
+  const titleDescription = currentOrder ? currentStatusMeta.description : '';
   const progressToneClassName = {
-    red: styles["orderStatus__progress--red"],
-    green: styles["orderStatus__progress--green"],
-    blue: styles["orderStatus__progress--blue"],
+    red: styles['orderStatus__progress--red'],
+    green: styles['orderStatus__progress--green'],
+    blue: styles['orderStatus__progress--blue'],
   }[currentStatusMeta.tone];
 
   return (
     <main className={styles.orderStatus}>
       <PageHeader
-        title="주문 완료"
+        title='주문 완료'
         onBack={() =>
           navigate(
-            hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/",
+            hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/',
           )
         }
       />
@@ -185,7 +185,7 @@ export default function OrderStatusPage() {
             <ol
               className={[styles.orderStatus__progress, progressToneClassName]
                 .filter(Boolean)
-                .join(" ")}
+                .join(' ')}
             >
               {ORDER_STATUS_STEPS.map((status) => {
                 const stepMeta = getOrderStatusMeta(status);
@@ -198,13 +198,13 @@ export default function OrderStatusPage() {
                     key={status}
                     className={[
                       styles.orderStatus__progressStep,
-                      isDone ? styles["orderStatus__progressStep--done"] : "",
+                      isDone ? styles['orderStatus__progressStep--done'] : '',
                       isActive
-                        ? styles["orderStatus__progressStep--active"]
-                        : "",
+                        ? styles['orderStatus__progressStep--active']
+                        : '',
                     ]
                       .filter(Boolean)
-                      .join(" ")}
+                      .join(' ')}
                   >
                     <span className={styles.orderStatus__stepDot} />
                     <span className={styles.orderStatus__stepLabel}>
@@ -218,7 +218,7 @@ export default function OrderStatusPage() {
             <article className={styles.orderStatus__orderCard}>
               <div className={styles.orderStatus__orderHeader}>
                 <span className={styles.orderStatus__orderNumber}>
-                  {`주문 번호 ${String(currentOrder.id).padStart(2, "0")}`}
+                  {`주문 번호 ${String(currentOrder.id).padStart(2, '0')}`}
                 </span>
                 <span className={styles.orderStatus__orderTime}>
                   {formatOrderTime(currentOrder.createdAt)}
@@ -253,24 +253,24 @@ export default function OrderStatusPage() {
       <BottomActionBar>
         <div className={styles.orderStatus__buttonGroup}>
           <button
-            type="button"
+            type='button'
             className={styles.orderStatus__secondaryButton}
             onClick={() =>
               navigate(
                 hasTableContext
                   ? buildOrderHistoryPath(storeId, tableNum)
-                  : "/",
+                  : '/',
               )
             }
           >
             주문 내역
           </button>
           <button
-            type="button"
+            type='button'
             className={styles.orderStatus__menuButton}
             onClick={() =>
               navigate(
-                hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/",
+                hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/',
               )
             }
           >

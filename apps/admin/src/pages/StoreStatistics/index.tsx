@@ -230,11 +230,11 @@ export default function StoreStatistics() {
     <section className={styles.storeStatistics}>
       <div className={styles.filterBar}>
         <div className={styles.periodSelect} ref={periodSelectRef}>
-          <button type="button" className={styles.periodButton} onClick={() => setIsPresetOpen((prev) => !prev)}>
+          <button type='button' className={styles.periodButton} onClick={() => setIsPresetOpen((prev) => !prev)}>
             {selectedPreset}
             <ArrowDownIcon
               className={`${styles.periodIcon} ${isPresetOpen ? styles.periodIconOpen : ''}`}
-              aria-hidden="true"
+              aria-hidden='true'
             />
           </button>
           {isPresetOpen ? (
@@ -242,7 +242,7 @@ export default function StoreStatistics() {
               {PERIOD_PRESET_OPTIONS.map((option) => (
                 <li key={option.value}>
                   <button
-                    type="button"
+                    type='button'
                     className={`${styles.periodOption} ${periodPreset === option.value ? styles.periodOptionActive : ''}`}
                     onClick={() => handlePresetClick(option.value)}
                   >
@@ -257,7 +257,7 @@ export default function StoreStatistics() {
         {periodPreset === 'CUSTOM' ? (
           <div className={styles.customDateRange}>
             <input
-              type="date"
+              type='date'
               className={styles.dateInput}
               value={fromDate}
               max={toDate}
@@ -265,7 +265,7 @@ export default function StoreStatistics() {
             />
             <span className={styles.dateRangeMark}>~</span>
             <input
-              type="date"
+              type='date'
               className={styles.dateInput}
               value={toDate}
               min={fromDate}
@@ -305,16 +305,16 @@ export default function StoreStatistics() {
 
       <div className={styles.tabGroup}>
         <Button
-          type="button"
-          size="md"
+          type='button'
+          size='md'
           className={`${styles.tabButton} ${tab === 'orders' ? styles.tabButtonActive : styles.tabButtonInactive}`}
           onClick={() => setTab('orders')}
         >
           전체 주문 조회
         </Button>
         <Button
-          type="button"
-          size="md"
+          type='button'
+          size='md'
           className={`${styles.tabButton} ${tab === 'menus' ? styles.tabButtonActive : styles.tabButtonInactive}`}
           onClick={() => setTab('menus')}
         >

@@ -85,13 +85,13 @@ export default function OrderCard({
       <div className={styles.headerRow}>
         <h4 className={styles.tableName}>{tableName}</h4>
         <button
-          type="button"
+          type='button'
           className={selectBoxClassName}
           aria-label={`${tableName} 선택`}
           aria-pressed={isSelected}
           onClick={handleSelectClick}
         >
-          {isSelected ? <CheckIcon className={styles.selectIcon} aria-hidden="true" /> : null}
+          {isSelected ? <CheckIcon className={styles.selectIcon} aria-hidden='true' /> : null}
         </button>
       </div>
 
@@ -112,7 +112,7 @@ export default function OrderCard({
       {!isEmptyState && statusConfig && (
         <div className={styles.footer}>
           <span className={`${styles.statusBadge} ${statusConfig.badgeClassName}`}>
-            <statusConfig.Icon className={styles.statusIcon} aria-hidden="true" />
+            <statusConfig.Icon className={styles.statusIcon} aria-hidden='true' />
             {statusConfig.label}
           </span>
           {typeof totalPrice === 'number' && (

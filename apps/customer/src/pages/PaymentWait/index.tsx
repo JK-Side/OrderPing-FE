@@ -1,9 +1,9 @@
-﻿import { getPaymentTossDeeplink } from "../../api/customer";
-import CoinIcon from "../../assets/imgs/3d-coin-icon.png?url";
-import BottomActionBar from "../../components/BottomActionBar";
-import PageHeader from "../../components/PageHeader";
-import { useToast } from "../../components/Toast/useToast";
-import { useCart } from "../../stores/cart";
+import { getPaymentTossDeeplink } from '../../api/customer';
+import CoinIcon from '../../assets/imgs/3d-coin-icon.png?url';
+import BottomActionBar from '../../components/BottomActionBar';
+import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast/useToast';
+import { useCart } from '../../stores/cart';
 import {
   buildCartPath,
   buildOrderPaymentAccountPath,
@@ -14,12 +14,12 @@ import {
   openTossWithStoreFallback,
   parsePositiveInt,
   savePendingOrderDraft,
-} from "../../utils/orderFlow";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "./PaymentWait.module.scss";
+} from '../../utils/orderFlow';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styles from './PaymentWait.module.scss';
 
-const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
+const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
 export default function PaymentWaitPage() {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ export default function PaymentWaitPage() {
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
   const tableNum = useMemo(
-    () => parsePositiveInt(searchParams.get("tableNum")),
+    () => parsePositiveInt(searchParams.get('tableNum')),
     [searchParams],
   );
   const hasTableContext = storeId !== null && tableNum !== null;
@@ -52,11 +52,11 @@ export default function PaymentWaitPage() {
       if (hasRedirectedRef.current || !hasTableContext) return;
       hasRedirectedRef.current = true;
       toast({
-        message: "결제 정보를 다시 준비해 주세요.",
-        variant: "warning",
+        message: '결제 정보를 다시 준비해 주세요.',
+        variant: 'warning',
         duration: 3000,
       });
-      navigate(hasTableContext ? buildCartPath(storeId, tableNum) : "/cart", {
+      navigate(hasTableContext ? buildCartPath(storeId, tableNum) : '/cart', {
         replace: true,
       });
     }
@@ -64,7 +64,7 @@ export default function PaymentWaitPage() {
 
   const ensureTossDeeplink = useCallback(async () => {
     if (!draft) {
-      throw new Error("Missing draft");
+      throw new Error('Missing draft');
     }
 
     if (draft.tossDeeplink) {
@@ -91,8 +91,8 @@ export default function PaymentWaitPage() {
 
     await openTossWithStoreFallback(latestDraft.tossDeeplink, () => {
       toast({
-        message: "모바일 기기에서 토스 앱으로 결제해 주세요.",
-        variant: "info",
+        message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
+        variant: 'info',
         duration: 3000,
       });
     });
@@ -107,9 +107,9 @@ export default function PaymentWaitPage() {
       toast({
         message:
           status === 404
-            ? "입금 계좌 정보를 찾을 수 없어요. 다시 시도해 주세요."
-            : "토스 앱을 열지 못했어요. 다시 시도해 주세요.",
-        variant: "error",
+            ? '입금 계좌 정보를 찾을 수 없어요. 다시 시도해 주세요.'
+            : '토스 앱을 열지 못했어요. 다시 시도해 주세요.',
+        variant: 'error',
         duration: 3000,
       });
     });
@@ -140,10 +140,10 @@ export default function PaymentWaitPage() {
   return (
     <main className={styles.paymentWait}>
       <PageHeader
-        title="결제 진행"
+        title='결제 진행'
         onBack={() =>
           navigate(
-            hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/cart",
+            hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/cart',
           )
         }
       />
@@ -151,7 +151,7 @@ export default function PaymentWaitPage() {
       <section className={styles.paymentWait__content}>
         <img
           src={CoinIcon}
-          alt="결제 대기 아이콘"
+          alt='결제 대기 아이콘'
           className={styles.paymentWait__coinIcon}
         />
         <div className={styles.paymentWait__headline}>
@@ -164,7 +164,7 @@ export default function PaymentWaitPage() {
         </div>
         <div className={styles.paymentWait__helper}>
           <button
-            type="button"
+            type='button'
             className={styles.paymentWait__linkButton}
             onClick={() =>
               navigate(buildOrderPaymentAccountPath(storeId, tableNum))
@@ -177,12 +177,12 @@ export default function PaymentWaitPage() {
 
       <BottomActionBar>
         <button
-          type="button"
+          type='button'
           className={styles.paymentWait__submitButton}
           disabled={isMovingNext}
           onClick={handleCompletePayment}
         >
-          {isMovingNext ? "다음 화면으로 이동 중..." : "결제 완료"}
+          {isMovingNext ? '다음 화면으로 이동 중...' : '결제 완료'}
         </button>
       </BottomActionBar>
     </main>

@@ -142,8 +142,8 @@ export default function MenuCreate() {
             <p className={styles.photoHelp}>메뉴 사진이 없으면 기본 사진으로 대체됩니다.</p>
             <label className={styles.photoUpload}>
               <input
-                type="file"
-                accept="image/*"
+                type='file'
+                accept='image/*'
                 hidden
                 {...register('menuImage', {
                   onChange: (event) => {
@@ -158,22 +158,22 @@ export default function MenuCreate() {
                 })}
               />
               {previewUrl ? (
-                <img className={styles.photoPreview} src={previewUrl} alt="메뉴 이미지 미리보기" />
+                <img className={styles.photoPreview} src={previewUrl} alt='메뉴 이미지 미리보기' />
               ) : (
-                <PlusIcon className={styles.photoIcon} aria-hidden="true" />
+                <PlusIcon className={styles.photoIcon} aria-hidden='true' />
               )}
             </label>
           </div>
 
           <div className={styles.fields}>
             <Input
-              label="메뉴명"
+              label='메뉴명'
               required
               message={errors.name?.message}
               messageState={errors.name ? 'error' : undefined}
             >
               <Input.Text
-                placeholder="내용을 입력해 주세요."
+                placeholder='내용을 입력해 주세요.'
                 {...register('name', {
                   required: '메뉴명을 입력해 주세요.',
                   maxLength: { value: 20, message: '메뉴명은 최대 20자입니다.' },
@@ -182,11 +182,11 @@ export default function MenuCreate() {
             </Input>
 
             <div className={styles.row}>
-              <Input label="메뉴 가격" required message={errors.price?.message} messageState={priceMessageState}>
+              <Input label='메뉴 가격' required message={errors.price?.message} messageState={priceMessageState}>
                 <Input.Text
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="내용을 입력해 주세요."
+                  type='text'
+                  inputMode='numeric'
+                  placeholder='내용을 입력해 주세요.'
                   {...register('price', {
                     required: MESSAGES.MENU.PRICE_REQUIRED,
                     pattern: {
@@ -196,11 +196,11 @@ export default function MenuCreate() {
                   })}
                 />
               </Input>
-              <Input label="재고" required message={errors.stock?.message} messageState={stockMessageState}>
+              <Input label='재고' required message={errors.stock?.message} messageState={stockMessageState}>
                 <Input.Text
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="수량을 입력해 주세요."
+                  type='text'
+                  inputMode='numeric'
+                  placeholder='수량을 입력해 주세요.'
                   {...register('stock', {
                     required: MESSAGES.MENU.STOCK_REQUIRED,
                     pattern: {
@@ -217,7 +217,7 @@ export default function MenuCreate() {
                 카테고리 <span className={styles.required}>*</span>
               </div>
               <input
-                type="hidden"
+                type='hidden'
                 {...register('categoryId', {
                   valueAsNumber: true,
                   required: '카테고리를 선택해 주세요.',
@@ -225,7 +225,7 @@ export default function MenuCreate() {
               />
               <div className={styles.categoryButtons}>
                 <button
-                  type="button"
+                  type='button'
                   className={`${styles.categoryButton} ${
                     categoryId === CATEGORY_MAIN ? styles.categoryButtonActive : ''
                   }`}
@@ -240,7 +240,7 @@ export default function MenuCreate() {
                   메인 메뉴
                 </button>
                 <button
-                  type="button"
+                  type='button'
                   className={`${styles.categoryButton} ${
                     categoryId === CATEGORY_SIDE ? styles.categoryButtonActive : ''
                   }`}
@@ -259,12 +259,12 @@ export default function MenuCreate() {
             </div>
 
             <Input
-              label="메뉴 설명 (선택)"
+              label='메뉴 설명 (선택)'
               message={errors.description?.message}
               messageState={errors.description ? 'error' : undefined}
             >
               <Input.TextArea
-                placeholder={`예시) 우리 주점 최고의 안주,\n둘이 먹다 죽어도 몰라요.\n극강의 매운맛에 도전해 보세요!`}
+                placeholder={'예시) 우리 주점 최고의 안주,\n둘이 먹다 죽어도 몰라요.\n극강의 매운맛에 도전해 보세요!'}
                 {...register('description', {
                   maxLength: { value: 30, message: '메뉴 설명은 최대 30자입니다.' },
                 })}
@@ -273,10 +273,10 @@ export default function MenuCreate() {
           </div>
         </div>
         <div className={styles.actions}>
-          <Button type="button" variant="ghost" className={styles.cancelButton} onClick={handleCancel}>
+          <Button type='button' variant='ghost' className={styles.cancelButton} onClick={handleCancel}>
             취소
           </Button>
-          <Button type="submit" size="md" className={styles.submitButton} disabled={!canSubmit || isSubmitting}>
+          <Button type='submit' size='md' className={styles.submitButton} disabled={!canSubmit || isSubmitting}>
             메뉴 추가
           </Button>
         </div>{' '}

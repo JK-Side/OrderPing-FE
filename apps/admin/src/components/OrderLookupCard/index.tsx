@@ -108,9 +108,9 @@ export default function OrderLookupCard({
     <article className={cardClassName} data-status={stat} {...rest}>
       <div className={styles.header}>
         <span className={styles.tableNumber}>{formatTableNumber(tableNumber)}</span>
-        <button type="button" className={styles.detailButton} onClick={onDetailClick}>
+        <button type='button' className={styles.detailButton} onClick={onDetailClick}>
           자세히 보기
-          <ArrowRightIcon className={styles.detailIcon} aria-hidden="true" />
+          <ArrowRightIcon className={styles.detailIcon} aria-hidden='true' />
         </button>
       </div>
 
@@ -134,31 +134,31 @@ export default function OrderLookupCard({
 
       <div className={styles.actions}>
         <Button
-          type="button"
-          variant="secondary"
-          size="sm"
+          type='button'
+          variant='secondary'
+          size='sm'
           className={styles.rejectButton}
           onClick={handlePrevClick}
           isLoading={isReverting}
           disabled={isReverting}
         >
           {actionConfig.prevIcon === 'close' ? (
-            <CloseIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
+            <CloseIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden='true' />
           ) : (
-            <BackIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden="true" />
+            <BackIcon className={`${styles.actionIcon} ${styles.rejectIcon}`} aria-hidden='true' />
           )}
           {actionConfig.prevLabel}
         </Button>
         {!!actionConfig.nextLabel && (
           <Button
-            type="button"
-            size="sm"
+            type='button'
+            size='sm'
             className={styles.actionButton}
             onClick={onAccept}
             isLoading={isAccepting}
             disabled={isAcceptDisabled || isAccepting}
           >
-            <CheckIcon className={styles.actionIcon} aria-hidden="true" />
+            <CheckIcon className={styles.actionIcon} aria-hidden='true' />
             {actionConfig.nextLabel}
           </Button>
         )}

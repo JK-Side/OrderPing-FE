@@ -1,9 +1,9 @@
-import styles from "./CustomerHome.module.scss";
+import styles from './CustomerHome.module.scss';
 
 export default function CustomerHomePage() {
   return (
     <main className={styles.landing}>
-      <div className={styles.landing__backgroundGlow} aria-hidden="true" />
+      <div className={styles.landing__backgroundGlow} aria-hidden='true' />
 
       <section className={styles.landing__hero}>
         <div className={styles.landing__brandBadge}>ORDER PING</div>
@@ -18,7 +18,7 @@ export default function CustomerHomePage() {
         </p>
 
         <div className={styles.landing__phoneQrPreview}>
-          <div className={styles.landing__phoneQrBox} aria-hidden="true" />
+          <div className={styles.landing__phoneQrBox} aria-hidden='true' />
           <div className={styles.landing__phoneQrText}>
             <strong>QR 스캔 후 자동 입장</strong>
             <span>매장/테이블 정보가 포함된 링크로 연결돼요</span>

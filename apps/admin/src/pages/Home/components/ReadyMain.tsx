@@ -38,7 +38,7 @@ export default function ReadyMain({ userName = 'User', store }: ReadyMainProps) 
           <div className={styles.storeImageWrap}>
             <img className={styles.storeImage} src={storeImage} alt={`${storeName} 주점`} />
           </div>
-          <Button className={styles.storeButton} size="md" onClick={() => navigate(`/store/operate/${store!.id}`)}>
+          <Button className={styles.storeButton} size='md' onClick={() => navigate(`/store/operate/${store!.id}`)}>
             주점 시작
           </Button>
         </div>

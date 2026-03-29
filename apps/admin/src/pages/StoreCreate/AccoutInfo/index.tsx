@@ -53,7 +53,7 @@ export default function AccoutInfo({
         <div className={styles.fields}>
           <div className={styles.bankField}>
             <Controller
-              name="bankCode"
+              name='bankCode'
               control={control}
               rules={{ required: '은행명을 선택해 주세요.' }}
               render={({ field }) => (
@@ -62,7 +62,7 @@ export default function AccoutInfo({
                   value={field.value ?? ''}
                   onValueChange={field.onChange}
                   options={bankOptions}
-                  placeholder="은행명을 선택해 주세요."
+                  placeholder='은행명을 선택해 주세요.'
                   disabled={isLoading}
                   required
                 />
@@ -71,13 +71,13 @@ export default function AccoutInfo({
           </div>
 
           <Input
-            label="예금주"
+            label='예금주'
             required
             message={errors.accountHolder?.message}
             messageState={errors.accountHolder ? 'error' : undefined}
           >
             <Input.Text
-              placeholder="예금주명을 입력해 주세요. (최대 6글자)"
+              placeholder='예금주명을 입력해 주세요. (최대 6글자)'
               {...register('accountHolder', {
                 required: '예금주명을 입력해 주세요.',
                 maxLength: { value: 6, message: '예금주명은 최대 6자입니다.' },
@@ -86,14 +86,14 @@ export default function AccoutInfo({
           </Input>
 
           <Input
-            label="계좌번호"
+            label='계좌번호'
             required
             message={errors.accountNumber?.message || '입력한 계좌 정보는 주점 정산 용도로만 사용돼요'}
             messageState={errors.accountNumber ? 'error' : 'info'}
           >
             <Input.Text
-              placeholder="계좌번호를 숫자만 입력해 주세요. (최대 20글자)"
-              inputMode="numeric"
+              placeholder='계좌번호를 숫자만 입력해 주세요. (최대 20글자)'
+              inputMode='numeric'
               {...register('accountNumber', {
                 required: '계좌번호를 입력해 주세요.',
                 maxLength: { value: 20, message: '계좌번호은 최대 20자입니다.' },
@@ -137,8 +137,8 @@ export default function AccoutInfo({
         </div>
 
         <Button
-          type="submit"
-          size="lg"
+          type='submit'
+          size='lg'
           className={styles.nextButton}
           disabled={isSubmitting || isNextDisabled}
           isLoading={isSubmitting}

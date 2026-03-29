@@ -32,12 +32,12 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
               )}
               <img className={styles.menuImage} src={menu.imageUrl || MenuDefault} alt={menu.name} />
               <button
-                type="button"
+                type='button'
                 className={styles.menuAction}
                 aria-label={`${menu.name} 설정`}
                 onClick={() => navigate(`/store/${menu.storeId}/menu/${menu.id}/edit`)}
               >
-                <SettingIcon className={styles.menuActionIcon} aria-hidden="true" />
+                <SettingIcon className={styles.menuActionIcon} aria-hidden='true' />
               </button>
             </div>
             <div className={styles.menuInfo}>
@@ -57,8 +57,8 @@ export default function MenuList({ menus }: MenuListProps) {
 
   return (
     <div className={styles.menuList}>
-      {mainMenus.length > 0 && <MenuSection title="메인 메뉴" menus={mainMenus} />}
-      {sideMenus.length > 0 && <MenuSection title="사이드 메뉴" menus={sideMenus} />}
+      {mainMenus.length > 0 && <MenuSection title='메인 메뉴' menus={mainMenus} />}
+      {sideMenus.length > 0 && <MenuSection title='사이드 메뉴' menus={sideMenus} />}
     </div>
   );
 }

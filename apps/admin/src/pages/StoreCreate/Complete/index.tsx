@@ -26,7 +26,7 @@ export default function StoreCreateComplete({ storeName }: StoreCreateCompletePr
         )}
       </h2>
       <p className={styles.subtitle}>이제 주문을 받고 주점을 운영할 수 있어요.</p>
-      <Button size="lg" className={styles.homeButton} onClick={handleGoHome}>
+      <Button size='lg' className={styles.homeButton} onClick={handleGoHome}>
         홈으로 가기
       </Button>
     </div>

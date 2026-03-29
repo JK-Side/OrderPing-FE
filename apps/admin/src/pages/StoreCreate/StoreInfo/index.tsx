@@ -102,13 +102,13 @@ export default function StoreInfo({
 
         <div className={styles.fields}>
           <Input
-            label="주점명"
+            label='주점명'
             required
             message={errors.storeName?.message}
             messageState={errors.storeName ? 'error' : undefined}
           >
             <Input.Text
-              placeholder="주점명을 입력해 주세요. (최대 10자)"
+              placeholder='주점명을 입력해 주세요. (최대 10자)'
               {...register('storeName', {
                 required: '주점명을 입력해 주세요.',
                 maxLength: { value: 10, message: '주점명은 최대 10자입니다.' },
@@ -117,13 +117,13 @@ export default function StoreInfo({
           </Input>
 
           <Input
-            label="주점 설명"
+            label='주점 설명'
             required
             message={errors.storeDescription?.message}
             messageState={errors.storeDescription ? 'error' : undefined}
           >
             <Input.TextArea
-              placeholder={`주점 설명을 입력해 주세요. (최대 100자) \n예시) 어서오세요, 컴퓨터공학부 주점입니다!`}
+              placeholder={'주점 설명을 입력해 주세요. (최대 100자) \n예시) 어서오세요, 컴퓨터공학부 주점입니다!'}
               {...register('storeDescription', {
                 required: '주점 설명을 입력해 주세요.',
                 maxLength: { value: 100, message: '주점 설명은 최대 100자입니다.' },
@@ -132,13 +132,13 @@ export default function StoreInfo({
           </Input>
 
           <div className={styles.imageField}>
-            <label className={styles.fieldLabel} htmlFor="storeImage">
+            <label className={styles.fieldLabel} htmlFor='storeImage'>
               주점 이미지
             </label>
             <input
-              id="storeImage"
-              type="file"
-              accept="image/*"
+              id='storeImage'
+              type='file'
+              accept='image/*'
               hidden
               {...storeImageFieldProps}
               ref={(element) => {
@@ -152,7 +152,7 @@ export default function StoreInfo({
             />
             <label
               className={`${styles.imageUpload} ${isDragging ? styles.imageUploadDragging : ''}`}
-              htmlFor="storeImage"
+              htmlFor='storeImage'
               onDragEnter={handleDragEnter}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
@@ -160,19 +160,19 @@ export default function StoreInfo({
             >
               {storePreviewUrl ? (
                 <>
-                  <img className={styles.previewImage} src={storePreviewUrl} alt="미리보기 이미지" />
+                  <img className={styles.previewImage} src={storePreviewUrl} alt='미리보기 이미지' />
                   <button
-                    type="button"
+                    type='button'
                     className={styles.previewRemove}
-                    aria-label="Remove image"
+                    aria-label='Remove image'
                     onClick={handleRemovePreview}
                   >
-                    <CloseIcon className={styles.previewRemoveIcon} aria-hidden="true" />
+                    <CloseIcon className={styles.previewRemoveIcon} aria-hidden='true' />
                   </button>
                 </>
               ) : (
                 <>
-                  <UploadIcon className={styles.uploadIcon} aria-hidden="true" />
+                  <UploadIcon className={styles.uploadIcon} aria-hidden='true' />
                   <span>파일 드래그 또는 클릭하여 업로드</span>
                 </>
               )}
@@ -181,7 +181,7 @@ export default function StoreInfo({
         </div>
 
         <div className={styles.buttonContainer}>
-          <Button type="submit" size="lg" className={styles.nextButton} disabled={isNextDisabled}>
+          <Button type='submit' size='lg' className={styles.nextButton} disabled={isNextDisabled}>
             다음
           </Button>
         </div>

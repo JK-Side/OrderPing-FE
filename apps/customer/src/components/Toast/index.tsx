@@ -78,7 +78,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ToastPrimitive.Provider swipeDirection="right" duration={DEFAULT_TOAST_DURATION}>
+    <ToastPrimitive.Provider swipeDirection='right' duration={DEFAULT_TOAST_DURATION}>
       <ToastContext.Provider value={value}>
         {children}
         {toasts.map((toastItem) => {
@@ -96,7 +96,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 }
               }}
             >
-              <CheckIcon className={styles.toast__icon} aria-hidden="true" />
+              <CheckIcon className={styles.toast__icon} aria-hidden='true' />
               <ToastPrimitive.Title className={styles.toast__message}>
                 {toastItem.message}
               </ToastPrimitive.Title>
