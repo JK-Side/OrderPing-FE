@@ -361,7 +361,7 @@ export default function MenuEdit() {
               messageState={errors.description ? 'error' : undefined}
             >
               <Input.TextArea
-                placeholder={`예시) 사랑의 티니핑 월드에 빠져버린 맛,\n둘이 먹다 죽어도 난 몰라요.\n저는 그저 티니핑 월드에 갈 것이에요.`}
+                placeholder={`예시) 우리 주점 최고의 안주,\n둘이 먹다 죽어도 몰라요.\n극강의 매운맛에 도전해 보세요!`}
                 {...register('description', {
                   maxLength: { value: 30, message: '메뉴 설명은 최대 30자입니다.' },
                 })}
