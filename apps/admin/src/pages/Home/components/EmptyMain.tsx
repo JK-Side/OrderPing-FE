@@ -19,7 +19,7 @@ export default function EmptyMain() {
 
       <div className={styles.panel}>
         <button className={styles.createBox} onClick={() => navigate('/store/create')}>
-          <PlusIcon width={32} height={32} fill="#8e8e93" />
+          <PlusIcon width={32} height={32} fill='#8e8e93' />
         </button>
         <p className={styles.panelText}>주점을 생성해 보세요!</p>
       </div>

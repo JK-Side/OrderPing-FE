@@ -22,7 +22,7 @@ export default function GuestHome() {
 
         <div className={styles.lockPanel}>
           <div className={styles.lockBox}>
-            <LockIcon width={32} height={32} fill="#8e8e93" />
+            <LockIcon width={32} height={32} fill='#8e8e93' />
           </div>
           <p className={styles.lockText}>로그인 후 주점을 생성해 보세요!</p>
         </div>

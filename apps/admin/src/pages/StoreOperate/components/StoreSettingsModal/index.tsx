@@ -150,8 +150,8 @@ export default function StoreSettingsModal({
   return (
     <Modal open={open} onOpenChange={handleOpenChange}>
       <ModalTrigger asChild>
-        <Button className={styles.triggerButton} size="md" variant="ghost">
-          <SettingDetailIcon className={styles.triggerIcon} aria-hidden="true" />
+        <Button className={styles.triggerButton} size='md' variant='ghost'>
+          <SettingDetailIcon className={styles.triggerIcon} aria-hidden='true' />
           주점 설정
         </Button>
       </ModalTrigger>
@@ -165,13 +165,13 @@ export default function StoreSettingsModal({
           <ModalBody>
             <div className={styles.form}>
               <Input
-                label="주점명"
+                label='주점명'
                 required
                 message={errors.name?.message}
                 messageState={errors.name ? 'error' : undefined}
               >
                 <Input.Text
-                  placeholder="주점명을 입력해 주세요."
+                  placeholder='주점명을 입력해 주세요.'
                   {...register('name', {
                     required: '주점명을 입력해 주세요.',
                     maxLength: { value: 10, message: '주점명은 최대 10자입니다.' },
@@ -180,13 +180,13 @@ export default function StoreSettingsModal({
               </Input>
 
               <Input
-                label="주점 설명"
+                label='주점 설명'
                 required
                 message={errors.description?.message}
                 messageState={errors.description ? 'error' : undefined}
               >
                 <Input.TextArea
-                  placeholder="주점 설명을 입력해 주세요."
+                  placeholder='주점 설명을 입력해 주세요.'
                   {...register('description', {
                     required: '주점 설명을 입력해 주세요.',
                     maxLength: { value: 100, message: '주점 설명은 최대 100자입니다.' },
@@ -205,12 +205,12 @@ export default function StoreSettingsModal({
                 <div className={styles.imageColumn}>
                   <div className={styles.imageLabel}>변경할 이미지</div>
                   <label className={styles.imageUpload}>
-                    <input type="file" accept="image/*" hidden onChange={handleImageChange} />
+                    <input type='file' accept='image/*' hidden onChange={handleImageChange} />
                     {previewUrl ? (
-                      <img className={styles.imagePreviewImage} src={previewUrl} alt="변경할 이미지 미리보기" />
+                      <img className={styles.imagePreviewImage} src={previewUrl} alt='변경할 이미지 미리보기' />
                     ) : (
                       <>
-                        <UploadIcon className={styles.uploadIcon} aria-hidden="true" />
+                        <UploadIcon className={styles.uploadIcon} aria-hidden='true' />
                         <span>드래그 하여 이미지 삽입</span>
                       </>
                     )}
@@ -222,8 +222,8 @@ export default function StoreSettingsModal({
 
           <ModalFooter>
             <Button
-              type="submit"
-              size="md"
+              type='submit'
+              size='md'
               className={styles.submitButton}
               disabled={!isValid || !hasChanges || isSubmitting}
             >

@@ -62,8 +62,8 @@ function StoreInfoCard({ store, onStoreDeleteClick, isActionPending }: StoreInfo
           <div className={styles.cardSetting}>
             <StoreSettingsModal store={store} className={styles.infoFixButton} />
             <Button
-              type="button"
-              variant="danger"
+              type='button'
+              variant='danger'
               className={styles.dangerActionButton}
               onClick={() => onStoreDeleteClick(store)}
               disabled={isActionPending}
@@ -107,7 +107,7 @@ function EmptyState() {
       <div className={styles.stateTitle}>아직 등록된 주점이 없어요</div>
       <div className={styles.stateDescription}>첫 번째 주점을 등록하고 주점 정보를 관리해 보세요.</div>
       <div className={styles.stateActions}>
-        <Link to="/store/create" className={styles.primaryLink}>
+        <Link to='/store/create' className={styles.primaryLink}>
           주점 생성하러 가기
         </Link>
       </div>
@@ -129,7 +129,7 @@ function ErrorState({ error }: { error: unknown }) {
       <h2 className={styles.stateTitle}>마이페이지를 이용할 수 없습니다.</h2>
       <p className={styles.stateDescription}>{message}</p>
       <div className={styles.stateActions}>
-        <Link to="/" className={styles.secondaryLink}>
+        <Link to='/' className={styles.secondaryLink}>
           메인 화면으로
         </Link>
       </div>
@@ -269,8 +269,8 @@ export default function MyPage() {
             : null}
           <div className={styles.dangerActions}>
             <Button
-              type="button"
-              variant="danger"
+              type='button'
+              variant='danger'
               className={styles.dangerActionButton}
               onClick={() => setIsDeleteUserModalOpen(true)}
               disabled={isDangerActionPending}
@@ -295,8 +295,8 @@ export default function MyPage() {
           </ModalBody>
           <ModalFooter className={styles.dangerModalFooter}>
             <Button
-              type="button"
-              variant="ghost"
+              type='button'
+              variant='ghost'
               className={styles.dangerModalButton}
               onClick={() => setIsDeleteUserModalOpen(false)}
               disabled={isUserDeleting}
@@ -304,13 +304,13 @@ export default function MyPage() {
               취소
             </Button>
             <Button
-              type="button"
-              variant="danger"
+              type='button'
+              variant='danger'
               className={styles.dangerModalButton}
               onClick={handleConfirmDeleteUser}
               isLoading={isUserDeleting}
               disabled={isUserDeleting}
-              loadingText="탈퇴 중..."
+              loadingText='탈퇴 중...'
             >
               탈퇴하기
             </Button>
@@ -335,8 +335,8 @@ export default function MyPage() {
           </ModalBody>
           <ModalFooter className={styles.dangerModalFooter}>
             <Button
-              type="button"
-              variant="ghost"
+              type='button'
+              variant='ghost'
               className={styles.dangerModalButton}
               onClick={() => setDeleteTargetStore(null)}
               disabled={isStoreDeleting}
@@ -344,13 +344,13 @@ export default function MyPage() {
               취소
             </Button>
             <Button
-              type="button"
-              variant="danger"
+              type='button'
+              variant='danger'
               className={styles.dangerModalButton}
               onClick={handleConfirmDeleteStore}
               isLoading={isStoreDeleting}
               disabled={isStoreDeleting || !deleteTargetStore}
-              loadingText="삭제 중..."
+              loadingText='삭제 중...'
             >
               삭제하기
             </Button>

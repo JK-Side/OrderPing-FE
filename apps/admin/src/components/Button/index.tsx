@@ -37,7 +37,7 @@ export default function Button({
 
   return (
     <button
-      type="button"
+      type='button'
       disabled={isButtonDisabled}
       aria-busy={isLoading || undefined}
       className={clsx(
@@ -54,7 +54,7 @@ export default function Button({
     >
       {isLoading ? (
         <span className={styles.loadingContent}>
-          <span className={styles.spinner} aria-hidden="true" />
+          <span className={styles.spinner} aria-hidden='true' />
           {loadingText ?? children}
         </span>
       ) : (

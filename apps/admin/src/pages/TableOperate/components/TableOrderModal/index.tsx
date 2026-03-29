@@ -191,7 +191,7 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
                 </span>
                 <div className={styles.memoActions}>
                   <Button
-                    type="button"
+                    type='button'
                     className={styles.memoSaveButton}
                     onClick={handleSaveMemo}
                     disabled={isSavingMemo || !isMemoDirty || isMemoTooLong}
@@ -207,8 +207,8 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
               value={memo}
               onChange={handleMemoChange}
               maxLength={MEMO_MAX_LENGTH}
-              placeholder="손님의 요청사항을 입력해 주세요."
-              aria-label="테이블 메모"
+              placeholder='손님의 요청사항을 입력해 주세요.'
+              aria-label='테이블 메모'
             />
           </div>
 
@@ -232,12 +232,12 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
         </ModalBody>
         <ModalFooter className={styles.footer}>
           <div className={styles.footerButtons}>
-            <Button type="button" className={styles.footerButton} onClick={onServiceAdd} disabled={!onServiceAdd}>
+            <Button type='button' className={styles.footerButton} onClick={onServiceAdd} disabled={!onServiceAdd}>
               서비스 추가
             </Button>
             <Button
-              type="button"
-              variant="danger"
+              type='button'
+              variant='danger'
               className={styles.footerButton}
               onClick={handleClearTable}
               disabled={isClearing || !canClearTable || isClosedTable}

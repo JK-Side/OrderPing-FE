@@ -60,22 +60,22 @@ export default function Header() {
 
   return (
     <header className={styles.header}>
-      <Link to="/" className={styles.logo} onClick={handleMenuClose}>
-        <img src={OrderPingLogo} alt="Order ping Logo" className={styles.logoImage} />
+      <Link to='/' className={styles.logo} onClick={handleMenuClose}>
+        <img src={OrderPingLogo} alt='Order ping Logo' className={styles.logoImage} />
       </Link>
 
       <button
-        type="button"
+        type='button'
         className={styles.menuButton}
         aria-label={isMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
         aria-expanded={isMenuOpen}
-        aria-controls="admin-header-navigation"
+        aria-controls='admin-header-navigation'
         onClick={handleMenuToggle}
       >
         <MenuIcon className={styles.menuButtonIcon} />
       </button>
 
-      <nav id="admin-header-navigation" className={navClassName}>
+      <nav id='admin-header-navigation' className={navClassName}>
         {!isAuthHeaderPage ? (
           <>
             <Link
@@ -110,14 +110,14 @@ export default function Header() {
         ) : isLoggedIn ? (
           <>
             <Link
-              to="/mypage"
+              to='/mypage'
               className={`${styles.navItem} ${isMyPage ? styles.navItemActive : ''}`}
               onClick={handleMenuClose}
             >
               마이페이지
             </Link>
             <button
-              type="button"
+              type='button'
               className={styles.navItem}
               onClick={() => {
                 handleMenuClose();
@@ -129,7 +129,7 @@ export default function Header() {
           </>
         ) : (
           <button
-            type="button"
+            type='button'
             className={styles.navItem}
             onClick={() => {
               handleMenuClose();

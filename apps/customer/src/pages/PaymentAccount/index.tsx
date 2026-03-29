@@ -1,8 +1,8 @@
-import { getPaymentTossDeeplink } from "../../api/customer";
-import BottomActionBar from "../../components/BottomActionBar";
-import PageHeader from "../../components/PageHeader";
-import { useToast } from "../../components/Toast/useToast";
-import { useCart } from "../../stores/cart";
+import { getPaymentTossDeeplink } from '../../api/customer';
+import BottomActionBar from '../../components/BottomActionBar';
+import PageHeader from '../../components/PageHeader';
+import { useToast } from '../../components/Toast/useToast';
+import { useCart } from '../../stores/cart';
 import {
   buildCartPath,
   buildOrderPaymentWaitPath,
@@ -10,12 +10,12 @@ import {
   openTossWithStoreFallback,
   parsePositiveInt,
   savePendingOrderDraft,
-} from "../../utils/orderFlow";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "./PaymentAccount.module.scss";
+} from '../../utils/orderFlow';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styles from './PaymentAccount.module.scss';
 
-const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
+const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
 export default function PaymentAccountPage() {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ export default function PaymentAccountPage() {
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
   const tableNum = useMemo(
-    () => parsePositiveInt(searchParams.get("tableNum")),
+    () => parsePositiveInt(searchParams.get('tableNum')),
     [searchParams],
   );
   const hasTableContext = storeId !== null && tableNum !== null;
@@ -43,7 +43,7 @@ export default function PaymentAccountPage() {
       draft.storeId !== storeId ||
       draft.tableNum !== tableNum
     ) {
-      navigate(hasTableContext ? buildCartPath(storeId, tableNum) : "/cart", {
+      navigate(hasTableContext ? buildCartPath(storeId, tableNum) : '/cart', {
         replace: true,
       });
     }
@@ -51,7 +51,7 @@ export default function PaymentAccountPage() {
 
   const ensurePaymentInfo = async () => {
     if (!draft) {
-      throw new Error("Missing draft");
+      throw new Error('Missing draft');
     }
 
     if (draft.tossDeeplink && draft.account.accountNumber) {
@@ -79,14 +79,14 @@ export default function PaymentAccountPage() {
     try {
       await navigator.clipboard.writeText(draft.account.accountNumber);
       toast({
-        message: "계좌번호를 복사했어요.",
-        variant: "success",
+        message: '계좌번호를 복사했어요.',
+        variant: 'success',
         duration: 2500,
       });
     } catch {
       toast({
-        message: "계좌번호를 복사하지 못했어요.",
-        variant: "error",
+        message: '계좌번호를 복사하지 못했어요.',
+        variant: 'error',
         duration: 2500,
       });
     }
@@ -98,8 +98,8 @@ export default function PaymentAccountPage() {
       const latestDraft = await ensurePaymentInfo();
       await openTossWithStoreFallback(latestDraft.tossDeeplink, () => {
         toast({
-          message: "모바일 기기에서 토스 앱으로 결제해 주세요.",
-          variant: "info",
+          message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
+          variant: 'info',
           duration: 3000,
         });
       });
@@ -108,9 +108,9 @@ export default function PaymentAccountPage() {
       toast({
         message:
           status === 404
-            ? "입금 계좌 정보를 찾을 수 없어요. 다시 시도해 주세요."
-            : "토스 앱을 열지 못했어요. 다시 시도해 주세요.",
-        variant: "error",
+            ? '입금 계좌 정보를 찾을 수 없어요. 다시 시도해 주세요.'
+            : '토스 앱을 열지 못했어요. 다시 시도해 주세요.',
+        variant: 'error',
         duration: 3000,
       });
     } finally {
@@ -130,7 +130,7 @@ export default function PaymentAccountPage() {
   return (
     <main className={styles.paymentAccount}>
       <PageHeader
-        title="계좌번호 확인"
+        title='계좌번호 확인'
         onBack={() => navigate(buildOrderPaymentWaitPath(storeId, tableNum))}
       />
 
@@ -167,7 +167,7 @@ export default function PaymentAccountPage() {
                 {draft.account.accountNumber}
               </div>
               <button
-                type="button"
+                type='button'
                 className={styles.paymentAccount__copyButton}
                 onClick={handleCopyAccountNumber}
               >
@@ -192,18 +192,18 @@ export default function PaymentAccountPage() {
         </section>
 
         <button
-          type="button"
+          type='button'
           className={styles.paymentAccount__reopenButton}
           onClick={() => void handleOpenToss()}
           disabled={isOpeningToss}
         >
-          {isOpeningToss ? "토스 앱 여는 중..." : "토스 앱 다시 열기"}
+          {isOpeningToss ? '토스 앱 여는 중...' : '토스 앱 다시 열기'}
         </button>
       </section>
 
       <BottomActionBar>
         <button
-          type="button"
+          type='button'
           className={styles.paymentAccount__confirmButton}
           onClick={() => navigate(buildOrderPaymentWaitPath(storeId, tableNum))}
         >

@@ -31,8 +31,8 @@ export function ModalHeader({ children, showClose = true }: ModalHeaderProps) {
     <div className={styles.header}>
       {children}
       {showClose && (
-        <Dialog.Close className={styles.closeButton} aria-label="Close">
-          <CloseIcon className={styles.closeIcon} aria-hidden="true" />
+        <Dialog.Close className={styles.closeButton} aria-label='Close'>
+          <CloseIcon className={styles.closeIcon} aria-hidden='true' />
         </Dialog.Close>
       )}
     </div>

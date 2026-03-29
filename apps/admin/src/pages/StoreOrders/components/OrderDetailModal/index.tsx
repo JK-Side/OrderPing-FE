@@ -144,7 +144,7 @@ export default function OrderDetailModal({
         <ModalFooter className={styles.footer}>
           <div className={styles.footerButtons}>
             <Button
-              type="button"
+              type='button'
               variant={actionConfig.prevVariant}
               className={styles.footerButton}
               onClick={handlePrevClick}
@@ -155,7 +155,7 @@ export default function OrderDetailModal({
             </Button>
             {!!actionConfig.nextLabel && (
               <Button
-                type="button"
+                type='button'
                 className={styles.footerButton}
                 onClick={onAccept}
                 disabled={isAcceptDisabled || isAccepting}

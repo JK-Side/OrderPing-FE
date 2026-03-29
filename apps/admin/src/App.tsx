@@ -20,19 +20,19 @@ function App() {
   return (
     <Routes>
       <Route element={<AppLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/mypage" element={<MyPage />} />
-        <Route path="/store/create" element={<StoreCreate />} />
-        <Route path="/store/operate/:id" element={<StoreOperate />} />
-        <Route path="/store/:id/menu/create" element={<MenuCreate />} />
-        <Route path="/store/:id/menu/:menuId/edit" element={<MenuEdit />} />
-        <Route path="/store/:id/orders" element={<StoreOrders />} />
-        <Route path="/store/:id/statistics" element={<StoreStatistics />} />
-        <Route path="/store/:id/start" element={<TableStart />} />
-        <Route path="/store/:id/qr-print" element={<TableQrPrint />} />
+        <Route path='/' element={<Home />} />
+        <Route path='/mypage' element={<MyPage />} />
+        <Route path='/store/create' element={<StoreCreate />} />
+        <Route path='/store/operate/:id' element={<StoreOperate />} />
+        <Route path='/store/:id/menu/create' element={<MenuCreate />} />
+        <Route path='/store/:id/menu/:menuId/edit' element={<MenuEdit />} />
+        <Route path='/store/:id/orders' element={<StoreOrders />} />
+        <Route path='/store/:id/statistics' element={<StoreStatistics />} />
+        <Route path='/store/:id/start' element={<TableStart />} />
+        <Route path='/store/:id/qr-print' element={<TableQrPrint />} />
       </Route>
 
-      <Route path="/callback" element={<OAuthCallback />} />
+      <Route path='/callback' element={<OAuthCallback />} />
     </Routes>
   );
 }

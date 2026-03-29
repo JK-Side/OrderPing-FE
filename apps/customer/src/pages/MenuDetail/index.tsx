@@ -1,16 +1,16 @@
-﻿import { getMenuDetailByMenuId } from "../../api/customer";
-import BottomActionBar from "../../components/BottomActionBar";
-import PageHeader from "../../components/PageHeader";
-import QuantityControl from "../../components/QuantityControl";
-import { useToast } from "../../components/Toast/useToast";
-import { useCart } from "../../stores/cart";
-import { buildOrderHistoryPath, parsePositiveInt } from "../../utils/orderFlow";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "./MenuDetail.module.scss";
+﻿import { getMenuDetailByMenuId } from '../../api/customer';
+import BottomActionBar from '../../components/BottomActionBar';
+import PageHeader from '../../components/PageHeader';
+import QuantityControl from '../../components/QuantityControl';
+import { useToast } from '../../components/Toast/useToast';
+import { useCart } from '../../stores/cart';
+import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styles from './MenuDetail.module.scss';
 
-const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
+const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
 export default function MenuDetailPage() {
   const [quantity, setQuantity] = useState(1);
@@ -30,13 +30,13 @@ export default function MenuDetailPage() {
 
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
   const tableNum = useMemo(
-    () => parsePositiveInt(searchParams.get("tableNum")),
+    () => parsePositiveInt(searchParams.get('tableNum')),
     [searchParams],
   );
   const hasTableContext = storeId !== null && tableNum !== null;
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["customer", "menu-detail", menuId],
+    queryKey: ['customer', 'menu-detail', menuId],
     queryFn: () => getMenuDetailByMenuId(menuId as number),
     enabled: menuId !== null,
   });
@@ -49,11 +49,11 @@ export default function MenuDetailPage() {
   }, [setActiveTable, tableNum]);
 
   const backToMenu = () => {
-    navigate(hasTableContext ? `/stores/${storeId}?tableNum=${tableNum}` : "/");
+    navigate(hasTableContext ? `/stores/${storeId}?tableNum=${tableNum}` : '/');
   };
 
   const openOrderHistoryPage = () => {
-    navigate(hasTableContext ? buildOrderHistoryPath(storeId, tableNum) : "/");
+    navigate(hasTableContext ? buildOrderHistoryPath(storeId, tableNum) : '/');
   };
 
   const increaseQuantity = () => {
@@ -78,12 +78,12 @@ export default function MenuDetailPage() {
     );
 
     toast({
-      message: "장바구니에 메뉴를 추가했어요.",
-      variant: "success",
+      message: '장바구니에 메뉴를 추가했어요.',
+      variant: 'success',
       duration: 3000,
     });
 
-    navigate(hasTableContext ? `/stores/${storeId}?tableNum=${tableNum}` : "/");
+    navigate(hasTableContext ? `/stores/${storeId}?tableNum=${tableNum}` : '/');
   };
 
   const totalPrice = (data?.price ?? 0) * quantity;
@@ -91,12 +91,12 @@ export default function MenuDetailPage() {
   return (
     <main className={styles.menuDetail}>
       <PageHeader
-        title="메뉴 상세"
+        title='메뉴 상세'
         onBack={backToMenu}
         rightSlot={
           hasTableContext ? (
             <button
-              type="button"
+              type='button'
               className={styles.menuDetail__historyButton}
               onClick={openOrderHistoryPage}
             >
@@ -161,13 +161,13 @@ export default function MenuDetailPage() {
 
           <BottomActionBar>
             <button
-              type="button"
+              type='button'
               className={styles.menuDetail__addButton}
               onClick={handleAddToCart}
               disabled={data.isSoldOut}
             >
               {data.isSoldOut ? (
-                "품절"
+                '품절'
               ) : (
                 <>
                   <span className={styles.menuDetail__quantity}>

@@ -1,5 +1,5 @@
-import { forwardRef, type InputHTMLAttributes } from "react";
-import styles from "./Input.module.scss";
+import { forwardRef, type InputHTMLAttributes } from 'react';
+import styles from './Input.module.scss';
 
 export const Text = forwardRef<
   HTMLInputElement,
@@ -8,10 +8,10 @@ export const Text = forwardRef<
   return (
     <input
       ref={ref}
-      className={`${styles.input} ${className || ""}`.trim()}
+      className={`${styles.input} ${className || ''}`.trim()}
       {...props}
     />
   );
 });
 
-Text.displayName = "Text";
+Text.displayName = 'Text';

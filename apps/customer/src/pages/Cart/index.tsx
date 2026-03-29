@@ -1,19 +1,19 @@
-﻿import CloseIcon from "@/assets/icons/close.svg?react";
-import BottomActionBar from "../../components/BottomActionBar";
-import QuantityControl from "../../components/QuantityControl";
-import { useToast } from "../../components/Toast/useToast";
-import { useCart } from "../../stores/cart";
+﻿import CloseIcon from '@/assets/icons/close.svg?react';
+import BottomActionBar from '../../components/BottomActionBar';
+import QuantityControl from '../../components/QuantityControl';
+import { useToast } from '../../components/Toast/useToast';
+import { useCart } from '../../stores/cart';
 import {
   buildOrderConfirmPath,
   buildStoreHomePath,
   parsePositiveInt,
-} from "../../utils/orderFlow";
-import { useEffect, useMemo } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import styles from "./Cart.module.scss";
-import PageHeader from "../../components/PageHeader";
+} from '../../utils/orderFlow';
+import { useEffect, useMemo } from 'react';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import styles from './Cart.module.scss';
+import PageHeader from '../../components/PageHeader';
 
-const formatPrice = (price: number) => `${price.toLocaleString("ko-KR")}원`;
+const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -21,11 +21,11 @@ export default function CartPage() {
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(
-    () => parsePositiveInt(storeIdParam ?? searchParams.get("storeId")),
+    () => parsePositiveInt(storeIdParam ?? searchParams.get('storeId')),
     [searchParams, storeIdParam],
   );
   const tableNum = useMemo(
-    () => parsePositiveInt(searchParams.get("tableNum")),
+    () => parsePositiveInt(searchParams.get('tableNum')),
     [searchParams],
   );
   const hasTableContext = storeId !== null && tableNum !== null;
@@ -40,7 +40,7 @@ export default function CartPage() {
   } = useCart();
 
   const backToMenuUrl = useMemo(
-    () => (hasTableContext ? buildStoreHomePath(storeId, tableNum) : "/"),
+    () => (hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/'),
     [hasTableContext, storeId, tableNum],
   );
 
@@ -53,8 +53,8 @@ export default function CartPage() {
 
     if (!hasTableContext) {
       toast({
-        message: "테이블 정보를 확인할 수 없어요.",
-        variant: "warning",
+        message: '테이블 정보를 확인할 수 없어요.',
+        variant: 'warning',
         duration: 3000,
       });
       return;
@@ -65,7 +65,7 @@ export default function CartPage() {
 
   return (
     <main className={styles.cart}>
-      <PageHeader title="장바구니" onBack={() => navigate(backToMenuUrl)} />
+      <PageHeader title='장바구니' onBack={() => navigate(backToMenuUrl)} />
 
       <section className={styles.cart__content}>
         {items.length === 0 ? (
@@ -83,12 +83,12 @@ export default function CartPage() {
                   </div>
 
                   <button
-                    type="button"
+                    type='button'
                     className={styles.cart__removeButton}
                     onClick={() => removeMenu(item.menuId)}
                     aria-label={`${item.name} 삭제`}
                   >
-                    <CloseIcon fill="#fff" width={16} height={16} />
+                    <CloseIcon fill='#fff' width={16} height={16} />
                   </button>
                 </div>
 
@@ -109,7 +109,7 @@ export default function CartPage() {
             ))}
 
             <button
-              type="button"
+              type='button'
               className={styles.cart__addMoreButton}
               onClick={() => navigate(backToMenuUrl)}
             >
@@ -121,7 +121,7 @@ export default function CartPage() {
 
       <BottomActionBar>
         <button
-          type="button"
+          type='button'
           className={styles.cart__orderButton}
           disabled={items.length === 0}
           onClick={handleOrderButtonClick}

@@ -95,7 +95,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ToastPrimitive.Provider swipeDirection="right" duration={DEFAULT_TOAST_DURATION}>
+    <ToastPrimitive.Provider swipeDirection='right' duration={DEFAULT_TOAST_DURATION}>
       <ToastContext.Provider value={value}>
         {children}
         {toasts.map((toastItem) => {
@@ -130,7 +130,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               }}
             >
               <div className={styles.icon}>
-                <Icon aria-hidden="true" />
+                <Icon aria-hidden='true' />
               </div>
               <div className={styles.content}>
                 <ToastPrimitive.Title className={styles.title}>{toastItem.message}</ToastPrimitive.Title>
@@ -140,8 +140,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   </ToastPrimitive.Description>
                 )}
               </div>
-              <ToastPrimitive.Close className={styles.closeButton} aria-label="닫기">
-                <CloseIcon aria-hidden="true" fill="#727272" />
+              <ToastPrimitive.Close className={styles.closeButton} aria-label='닫기'>
+                <CloseIcon aria-hidden='true' fill='#727272' />
               </ToastPrimitive.Close>
             </ToastPrimitive.Root>
           );

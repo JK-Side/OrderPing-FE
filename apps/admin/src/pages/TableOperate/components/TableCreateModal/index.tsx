@@ -45,7 +45,7 @@ const PROGRESS_PHASE_LABEL: Record<Exclude<ProgressPhase, 'idle'>, string> = {
 };
 
 const createQrSvgMarkup = (value: string) => {
-  const qrSvg = renderToStaticMarkup(<QRCodeSVG value={value} size={QR_IMAGE_SIZE} level="M" includeMargin />);
+  const qrSvg = renderToStaticMarkup(<QRCodeSVG value={value} size={QR_IMAGE_SIZE} level='M' includeMargin />);
   const svgWithNamespace = qrSvg.includes('xmlns=')
     ? qrSvg
     : qrSvg.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
@@ -543,8 +543,8 @@ export default function TableCreateModal({
   return (
     <Modal open={open} onOpenChange={handleOpenChange}>
       <ModalTrigger asChild>
-        <Button className={styles.triggerButton} size="md" disabled={!storeId}>
-          <AddTableIcon className={styles.triggerIcon} aria-hidden="true" />
+        <Button className={styles.triggerButton} size='md' disabled={!storeId}>
+          <AddTableIcon className={styles.triggerIcon} aria-hidden='true' />
           {name}
         </Button>
       </ModalTrigger>
@@ -562,8 +562,8 @@ export default function TableCreateModal({
         <form onSubmit={handleSubmit(handleSubmitForm)}>
           <ModalBody>
             {isProgressActive ? (
-              <div className={styles.progressPanel} role="status" aria-live="polite">
-                <div className={styles.progressSpinner} aria-hidden="true" />
+              <div className={styles.progressPanel} role='status' aria-live='polite'>
+                <div className={styles.progressSpinner} aria-hidden='true' />
                 <p className={styles.progressTitle}>{progressMessage}</p>
                 <p className={styles.progressDescription}>작업 중에는 창을 닫지 말고 잠시 기다려 주세요.</p>
               </div>
@@ -571,15 +571,15 @@ export default function TableCreateModal({
               <>
                 <div className={styles.form}>
                   <Input
-                    label="테이블 수"
+                    label='테이블 수'
                     required
                     message={errors.tableCount?.message}
                     messageState={errors.tableCount ? 'error' : undefined}
                   >
                     <Input.Text
-                      type="text"
-                      inputMode="numeric"
-                      placeholder="숫자만 입력하세요."
+                      type='text'
+                      inputMode='numeric'
+                      placeholder='숫자만 입력하세요.'
                       {...register('tableCount', {
                         required: '테이블 수를 입력해 주세요.',
                         pattern: {
@@ -591,12 +591,12 @@ export default function TableCreateModal({
                   </Input>
                 </div>
                 {retryMessage ? (
-                  <div className={styles.retryNotice} role="status" aria-live="polite">
+                  <div className={styles.retryNotice} role='status' aria-live='polite'>
                     <span className={styles.retryText}>{retryMessage}</span>
                     <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
+                      type='button'
+                      size='sm'
+                      variant='ghost'
                       className={styles.retryButton}
                       disabled={isUploadingQr}
                       onClick={handleRetry}
@@ -610,13 +610,13 @@ export default function TableCreateModal({
           </ModalBody>
           <ModalFooter>
             {isProgressActive ? (
-              <Button type="button" size="md" fullWidth disabled isLoading>
+              <Button type='button' size='md' fullWidth disabled isLoading>
                 {progressMessage}
               </Button>
             ) : (
               <Button
-                type="submit"
-                size="md"
+                type='submit'
+                size='md'
                 fullWidth
                 disabled={
                   !isValid ||

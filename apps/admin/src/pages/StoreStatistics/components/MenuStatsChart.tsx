@@ -36,17 +36,17 @@ export default function MenuStatsChart({ items, maxValue }: MenuStatsChartProps)
     <div className={styles.chart}>
       <div className={styles.legend}>
         <span className={styles.legendItem}>
-          <span className={`${styles.legendDot} ${styles.legendDotStock}`} aria-hidden="true" />
+          <span className={`${styles.legendDot} ${styles.legendDotStock}`} aria-hidden='true' />
           재고량
         </span>
         <span className={styles.legendItem}>
-          <span className={`${styles.legendDot} ${styles.legendDotSold}`} aria-hidden="true" />
+          <span className={`${styles.legendDot} ${styles.legendDotSold}`} aria-hidden='true' />
           판매량
         </span>
       </div>
 
       <div className={styles.chartBody}>
-        <div className={styles.yAxis} aria-hidden="true">
+        <div className={styles.yAxis} aria-hidden='true'>
           {yAxisTicks.map((tick, index) => (
             <span key={`tick-${index}`} className={styles.yAxisTick}>
               {tick}
@@ -57,7 +57,7 @@ export default function MenuStatsChart({ items, maxValue }: MenuStatsChartProps)
         <div className={styles.chartViewport}>
           <div className={styles.chartCanvas} style={{ minWidth: `${chartMinWidth}px` }}>
             <div className={styles.plotArea}>
-              <div className={styles.gridLines} aria-hidden="true">
+              <div className={styles.gridLines} aria-hidden='true'>
                 {Array.from({ length: GRID_ROWS }).map((_, index) => (
                   <span key={`line-${index}`} className={styles.gridLine} />
                 ))}

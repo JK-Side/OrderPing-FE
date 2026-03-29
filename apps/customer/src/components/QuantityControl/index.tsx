@@ -67,7 +67,7 @@ export default function QuantityControl({
   return (
     <div className={`${styles.quantityControl} ${className}`.trim()}>
       <button
-        type="button"
+        type='button'
         className={getButtonClassName('decrease', decreaseBlocked)}
         onClick={() => runAction('decrease')}
         onPointerDown={() => startPress('decrease', decreaseBlocked)}
@@ -76,15 +76,15 @@ export default function QuantityControl({
         onPointerCancel={endPress}
         onBlur={endPress}
         disabled={decreaseBlocked}
-        aria-label="수량 감소"
+        aria-label='수량 감소'
       >
         -
       </button>
-      <span className={styles.quantityControl__value} aria-live="polite">
+      <span className={styles.quantityControl__value} aria-live='polite'>
         {value}
       </span>
       <button
-        type="button"
+        type='button'
         className={getButtonClassName('increase', increaseBlocked)}
         onClick={() => runAction('increase')}
         onPointerDown={() => startPress('increase', increaseBlocked)}
@@ -93,7 +93,7 @@ export default function QuantityControl({
         onPointerCancel={endPress}
         onBlur={endPress}
         disabled={increaseBlocked}
-        aria-label="수량 증가"
+        aria-label='수량 증가'
       >
         +
       </button>

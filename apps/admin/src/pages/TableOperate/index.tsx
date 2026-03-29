@@ -238,16 +238,16 @@ export default function TableOperate() {
           <div className={styles.sidePanel}>
             {!isDismissed && (
               <div className={styles.noticeCard}>
-                <InfoIcon className={styles.noticeIcon} aria-hidden="true" />
+                <InfoIcon className={styles.noticeIcon} aria-hidden='true' />
                 <p className={styles.noticeText}>테이블의 체크박스를 누르고 테이블을 비워보세요!</p>
                 <button
-                  type="button"
+                  type='button'
                   className={styles.noticeClose}
-                  aria-label="안내 닫기"
+                  aria-label='안내 닫기'
                   // onClick={() => setIsNoticeVisible(false)}
                   onClick={handleClose}
                 >
-                  <CloseIcon className={styles.noticeCloseIcon} aria-hidden="true" />
+                  <CloseIcon className={styles.noticeCloseIcon} aria-hidden='true' />
                 </button>
               </div>
             )}
@@ -255,9 +255,9 @@ export default function TableOperate() {
               {selectedTableIds.length > 0 ? (
                 <Button
                   className={styles.deleteButton}
-                  type="button"
-                  variant="danger"
-                  size="md"
+                  type='button'
+                  variant='danger'
+                  size='md'
                   onClick={handleDeleteTables}
                   disabled={isDeleting}
                   isLoading={isDeleting}
@@ -268,9 +268,9 @@ export default function TableOperate() {
               {hasTables ? (
                 <Button
                   className={styles.selectAllButton}
-                  type="button"
-                  variant="ghost"
-                  size="md"
+                  type='button'
+                  variant='ghost'
+                  size='md'
                   onClick={handleToggleSelectAll}
                 >
                   {isAllSelected ? '선택 해제' : '전체 선택'}
@@ -279,17 +279,17 @@ export default function TableOperate() {
 
               <Button
                 className={styles.printButton}
-                variant="secondary"
-                size="md"
+                variant='secondary'
+                size='md'
                 onClick={handleOpenQrPrint}
                 disabled={!storeId}
               >
-                <DownloadIcon className={styles.printButtonIcon} aria-hidden="true" />
+                <DownloadIcon className={styles.printButtonIcon} aria-hidden='true' />
                 QR 일괄 출력
               </Button>
               <Button
                 className={styles.clearButton}
-                size="md"
+                size='md'
                 onClick={handleClearTables}
                 disabled={selectedTableIds.length === 0 || isClearing}
                 isLoading={isClearing}
@@ -352,7 +352,7 @@ export default function TableOperate() {
           </div>
         ) : (
           <div className={styles.emptyState}>
-            <AddTableIcon className={styles.emptyIcon} aria-hidden="true" />
+            <AddTableIcon className={styles.emptyIcon} aria-hidden='true' />
             <p className={styles.emptyText}>테이블을 추가해 보세요!</p>
           </div>
         )}

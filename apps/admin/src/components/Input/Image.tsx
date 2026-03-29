@@ -11,7 +11,7 @@ export function Image({ onChange }: ImageProps) {
 
   return (
     <label className={styles.image}>
-      <input type="file" hidden accept="image/*" onChange={handleChange} />
+      <input type='file' hidden accept='image/*' onChange={handleChange} />
       <span>드래그 하여 이미지 삽입</span>
     </label>
   );

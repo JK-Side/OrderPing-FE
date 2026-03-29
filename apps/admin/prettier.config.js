@@ -5,7 +5,7 @@ export default {
   semi: true,
   singleQuote: true,
   quoteProps: 'as-needed',
-  jsxSingleQuote: false,
+  jsxSingleQuote: true,
   trailingComma: 'all',
   bracketSpacing: true,
   bracketSameLine: false,

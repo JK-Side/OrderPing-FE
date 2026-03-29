@@ -20,16 +20,16 @@ export default function OrderRejectModal({ open, onOpenChange, onConfirm, isLoad
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent className={styles.modalContent}>
-        <Dialog.Close className={styles.closeButton} aria-label="Close">
-          <CloseIcon className={styles.closeIcon} aria-hidden="true" />
+        <Dialog.Close className={styles.closeButton} aria-label='Close'>
+          <CloseIcon className={styles.closeIcon} aria-hidden='true' />
         </Dialog.Close>
         <ModalBody className={styles.body}>
           <Dialog.Title className={styles.message}>정말 주문을 취소할까요?</Dialog.Title>
         </ModalBody>
         <ModalFooter className={styles.footer}>
           <Button
-            type="button"
-            variant="danger"
+            type='button'
+            variant='danger'
             className={styles.footerButton}
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
@@ -37,12 +37,12 @@ export default function OrderRejectModal({ open, onOpenChange, onConfirm, isLoad
             아니요
           </Button>
           <Button
-            type="button"
+            type='button'
             className={styles.footerButton}
             onClick={handleConfirm}
             isLoading={isLoading}
             disabled={isLoading}
-            loadingText="취소 중..."
+            loadingText='취소 중...'
           >
             네
           </Button>
