@@ -18,6 +18,7 @@ import { useTablesByStore } from '@/pages/TableOperate/hooks/useTablesByStore';
 import styles from './TableOperate.module.scss';
 
 const ORDER_STATUS_PRIORITY = ['PENDING', 'COOKING', 'COMPLETE'] as const;
+const TABLE_GUIDE_BANNER_DISMISSED_KEY = 'table-guide-banner-dismissed';
 
 const formatTableName = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 
@@ -63,12 +64,15 @@ export default function TableOperate() {
   const hasTables = tables.length > 0;
   const hasActiveOrders = tables.some(hasIncompleteOrderOnTable);
   const tableButtonLabel = hasTables ? '테이블 수정' : '테이블 추가';
-  const [isNoticeVisible, setIsNoticeVisible] = useState(true);
   const [selectedTableIds, setSelectedTableIds] = useState<number[]>([]);
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [serviceTableId, setServiceTableId] = useState<number | null>(null);
   const [isServiceOpen, setIsServiceOpen] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(() => {
+    return window.localStorage.getItem(TABLE_GUIDE_BANNER_DISMISSED_KEY) === 'true';
+  });
+
   const selectableTableIds = sortedTables.map((table) => table.id);
   const isAllSelected =
     selectableTableIds.length > 0 && selectableTableIds.every((tableId) => selectedTableIds.includes(tableId));
@@ -221,13 +225,18 @@ export default function TableOperate() {
   const serviceTable = serviceTableId ? (tables.find((table) => table.id === serviceTableId) ?? null) : null;
   const canServiceAdd = isOrderableTable(selectedTable);
 
+  const handleClose = () => {
+    window.localStorage.setItem(TABLE_GUIDE_BANNER_DISMISSED_KEY, 'true');
+    setIsDismissed(true);
+  };
+
   return (
     <section className={styles.tableOperate}>
       <div className={styles.panel}>
         <div className={styles.summaryRow}>
           <div className={styles.summaryRow__title}>테이블 배치</div>
           <div className={styles.sidePanel}>
-            {isNoticeVisible ? (
+            {!isDismissed && (
               <div className={styles.noticeCard}>
                 <InfoIcon className={styles.noticeIcon} aria-hidden="true" />
                 <p className={styles.noticeText}>테이블의 체크박스를 누르고 테이블을 비워보세요!</p>
@@ -235,12 +244,13 @@ export default function TableOperate() {
                   type="button"
                   className={styles.noticeClose}
                   aria-label="안내 닫기"
-                  onClick={() => setIsNoticeVisible(false)}
+                  // onClick={() => setIsNoticeVisible(false)}
+                  onClick={handleClose}
                 >
                   <CloseIcon className={styles.noticeCloseIcon} aria-hidden="true" />
                 </button>
               </div>
-            ) : null}
+            )}
             <div className={styles.actionButtons}>
               {selectedTableIds.length > 0 ? (
                 <Button
