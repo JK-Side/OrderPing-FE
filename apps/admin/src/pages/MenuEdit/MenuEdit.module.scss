@@ -1,7 +1,7 @@
 @use '@order-ping/shared/styles/colors' as *;
 
 .menuEdit {
-  padding: 60px 80px 120px;
+  padding: 60px 80px 20px;
 }
 
 .header {
@@ -154,7 +154,6 @@
 }
 
 .actions {
-  margin-top: 40px;
   display: flex;
   justify-content: center;
   gap: 24px;
