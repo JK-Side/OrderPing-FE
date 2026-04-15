@@ -1,4 +1,4 @@
-@use "@order-ping/shared/styles/colors" as *;
+@use '@order-ping/shared/styles/colors' as *;
 
 .orderConfirm {
   width: 100%;
@@ -111,6 +111,11 @@
       background-color: $gray-40;
       cursor: not-allowed;
     }
+  }
+
+  &__info {
+    font-size: 14px;
+    color: $gray-50;
   }
 
   &__submitCount {

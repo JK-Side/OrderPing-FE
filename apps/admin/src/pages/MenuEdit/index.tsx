@@ -21,6 +21,7 @@ export interface MenuEditForm {
   price: string;
   stock: string;
   categoryId: number;
+  isTableFee: boolean;
   description?: string;
   menuImage?: FileList;
 }
@@ -51,8 +52,11 @@ export default function MenuEdit() {
     reValidateMode: 'onChange',
     defaultValues: {
       categoryId: CATEGORY_MAIN,
+      isTableFee: false,
     },
   });
+
+  const menuDetailIsTableFee = menuDetail?.isTableFee ?? false;
 
   useEffect(() => {
     if (!menuDetail) return;
@@ -61,14 +65,16 @@ export default function MenuEdit() {
       price: String(menuDetail.price),
       stock: String(menuDetail.stock),
       categoryId: menuDetail.categoryId,
+      isTableFee: menuDetailIsTableFee,
       description: menuDetail.description ?? '',
     });
-  }, [menuDetail, reset]);
+  }, [menuDetail, menuDetailIsTableFee, reset]);
 
   const menuName = useWatch({ control, name: 'name' });
   const menuPrice = useWatch({ control, name: 'price' });
   const menuStock = useWatch({ control, name: 'stock' });
   const categoryId = useWatch({ control, name: 'categoryId' });
+  const isTableFee = useWatch({ control, name: 'isTableFee' });
   const menuDescription = useWatch({ control, name: 'description' });
   const menuImage = useWatch({ control, name: 'menuImage' });
 
@@ -99,6 +105,7 @@ export default function MenuEdit() {
       Number(menuPrice) !== menuDetail.price ||
       Number(menuStock) !== menuDetail.stock ||
       categoryId !== menuDetail.categoryId ||
+      !!isTableFee !== !!menuDetailIsTableFee ||
       (menuDescription ?? '').trim() !== (menuDetail.description ?? '').trim() ||
       !!menuImage?.length);
 
@@ -185,6 +192,7 @@ export default function MenuEdit() {
             initialStock: menuDetail.initialStock,
             stock: Number(data.stock),
             isSoldOut: Number(data.stock) === 0,
+            isTableFee: data.isTableFee,
           },
         });
         toast({
@@ -309,50 +317,70 @@ export default function MenuEdit() {
               </Input>
             </div>
 
-            <div className={styles.category}>
-              <div className={styles.categoryLabel}>
-                카테고리 <span className={styles.required}>*</span>
+            <div className={styles.categoryRow}>
+              <div className={styles.category}>
+                <div className={styles.categoryLabel}>
+                  카테고리 <span className={styles.required}>*</span>
+                </div>
+                <input
+                  type='hidden'
+                  {...register('categoryId', {
+                    valueAsNumber: true,
+                    required: '카테고리를 선택해 주세요.',
+                  })}
+                />
+                <div className={styles.categoryButtons}>
+                  <button
+                    type='button'
+                    className={`${styles.categoryButton} ${
+                      categoryId === CATEGORY_MAIN ? styles.categoryButtonActive : ''
+                    }`}
+                    onClick={() =>
+                      setValue('categoryId', CATEGORY_MAIN, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    메인 메뉴
+                  </button>
+                  <button
+                    type='button'
+                    className={`${styles.categoryButton} ${
+                      categoryId === CATEGORY_SIDE ? styles.categoryButtonActive : ''
+                    }`}
+                    onClick={() =>
+                      setValue('categoryId', CATEGORY_SIDE, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    사이드 메뉴
+                  </button>
+                </div>
+                {errors.categoryId?.message && (
+                  <span className={styles.categoryError}>{errors.categoryId.message}</span>
+                )}
               </div>
-              <input
-                type='hidden'
-                {...register('categoryId', {
-                  valueAsNumber: true,
-                  required: '카테고리를 선택해 주세요.',
-                })}
-              />
-              <div className={styles.categoryButtons}>
-                <button
-                  type='button'
-                  className={`${styles.categoryButton} ${
-                    categoryId === CATEGORY_MAIN ? styles.categoryButtonActive : ''
-                  }`}
-                  onClick={() =>
-                    setValue('categoryId', CATEGORY_MAIN, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
-                >
-                  메인 메뉴
-                </button>
-                <button
-                  type='button'
-                  className={`${styles.categoryButton} ${
-                    categoryId === CATEGORY_SIDE ? styles.categoryButtonActive : ''
-                  }`}
-                  onClick={() =>
-                    setValue('categoryId', CATEGORY_SIDE, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
-                >
-                  사이드 메뉴
-                </button>
+
+              <div className={styles.toggleField}>
+                <div className={styles.toggleLabel}>테이블비 메뉴</div>
+                <label className={styles.toggleControl}>
+                  <input type='checkbox' className={styles.toggleInput} {...register('isTableFee')} />
+                  <span
+                    className={`${styles.toggleTrack} ${isTableFee ? styles.toggleTrackActive : ''}`}
+                    aria-hidden='true'
+                  >
+                    <span className={`${styles.toggleThumb} ${isTableFee ? styles.toggleThumbActive : ''}`} />
+                  </span>
+                  <span className={styles.toggleText}>
+                    {isTableFee ? '운영자 전용 메뉴 (고객 미노출)' : '일반 메뉴 (고객 노출)'}
+                  </span>
+                </label>
               </div>
-              {errors.categoryId?.message && <span className={styles.categoryError}>{errors.categoryId.message}</span>}
             </div>
 
             <Input

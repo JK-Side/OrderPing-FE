@@ -6,6 +6,7 @@ export interface CreateMenuRequest {
   description: string;
   imageUrl: string;
   stock: number;
+  isTableFee: boolean;
 }
 
 export interface CreateMenuResponse {
@@ -20,6 +21,7 @@ export interface CreateMenuResponse {
   stock: number;
   soldCount: number;
   isSoldOut: boolean;
+  isTableFee: boolean;
 }
 
 export interface MenuResponse {
@@ -34,6 +36,7 @@ export interface MenuResponse {
   stock: number;
   soldCount: number;
   isSoldOut: boolean;
+  isTableFee: boolean;
 }
 
 export type MenuListResponse = MenuResponse[];
@@ -47,6 +50,7 @@ export interface UpdateMenuRequest {
   initialStock: number;
   stock: number;
   isSoldOut: boolean;
+  isTableFee: boolean;
 }
 
 export type UpdateMenuResponse = MenuResponse;

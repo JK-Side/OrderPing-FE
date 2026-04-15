@@ -146,7 +146,7 @@ export default function TableOperate() {
 
     if (hasOrderTables) {
       toast({
-        message: 'PENDING 또는 COOKING 주문이 있는 테이블은 삭제할 수 없습니다.',
+        message: '주문이 있는 테이블은 삭제할 수 없습니다.',
         variant: 'error',
       });
       return;
@@ -179,7 +179,7 @@ export default function TableOperate() {
 
       const message =
         status === 400
-          ? 'PENDING 또는 COOKING 주문이 있는 테이블은 삭제할 수 없습니다.'
+          ? '주문이 있는 테이블은 삭제할 수 없습니다.'
           : status === 401
             ? '로그인이 필요한 기능입니다.'
             : status === 403
