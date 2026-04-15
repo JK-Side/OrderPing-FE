@@ -71,10 +71,17 @@ export default function PaymentWaitPage() {
       return draft;
     }
 
+    console.log('[DEEPLINK_REQUEST_AMOUNT]', {
+      draftPaymentAmount: draft.paymentAmount,
+      storeId: draft.storeId,
+    });
+
     const paymentInfo = await getPaymentTossDeeplink({
       storeId: draft.storeId,
       amount: draft.paymentAmount,
     });
+
+    console.log('[DEEPLINK_RESPONSE]', paymentInfo);
 
     const nextDraft = {
       ...draft,

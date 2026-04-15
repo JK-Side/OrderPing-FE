@@ -67,6 +67,9 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
   );
 }
 
+const isTableFeeMenu = (menu: CustomerStoreOrderMenu) =>
+  menu.isTableFee ?? false;
+
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<TabKey>('main');
   const [isTabSticky, setIsTabSticky] = useState(false);
@@ -110,8 +113,14 @@ export default function HomePage() {
     );
   }, [categories, mainCategory]);
 
-  const mainMenus = mainCategory?.menus ?? [];
-  const sideMenus = sideCategory?.menus ?? [];
+  const mainMenus = useMemo(
+    () => (mainCategory?.menus ?? []).filter((menu) => !isTableFeeMenu(menu)),
+    [mainCategory],
+  );
+  const sideMenus = useMemo(
+    () => (sideCategory?.menus ?? []).filter((menu) => !isTableFeeMenu(menu)),
+    [sideCategory],
+  );
 
   const mainSectionLabel = mainCategory?.name ?? '메인 메뉴';
   const sideSectionLabel = sideCategory?.name ?? '사이드 메뉴';

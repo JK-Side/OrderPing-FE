@@ -107,22 +107,19 @@ export default function OrderConfirmPage() {
       setIsPreparingPayment(true);
       const normalizedCouponAmount =
         couponAmountInput.trim() === '' ? 0 : appliedCouponAmount;
-      const normalizedPaymentAmount = Math.max(
-        totalPrice - normalizedCouponAmount,
-        0,
-      );
-
       const createdOrder = await postCreatedCustomerOrder({
         tableId: data.tableId,
         tableNum: data.tableNum,
         storeId: data.storeId,
         depositorName: depositorName.trim(),
-        couponAmount: normalizedCouponAmount,
+        couponAmount: normalizedCouponAmount, // 빈 문자열일 때 확실히 0으로 보냄
         menus: items.map((item) => ({
           menuId: item.menuId,
           quantity: item.quantity,
         })),
       });
+
+      const normalizedPaymentAmount = Math.max(createdOrder.cashAmount, 0);
 
       const baseDraft = {
         orderId: createdOrder.id,
@@ -130,7 +127,7 @@ export default function OrderConfirmPage() {
         tableId: data.tableId,
         tableNum: data.tableNum,
         depositorName: depositorName.trim(),
-        couponAmount: normalizedCouponAmount,
+        couponAmount: createdOrder.couponAmount, // 프론트 입력값 정리본(요청 보낸 값)이기에 실제랑 동일하게
         totalPrice,
         paymentAmount: normalizedPaymentAmount,
         tossDeeplink: '',
@@ -283,6 +280,10 @@ export default function OrderConfirmPage() {
               <div className={styles.orderConfirm__summaryFinal}>
                 <span>최종 결제 금액</span>
                 <div>{formatPrice(paymentAmount)}</div>
+              </div>
+
+              <div className={styles.orderConfirm__info}>
+                최초 주문 시에는 테이블비가 포함되어 있을 수도 있어요.
               </div>
             </section>
           </div>

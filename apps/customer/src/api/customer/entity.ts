@@ -35,6 +35,7 @@ export interface CustomerStoreOrderMenu {
   imageUrl: string;
   stock: number;
   isSoldOut: boolean;
+  isTableFee?: boolean;
 }
 
 export interface CustomerStoreOrderCategory {
@@ -73,6 +74,7 @@ export interface CustomerMenuDetailResponse {
   description: string;
   imageUrl: string;
   isSoldOut: boolean;
+  isTableFee?: boolean;
 }
 
 export interface CustomerOrderLookupMenu {
