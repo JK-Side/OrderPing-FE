@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
+import { useMemo, useState } from 'react';
+import { Controller, useForm, useWatch, type SubmitHandler } from 'react-hook-form';
 import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -20,20 +20,22 @@ interface TableDirectOrderModalProps {
 
 interface DirectOrderForm {
   tableId: string;
-  menuId: string;
-  quantity: string;
   depositorName: string;
   couponAmount: string;
 }
 
+type QuantityMap = Record<number, number>;
+
 const isOrderableTable = (table: TableResponse) => table.status === 'OCCUPIED' || table.status === 'EMPTY';
 const formatTableLabel = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
+const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 
 export default function TableDirectOrderModal({ open, onOpenChange, storeId, tables }: TableDirectOrderModalProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { data: menus = [], isLoading: isMenuLoading } = useAvailableMenus(storeId);
   const { mutateAsync: createOrder, isPending } = useCreateOrder();
+  const [quantityMap, setQuantityMap] = useState<QuantityMap>({});
 
   const orderableTables = useMemo(() => tables.filter(isOrderableTable), [tables]);
   const tableOptions = useMemo(
@@ -44,24 +46,32 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
       })),
     [orderableTables],
   );
-  const menuOptions = useMemo(
+  const selectedMenus = useMemo(
     () =>
-      menus.map((menu) => ({
-        value: String(menu.id),
-        label: menu.name,
-        disabled: menu.isSoldOut,
-      })),
-    [menus],
+      menus.flatMap((menu) => {
+        const quantity = quantityMap[menu.id] ?? 0;
+        if (quantity <= 0) return [];
+        return [
+          {
+            id: menu.id,
+            quantity,
+            price: menu.price,
+          },
+        ];
+      }),
+    [menus, quantityMap],
+  );
+  const selectedTotalCount = useMemo(
+    () => selectedMenus.reduce((sum, menu) => sum + menu.quantity, 0),
+    [selectedMenus],
+  );
+  const selectedSubtotal = useMemo(
+    () => selectedMenus.reduce((sum, menu) => sum + menu.price * menu.quantity, 0),
+    [selectedMenus],
   );
 
   const hasSelectableTable = tableOptions.length > 0;
-  const hasSelectableMenu = menuOptions.some((option) => !option.disabled);
   const tablePlaceholder = hasSelectableTable ? '테이블을 선택해 주세요.' : '주문 가능한 테이블이 없습니다.';
-  const menuPlaceholder = isMenuLoading
-    ? '메뉴를 불러오는 중입니다.'
-    : hasSelectableMenu
-      ? '메뉴를 선택해 주세요.'
-      : '판매 가능한 메뉴가 없습니다.';
 
   const {
     control,
@@ -73,24 +83,55 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
     mode: 'onChange',
     defaultValues: {
       tableId: '',
-      menuId: '',
-      quantity: '1',
       depositorName: '관리자',
       couponAmount: '0',
     },
   });
+  const couponAmountInput = useWatch({
+    control,
+    name: 'couponAmount',
+  });
+  const couponAmountValue = Number(couponAmountInput);
+  const safeCouponAmount = Number.isFinite(couponAmountValue) && couponAmountValue >= 0 ? couponAmountValue : 0;
+  const expectedCashAmount = Math.max(0, selectedSubtotal - safeCouponAmount);
 
   const handleModalOpenChange = (nextOpen: boolean) => {
     onOpenChange(nextOpen);
     if (!nextOpen) {
       reset({
         tableId: '',
-        menuId: '',
-        quantity: '1',
         depositorName: '관리자',
         couponAmount: '0',
       });
+      setQuantityMap({});
     }
+  };
+
+  const handleIncreaseQuantity = (menuId: number) => {
+    if (!storeId) return;
+    setQuantityMap((prev) => ({
+      ...prev,
+      [menuId]: (prev[menuId] ?? 0) + 1,
+    }));
+  };
+
+  const handleDecreaseQuantity = (menuId: number) => {
+    if (!storeId) return;
+    setQuantityMap((prev) => {
+      const currentQuantity = prev[menuId] ?? 0;
+      if (currentQuantity <= 0) return prev;
+
+      const nextQuantity = currentQuantity - 1;
+      if (nextQuantity <= 0) {
+        const next = { ...prev };
+        delete next[menuId];
+        return next;
+      }
+      return {
+        ...prev,
+        [menuId]: nextQuantity,
+      };
+    });
   };
 
   const handleSubmitForm: SubmitHandler<DirectOrderForm> = async (data) => {
@@ -98,8 +139,6 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
 
     const selectedTableId = Number(data.tableId);
     const selectedTable = orderableTables.find((table) => table.id === selectedTableId);
-    const menuId = Number(data.menuId);
-    const quantity = Number(data.quantity);
     const couponAmount = Number(data.couponAmount);
     const depositorName = data.depositorName.trim();
 
@@ -111,17 +150,9 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
       return;
     }
 
-    if (!Number.isFinite(menuId) || menuId <= 0) {
+    if (selectedMenus.length === 0) {
       toast({
-        message: '메뉴를 선택해 주세요.',
-        variant: 'error',
-      });
-      return;
-    }
-
-    if (!Number.isFinite(quantity) || quantity <= 0) {
-      toast({
-        message: '수량을 1 이상으로 입력해 주세요.',
+        message: '메뉴를 1개 이상 선택해 주세요.',
         variant: 'error',
       });
       return;
@@ -149,12 +180,10 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
         tableNum: selectedTable.tableNum,
         depositorName,
         couponAmount,
-        menus: [
-          {
-            menuId,
-            quantity,
-          },
-        ],
+        menus: selectedMenus.map((menu) => ({
+          menuId: menu.id,
+          quantity: menu.quantity,
+        })),
       });
 
       await Promise.all([
@@ -195,7 +224,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
         <ModalHeader>
           <ModalTitle className={styles.title}>주문 직접 추가</ModalTitle>
         </ModalHeader>
-        <form onSubmit={handleSubmit(handleSubmitForm)}>
+        <form className={styles.formRoot} onSubmit={handleSubmit(handleSubmitForm)}>
           <ModalBody className={styles.body}>
             <div className={styles.form}>
               <Input
@@ -219,52 +248,6 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
                       required
                     />
                   )}
-                />
-              </Input>
-
-              <Input
-                label='메뉴'
-                required
-                message={errors.menuId?.message}
-                messageState={errors.menuId ? 'error' : undefined}
-              >
-                <Controller
-                  name='menuId'
-                  control={control}
-                  rules={{ required: '메뉴를 선택해 주세요.' }}
-                  render={({ field }) => (
-                    <Input.InputSelect
-                      name={field.name}
-                      value={field.value ?? ''}
-                      onValueChange={field.onChange}
-                      options={menuOptions}
-                      placeholder={menuPlaceholder}
-                      disabled={isMenuLoading || !hasSelectableMenu || !storeId}
-                      required
-                    />
-                  )}
-                />
-              </Input>
-
-              <Input
-                label='수량'
-                required
-                message={errors.quantity?.message}
-                messageState={errors.quantity ? 'error' : undefined}
-              >
-                <Input.Text
-                  type='text'
-                  inputMode='numeric'
-                  placeholder='수량을 숫자로 입력해 주세요. ex) 1'
-                  disabled={!storeId}
-                  {...register('quantity', {
-                    required: '수량을 입력해 주세요.',
-                    pattern: {
-                      value: REGEX.NUMBER_ONLY,
-                      message: '숫자만 입력해 주세요.',
-                    },
-                    validate: (value) => Number(value) > 0 || '수량을 1 이상 입력해 주세요.',
-                  })}
                 />
               </Input>
 
@@ -302,19 +285,87 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
                       value: REGEX.NUMBER_ONLY,
                       message: '숫자만 입력해 주세요.',
                     },
+                    validate: (value) => Number(value) >= 0 || '쿠폰 금액은 0 이상으로 입력해 주세요.',
                   })}
                 />
               </Input>
             </div>
+
+            <section className={styles.menuSection}>
+              <div className={styles.menuHeader}>
+                <h3 className={styles.menuTitle}>메뉴 선택</h3>
+                <p className={styles.menuDescription}>카드의 +/- 버튼으로 수량을 조절해 주세요.</p>
+              </div>
+
+              {isMenuLoading ? <p className={styles.menuState}>메뉴를 불러오는 중입니다.</p> : null}
+              {!isMenuLoading && menus.length === 0 ? (
+                <p className={styles.menuState}>등록된 메뉴가 없습니다.</p>
+              ) : null}
+
+              {!isMenuLoading && menus.length > 0 ? (
+                <div className={styles.menuGridWrapper}>
+                  <div className={styles.menuGrid}>
+                    {menus.map((menu) => {
+                      const quantity = quantityMap[menu.id] ?? 0;
+                      const isMinusDisabled = quantity <= 0;
+                      const isPlusDisabled = !storeId || menu.isSoldOut;
+
+                      return (
+                        <article key={menu.id} className={styles.menuCard}>
+                          <div className={styles.menuCardHead}>
+                            <h4 className={styles.menuName}>{menu.name}</h4>
+                            {menu.isSoldOut ? <span className={styles.soldOutBadge}>품절</span> : null}
+                          </div>
+                          <div className={styles.quantityControl}>
+                            <button
+                              type='button'
+                              className={styles.quantityButton}
+                              onClick={() => handleDecreaseQuantity(menu.id)}
+                              disabled={isMinusDisabled || !storeId}
+                              aria-label={`${menu.name} 수량 감소`}
+                            >
+                              -
+                            </button>
+                            <span className={styles.quantityValue}>{quantity}</span>
+                            <button
+                              type='button'
+                              className={styles.quantityButton}
+                              onClick={() => handleIncreaseQuantity(menu.id)}
+                              disabled={isPlusDisabled}
+                              aria-label={`${menu.name} 수량 증가`}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+            </section>
+
+            <section className={styles.summarySection}>
+              <div className={styles.summaryRow}>
+                <span>총 선택 수량</span>
+                <strong>{selectedTotalCount}개</strong>
+              </div>
+              <div className={styles.summaryRow}>
+                <span>주문 금액</span>
+                <strong>{formatCurrency(selectedSubtotal)}</strong>
+              </div>
+              <div className={styles.summaryRow}>
+                <span>예상 결제 금액</span>
+                <strong>{formatCurrency(expectedCashAmount)}</strong>
+              </div>
+            </section>
           </ModalBody>
           <ModalFooter className={styles.footer}>
             <div className={styles.footerButtons}>
               <Button
                 type='submit'
                 className={styles.footerButton}
-                disabled={
-                  !storeId || !isValid || isSubmitting || isPending || !hasSelectableTable || !hasSelectableMenu
-                }
+                disabled={!storeId || !isValid || isSubmitting || isPending || !hasSelectableTable || selectedMenus.length === 0}
                 isLoading={isSubmitting || isPending}
               >
                 주문 추가
