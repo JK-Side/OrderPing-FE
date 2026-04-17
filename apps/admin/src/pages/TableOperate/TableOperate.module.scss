@@ -116,20 +116,6 @@
   fill: currentColor;
 }
 
-.addOrderButton {
-  display: flex;
-  gap: 8px;
-}
-
-.addOrderButtonIcon {
-  width: 18px;
-  height: 18px;
-}
-
-.addOrderButtonIcon path {
-  fill: $white;
-}
-
 .actionButtons {
   display: flex;
   align-items: center;

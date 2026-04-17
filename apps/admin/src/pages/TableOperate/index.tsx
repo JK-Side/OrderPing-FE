@@ -2,7 +2,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { TableResponse } from '@/api/table/entity';
-import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import DownloadIcon from '@/assets/icons/download.svg?react';
@@ -72,6 +71,7 @@ export default function TableOperate() {
   const [serviceTableId, setServiceTableId] = useState<number | null>(null);
   const [isServiceOpen, setIsServiceOpen] = useState(false);
   const [isDirectOrderOpen, setIsDirectOrderOpen] = useState(false);
+  const [directOrderReturnTableId, setDirectOrderReturnTableId] = useState<number | null>(null);
   const [isDismissed, setIsDismissed] = useState(() => {
     return window.localStorage.getItem(TABLE_GUIDE_BANNER_DISMISSED_KEY) === 'true';
   });
@@ -226,6 +226,9 @@ export default function TableOperate() {
 
   const selectedTable = selectedTableId ? (tables.find((table) => table.id === selectedTableId) ?? null) : null;
   const serviceTable = serviceTableId ? (tables.find((table) => table.id === serviceTableId) ?? null) : null;
+  const directOrderTable = directOrderReturnTableId
+    ? (tables.find((table) => table.id === directOrderReturnTableId) ?? null)
+    : null;
   const canServiceAdd = isOrderableTable(selectedTable);
 
   const handleClose = () => {
@@ -235,6 +238,20 @@ export default function TableOperate() {
 
   const handleDirectOrderOpenChange = (open: boolean) => {
     setIsDirectOrderOpen(open);
+  };
+
+  const handleDirectOrderFromDetail = () => {
+    if (!selectedTableId) return;
+    setDirectOrderReturnTableId(selectedTableId);
+    handleDetailOpenChange(false);
+    handleDirectOrderOpenChange(true);
+  };
+
+  const handleDirectOrderCancel = () => {
+    if (!directOrderReturnTableId) return;
+    setSelectedTableId(directOrderReturnTableId);
+    setIsDetailOpen(true);
+    setDirectOrderReturnTableId(null);
   };
 
   return (
@@ -308,17 +325,6 @@ export default function TableOperate() {
                 QR 일괄 출력
               </Button>
 
-              <Button
-                className={styles.addOrderButton}
-                variant='primary'
-                size='md'
-                onClick={() => handleDirectOrderOpenChange(true)}
-                disabled={!storeId}
-              >
-                <AddMenuIcon className={styles.addOrderButtonIcon} aria-hidden='true' />
-                주문 직접 추가
-              </Button>
-
               <TableCreateModal
                 storeId={storeId}
                 hasActiveOrders={hasActiveOrders}
@@ -385,16 +391,19 @@ export default function TableOperate() {
         open={isDetailOpen}
         onOpenChange={handleDetailOpenChange}
         onServiceAdd={canServiceAdd && selectedTable ? () => handleServiceOpen(selectedTable) : undefined}
+        onDirectOrderAdd={selectedTable ? handleDirectOrderFromDetail : undefined}
         table={selectedTable}
       />
 
       <TableServiceModal open={isServiceOpen} onOpenChange={handleServiceOpenChange} table={serviceTable} />
+
       <TableDirectOrderModal
         open={isDirectOrderOpen}
         onOpenChange={handleDirectOrderOpenChange}
-        storeId={storeId}
-        tables={sortedTables}
+        onCancel={handleDirectOrderCancel}
+        table={directOrderTable}
       />
     </section>
   );
 }
+
