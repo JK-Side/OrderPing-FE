@@ -1,0 +1,16 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.triggerButton {
+  white-space: nowrap;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer {
+  justify-content: flex-end;
+  gap: 12px;
+}

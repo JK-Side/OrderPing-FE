@@ -1,11 +1,12 @@
+import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import WarningIcon from '@/assets/icons/warning-circle.svg?react';
+import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
-import StoreSummaryCard from '@/components/StoreSummaryCard';
-import summaryStyles from '@/components/StoreSummaryCard/StoreSummaryCard.module.scss';
 import MenuList from '@/pages/StoreOperate/components/MenuList';
 import StoreSettingsModal from '@/pages/StoreOperate/components/StoreSettingsModal';
+import TableFeeCreateModal from '@/pages/StoreOperate/components/TableFeeCreateModal';
 import { useMenusByCategory } from '@/pages/StoreOperate/hooks/useMenus';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import styles from './StoreOperate.module.scss';
@@ -27,35 +28,67 @@ export default function StoreOperate() {
   const menuItems = [...mainMenus, ...sideMenus];
   const hasMenus = menuItems.length > 0;
   const hasMenuError = isMainMenuError || isSideMenuError;
+  const storeImage = storeImageUrl || StoreDefault;
+  const summaryTextRef = useRef<HTMLDivElement>(null);
+  const [imageSize, setImageSize] = useState(84);
+
+  useLayoutEffect(() => {
+    const summaryText = summaryTextRef.current;
+    if (!summaryText) return;
+
+    const updateImageSize = () => {
+      const textHeight = summaryText.getBoundingClientRect().height;
+      const nextSize = Math.min(140, Math.max(72, Math.round(textHeight)));
+      setImageSize((prev) => (prev === nextSize ? prev : nextSize));
+    };
+
+    updateImageSize();
+
+    const resizeObserver = new ResizeObserver(updateImageSize);
+    resizeObserver.observe(summaryText);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [storeName, storeDescription]);
+
+  const imageWrapStyle = { '--summary-image-size': `${imageSize}px` } as CSSProperties;
 
   return (
     <section className={styles.storeOperate}>
       <div className={styles.panel}>
-        <StoreSummaryCard
-          storeName={storeName}
-          storeDescription={storeDescription}
-          imageUrl={storeImageUrl}
-          actions={
-            <>
-              <Button
-                className={summaryStyles.actionButton}
-                size='md'
-                onClick={() => id && navigate(`/store/${id}/menu/create`)}
-              >
-                <AddMenuIcon className={summaryStyles.actionIcon} aria-hidden='true' />
-                메뉴 추가
-              </Button>
-              {storeId ? (
-                <StoreSettingsModal
-                  storeId={storeId}
-                  storeName={storeName}
-                  storeDescription={storeDescription}
-                  storeImageUrl={storeImageUrl}
-                />
-              ) : null}
-            </>
-          }
-        />
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryInfo}>
+            <div className={styles.summaryImageWrap} style={imageWrapStyle}>
+              <img className={styles.summaryImage} src={storeImage} alt={`${storeName} 주점`} />
+            </div>
+            <div className={styles.summaryText} ref={summaryTextRef}>
+              <div className={styles.summaryTitle}>
+                <span className={styles.storeName}>{storeName}</span> 주점
+              </div>
+              <p className={styles.summaryDescription}>{storeDescription}</p>
+            </div>
+          </div>
+          <div className={styles.summaryActions}>
+            <Button
+              className={styles.actionButton}
+              size='md'
+              onClick={() => id && navigate(`/store/${id}/menu/create`)}
+            >
+              <AddMenuIcon className={styles.actionIcon} aria-hidden='true' />
+              메뉴 추가
+            </Button>
+            {storeId ? (
+              <StoreSettingsModal
+                storeId={storeId}
+                storeName={storeName}
+                storeDescription={storeDescription}
+                storeImageUrl={storeImageUrl}
+              />
+            ) : null}
+            {storeId && <TableFeeCreateModal storeId={storeId} />}
+          </div>
+        </div>
 
         {hasMenuError ? (
           <div className={styles.emptyState}>
