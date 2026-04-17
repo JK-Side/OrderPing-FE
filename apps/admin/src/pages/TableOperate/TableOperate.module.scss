@@ -102,6 +102,11 @@
   min-width: 120px;
 }
 
+.printButton {
+  display: flex;
+  gap: 8px;
+}
+
 .printButtonIcon {
   width: 18px;
   height: 18px;
@@ -109,6 +114,20 @@
 
 .printButtonIcon path {
   fill: currentColor;
+}
+
+.addOrderButton {
+  display: flex;
+  gap: 8px;
+}
+
+.addOrderButtonIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.addOrderButtonIcon path {
+  fill: $white;
 }
 
 .actionButtons {
@@ -123,7 +142,7 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 300px));
   grid-auto-rows: 222px;
   justify-content: flex-start;
-  gap: 30px;
+  gap: 24px;
 }
 
 .orderPreviewScroll {

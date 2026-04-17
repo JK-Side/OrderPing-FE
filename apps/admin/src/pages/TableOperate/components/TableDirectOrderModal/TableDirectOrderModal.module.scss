@@ -1,0 +1,242 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+$menu-card-height: 84px;
+$menu-grid-gap: 12px;
+$menu-third-row-peek: 20px;
+
+.modalContent {
+  width: 720px;
+  max-height: 92vh;
+  background-color: $white;
+  border-radius: 20px;
+}
+
+.formRoot {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: $black;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  gap: 24px;
+  padding: 24px 32px;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: 16px;
+}
+
+.menuSection {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 12px;
+}
+
+.menuHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menuTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: $black;
+}
+
+.menuDescription {
+  margin: 0;
+  font-size: 13px;
+  color: $gray-60;
+}
+
+.menuState {
+  margin: 0;
+  padding: 16px;
+  border-radius: 12px;
+  background-color: $grayscale-10;
+  font-size: 14px;
+  color: $gray-60;
+}
+
+.menuGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: $menu-card-height;
+  gap: $menu-grid-gap;
+}
+
+.menuGridWrapper {
+  max-height: ($menu-card-height * 2) + $menu-grid-gap + $menu-third-row-peek;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.menuCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  min-height: 0;
+  padding: 12px 14px;
+  border: 1px solid $gray-20;
+  border-radius: 12px;
+  background-color: $white;
+}
+
+.menuCardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.menuName {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: $black;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.soldOutBadge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: $gray-20;
+  color: $gray-60;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.quantityButton {
+  width: 30px;
+  height: 30px;
+  border: 1px solid $gray-30;
+  border-radius: 8px;
+  background-color: $white;
+  color: $gray-80;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary-30;
+    outline-offset: 1px;
+  }
+}
+
+.quantityValue {
+  min-width: 22px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: $black;
+}
+
+.summarySection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  background-color: $grayscale-10;
+}
+
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: $gray-80;
+}
+
+.footer {
+  padding: 20px 32px 28px;
+}
+
+.footerButtons {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.footerButton {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .modalContent {
+    width: 100%;
+  }
+
+  .body {
+    padding: 24px;
+  }
+
+  .form {
+    grid-template-columns: 1fr;
+  }
+
+  .menuHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .menuGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer {
+    padding: 20px 24px 24px;
+  }
+
+  .footerButtons {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .menuGrid {
+    grid-template-columns: 1fr;
+  }
+}

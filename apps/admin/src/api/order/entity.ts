@@ -9,16 +9,13 @@ export interface UpdateOrderStatusRequest {
 export interface CreateOrderMenuRequest {
   menuId: number;
   quantity: number;
-  price: number;
-  isService: boolean;
 }
 
 export interface CreateOrderRequest {
   storeId: number;
-  tableId: number;
   tableNum: number;
-  depositorName?: string;
-  couponAmount?: number;
+  depositorName: string;
+  couponAmount: number;
   menus: CreateOrderMenuRequest[];
 }
 

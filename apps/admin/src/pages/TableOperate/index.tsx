@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { TableResponse } from '@/api/table/entity';
+import AddMenuIcon from '@/assets/icons/add-menu.svg?react';
 import AddTableIcon from '@/assets/icons/add-table.svg?react';
 import CloseIcon from '@/assets/icons/close.svg?react';
 import DownloadIcon from '@/assets/icons/download.svg?react';
@@ -10,6 +11,7 @@ import Button from '@/components/Button';
 import { useToast } from '@/components/Toast/useToast';
 import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
+import TableDirectOrderModal from '@/pages/TableOperate/components/TableDirectOrderModal';
 import TableOrderModal from '@/pages/TableOperate/components/TableOrderModal';
 import TableServiceModal from '@/pages/TableOperate/components/TableServiceModal';
 import { useClearTables } from '@/pages/TableOperate/hooks/useClearTables';
@@ -69,6 +71,7 @@ export default function TableOperate() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [serviceTableId, setServiceTableId] = useState<number | null>(null);
   const [isServiceOpen, setIsServiceOpen] = useState(false);
+  const [isDirectOrderOpen, setIsDirectOrderOpen] = useState(false);
   const [isDismissed, setIsDismissed] = useState(() => {
     return window.localStorage.getItem(TABLE_GUIDE_BANNER_DISMISSED_KEY) === 'true';
   });
@@ -230,6 +233,10 @@ export default function TableOperate() {
     setIsDismissed(true);
   };
 
+  const handleDirectOrderOpenChange = (open: boolean) => {
+    setIsDirectOrderOpen(open);
+  };
+
   return (
     <section className={styles.tableOperate}>
       <div className={styles.panel}>
@@ -265,6 +272,19 @@ export default function TableOperate() {
                   테이블 삭제
                 </Button>
               ) : null}
+
+              {selectedTableIds.length > 0 ? (
+                <Button
+                  className={styles.clearButton}
+                  size='md'
+                  onClick={handleClearTables}
+                  disabled={selectedTableIds.length === 0 || isClearing}
+                  isLoading={isClearing}
+                >
+                  테이블 비우기
+                </Button>
+              ) : null}
+
               {hasTables ? (
                 <Button
                   className={styles.selectAllButton}
@@ -287,15 +307,18 @@ export default function TableOperate() {
                 <DownloadIcon className={styles.printButtonIcon} aria-hidden='true' />
                 QR 일괄 출력
               </Button>
+
               <Button
-                className={styles.clearButton}
+                className={styles.addOrderButton}
+                variant='primary'
                 size='md'
-                onClick={handleClearTables}
-                disabled={selectedTableIds.length === 0 || isClearing}
-                isLoading={isClearing}
+                onClick={() => handleDirectOrderOpenChange(true)}
+                disabled={!storeId}
               >
-                테이블 비우기
+                <AddMenuIcon className={styles.addOrderButtonIcon} aria-hidden='true' />
+                주문 직접 추가
               </Button>
+
               <TableCreateModal
                 storeId={storeId}
                 hasActiveOrders={hasActiveOrders}
@@ -366,6 +389,12 @@ export default function TableOperate() {
       />
 
       <TableServiceModal open={isServiceOpen} onOpenChange={handleServiceOpenChange} table={serviceTable} />
+      <TableDirectOrderModal
+        open={isDirectOrderOpen}
+        onOpenChange={handleDirectOrderOpenChange}
+        storeId={storeId}
+        tables={sortedTables}
+      />
     </section>
   );
 }
