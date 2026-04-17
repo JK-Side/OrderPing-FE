@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import PlusIcon from '@/assets/icons/plus.svg?react';
-import { useUserInfo } from '@/utils/hooks/useUserInfo';
 import styles from './EmptyMain.module.scss';
 
-export default function EmptyMain() {
-  const { data: userInfo } = useUserInfo();
+interface EmptyMainProps {
+  userName?: string;
+}
+
+export default function EmptyMain({ userName = 'User' }: EmptyMainProps) {
   const navigate = useNavigate();
-  const userName = userInfo?.userName ?? 'User';
 
   return (
     <section className={styles.emptyMain}>
