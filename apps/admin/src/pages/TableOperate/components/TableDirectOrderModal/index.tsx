@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
-import { Controller, useForm, useWatch, type SubmitHandler } from 'react-hook-form';
+import { useForm, useWatch, type SubmitHandler } from 'react-hook-form';
 import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -14,12 +14,11 @@ import styles from './TableDirectOrderModal.module.scss';
 interface TableDirectOrderModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  storeId?: number;
-  tables: TableResponse[];
+  onCancel?: () => void;
+  table: TableResponse | null;
 }
 
 interface DirectOrderForm {
-  tableId: string;
   depositorName: string;
   couponAmount: string;
 }
@@ -30,22 +29,13 @@ const isOrderableTable = (table: TableResponse) => table.status === 'OCCUPIED' |
 const formatTableLabel = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 
-export default function TableDirectOrderModal({ open, onOpenChange, storeId, tables }: TableDirectOrderModalProps) {
+export default function TableDirectOrderModal({ open, onOpenChange, onCancel, table }: TableDirectOrderModalProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { data: menus = [], isLoading: isMenuLoading } = useAvailableMenus(storeId);
+  const { data: menus = [], isLoading: isMenuLoading } = useAvailableMenus(table?.storeId);
   const { mutateAsync: createOrder, isPending } = useCreateOrder();
   const [quantityMap, setQuantityMap] = useState<QuantityMap>({});
 
-  const orderableTables = useMemo(() => tables.filter(isOrderableTable), [tables]);
-  const tableOptions = useMemo(
-    () =>
-      orderableTables.map((table) => ({
-        value: String(table.id),
-        label: formatTableLabel(table.tableNum),
-      })),
-    [orderableTables],
-  );
   const selectedMenus = useMemo(
     () =>
       menus.flatMap((menu) => {
@@ -70,8 +60,8 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
     [selectedMenus],
   );
 
-  const hasSelectableTable = tableOptions.length > 0;
-  const tablePlaceholder = hasSelectableTable ? '테이블을 선택해 주세요.' : '주문 가능한 테이블이 없습니다.';
+  const canCreateOrder = !!table && isOrderableTable(table);
+  const tableLabel = table ? formatTableLabel(table.tableNum) : '-';
 
   const {
     control,
@@ -82,7 +72,6 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
   } = useForm<DirectOrderForm>({
     mode: 'onChange',
     defaultValues: {
-      tableId: '',
       depositorName: '관리자',
       couponAmount: '0',
     },
@@ -99,7 +88,6 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
     onOpenChange(nextOpen);
     if (!nextOpen) {
       reset({
-        tableId: '',
         depositorName: '관리자',
         couponAmount: '0',
       });
@@ -108,7 +96,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
   };
 
   const handleIncreaseQuantity = (menuId: number) => {
-    if (!storeId) return;
+    if (!canCreateOrder) return;
     setQuantityMap((prev) => ({
       ...prev,
       [menuId]: (prev[menuId] ?? 0) + 1,
@@ -116,7 +104,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
   };
 
   const handleDecreaseQuantity = (menuId: number) => {
-    if (!storeId) return;
+    if (!canCreateOrder) return;
     setQuantityMap((prev) => {
       const currentQuantity = prev[menuId] ?? 0;
       if (currentQuantity <= 0) return prev;
@@ -135,16 +123,15 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
   };
 
   const handleSubmitForm: SubmitHandler<DirectOrderForm> = async (data) => {
-    if (!storeId) return;
+    if (!table) return;
 
-    const selectedTableId = Number(data.tableId);
-    const selectedTable = orderableTables.find((table) => table.id === selectedTableId);
     const couponAmount = Number(data.couponAmount);
     const depositorName = data.depositorName.trim();
+    const storeId = table.storeId;
 
-    if (!selectedTable) {
+    if (!isOrderableTable(table)) {
       toast({
-        message: '테이블을 선택해 주세요.',
+        message: '주문 가능한 테이블 상태가 아닙니다.',
         variant: 'error',
       });
       return;
@@ -177,7 +164,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
     try {
       await createOrder({
         storeId,
-        tableNum: selectedTable.tableNum,
+        tableNum: table.tableNum,
         depositorName,
         couponAmount,
         menus: selectedMenus.map((menu) => ({
@@ -192,7 +179,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
       ]);
 
       toast({
-        message: '주문이 추가되었습니다.',
+        message: '주문을 추가했습니다.',
         variant: 'info',
       });
 
@@ -222,35 +209,16 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
     <Modal open={open} onOpenChange={handleModalOpenChange}>
       <ModalContent className={styles.modalContent}>
         <ModalHeader>
-          <ModalTitle className={styles.title}>주문 직접 추가</ModalTitle>
+          <ModalTitle className={styles.title}>
+            <div className={styles.title__tableNum}>{tableLabel}</div>
+            주문 직접 추가
+          </ModalTitle>
         </ModalHeader>
         <form className={styles.formRoot} onSubmit={handleSubmit(handleSubmitForm)}>
           <ModalBody className={styles.body}>
-            <div className={styles.form}>
-              <Input
-                label='테이블'
-                required
-                message={errors.tableId?.message}
-                messageState={errors.tableId ? 'error' : undefined}
-              >
-                <Controller
-                  name='tableId'
-                  control={control}
-                  rules={{ required: '테이블을 선택해 주세요.' }}
-                  render={({ field }) => (
-                    <Input.InputSelect
-                      name={field.name}
-                      value={field.value ?? ''}
-                      onValueChange={field.onChange}
-                      options={tableOptions}
-                      placeholder={tablePlaceholder}
-                      disabled={!hasSelectableTable || !storeId}
-                      required
-                    />
-                  )}
-                />
-              </Input>
+            {/* <div className={styles.tableLabel}>{tableLabel}</div> */}
 
+            <div className={styles.form}>
               <Input
                 label='입금자명'
                 required
@@ -260,7 +228,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
                 <Input.Text
                   type='text'
                   placeholder='입금자명을 입력해 주세요.'
-                  disabled={!storeId}
+                  disabled={!canCreateOrder}
                   {...register('depositorName', {
                     required: '입금자명을 입력해 주세요.',
                     validate: (value) => value.trim().length > 0 || '입금자명을 입력해 주세요.',
@@ -278,7 +246,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
                   type='text'
                   inputMode='numeric'
                   placeholder='쿠폰 금액을 숫자로 입력해 주세요. ex) 0'
-                  disabled={!storeId}
+                  disabled={!canCreateOrder}
                   {...register('couponAmount', {
                     required: '쿠폰 금액을 입력해 주세요.',
                     pattern: {
@@ -307,8 +275,8 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
                   <div className={styles.menuGrid}>
                     {menus.map((menu) => {
                       const quantity = quantityMap[menu.id] ?? 0;
-                      const isMinusDisabled = quantity <= 0;
-                      const isPlusDisabled = !storeId || menu.isSoldOut;
+                      const isMinusDisabled = quantity <= 0 || !canCreateOrder;
+                      const isPlusDisabled = !canCreateOrder || menu.isSoldOut;
 
                       return (
                         <article key={menu.id} className={styles.menuCard}>
@@ -321,7 +289,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
                               type='button'
                               className={styles.quantityButton}
                               onClick={() => handleDecreaseQuantity(menu.id)}
-                              disabled={isMinusDisabled || !storeId}
+                              disabled={isMinusDisabled}
                               aria-label={`${menu.name} 수량 감소`}
                             >
                               -
@@ -365,7 +333,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
               <Button
                 type='submit'
                 className={styles.footerButton}
-                disabled={!storeId || !isValid || isSubmitting || isPending || !hasSelectableTable || selectedMenus.length === 0}
+                disabled={!canCreateOrder || !isValid || isSubmitting || isPending || selectedMenus.length === 0}
                 isLoading={isSubmitting || isPending}
               >
                 주문 추가
@@ -374,7 +342,10 @@ export default function TableDirectOrderModal({ open, onOpenChange, storeId, tab
                 type='button'
                 variant='danger'
                 className={styles.footerButton}
-                onClick={() => handleModalOpenChange(false)}
+                onClick={() => {
+                  handleModalOpenChange(false);
+                  onCancel?.();
+                }}
               >
                 취소
               </Button>

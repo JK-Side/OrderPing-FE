@@ -19,10 +19,21 @@ $menu-third-row-peek: 20px;
 }
 
 .title {
+  display: flex;
   margin: 0;
   font-size: 18px;
   font-weight: 600;
   color: $black;
+  gap: 8px;
+
+  &__tableNum {
+    background-color: $primary-50;
+    color: $white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+  }
 }
 
 .body {
@@ -37,9 +48,15 @@ $menu-third-row-peek: 20px;
 
 .form {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
   gap: 16px;
+}
+
+.tableLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: $gray-80;
 }
 
 .menuSection {

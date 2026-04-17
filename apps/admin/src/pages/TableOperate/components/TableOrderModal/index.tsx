@@ -4,7 +4,6 @@ import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
-import { useClearTable } from '@/pages/TableOperate/hooks/useClearTable';
 import { useUpdateTableMemo } from '@/pages/TableOperate/hooks/useUpdateTableMemo';
 import styles from './TableOrderModal.module.scss';
 
@@ -12,6 +11,7 @@ interface TableOrderModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onServiceAdd?: () => void;
+  onDirectOrderAdd?: () => void;
   table: TableResponse | null;
 }
 
@@ -21,20 +21,9 @@ const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 
 const formatTableLabel = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 
-const resolveOrderStatuses = (rawStatus: TableResponse['orderStatus']) => {
-  if (!rawStatus) return [];
-  return Array.isArray(rawStatus) ? rawStatus : [rawStatus];
-};
-
-const isTableClearable = (rawStatus: TableResponse['orderStatus']) => {
-  const statuses = resolveOrderStatuses(rawStatus);
-  return statuses.length > 0 && statuses.every((status) => status === 'COMPLETE');
-};
-
-export default function TableOrderModal({ open, onOpenChange, onServiceAdd, table }: TableOrderModalProps) {
+export default function TableOrderModal({ open, onOpenChange, onServiceAdd, onDirectOrderAdd, table }: TableOrderModalProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { mutateAsync: clearTable, isPending: isClearing } = useClearTable();
   const { mutateAsync: updateTableMemo, isPending: isSavingMemo } = useUpdateTableMemo();
   const [memoDraft, setMemoDraft] = useState<{ tableId: number | null; value: string }>({
     tableId: null,
@@ -55,8 +44,6 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
 
   const orderMenus = table.orderMenus ?? [];
   const serviceMenus = table.serviceMenus ?? [];
-  const canClearTable = isTableClearable(table.orderStatus);
-  const isClosedTable = table.status === 'CLOSED';
   const isEmpty = table.orderStatus === null;
   const memo = memoDraft.tableId === table.id ? memoDraft.value : (table.memo ?? '');
   const originalMemo = table.memo ?? '';
@@ -106,33 +93,6 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
         description: error instanceof Error ? error.message : undefined,
         variant: 'error',
       });
-    }
-  };
-
-  const handleClearTable = async () => {
-    if (!canClearTable) {
-      toast({
-        message: '모든 주문이 완료된 테이블만 비울 수 있습니다.',
-        variant: 'error',
-      });
-      return;
-    }
-
-    try {
-      await clearTable(table.id);
-      await queryClient.invalidateQueries({ queryKey: ['tables', table.storeId] });
-      toast({
-        message: '테이블 비우기가 완료되었습니다.',
-        variant: 'info',
-      });
-      onOpenChange(false);
-    } catch (error) {
-      toast({
-        message: '테이블 비우기에 실패했습니다.',
-        description: error instanceof Error ? error.message : undefined,
-        variant: 'error',
-      });
-      console.error('Failed to clear table', error);
     }
   };
 
@@ -237,13 +197,12 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, tabl
             </Button>
             <Button
               type='button'
-              variant='danger'
+              variant='secondary'
               className={styles.footerButton}
-              onClick={handleClearTable}
-              disabled={isClearing || !canClearTable || isClosedTable}
-              isLoading={isClearing}
+              onClick={onDirectOrderAdd}
+              disabled={!onDirectOrderAdd}
             >
-              테이블 비우기
+              주문 직접 추가
             </Button>
           </div>
         </ModalFooter>
