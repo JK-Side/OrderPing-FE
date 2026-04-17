@@ -309,13 +309,13 @@ export default function TableOperate() {
               </Button>
 
               <Button
-                className={styles.printButton}
+                className={styles.addOrderButton}
                 variant='primary'
                 size='md'
                 onClick={() => handleDirectOrderOpenChange(true)}
                 disabled={!storeId}
               >
-                <AddMenuIcon fill='#fff' />
+                <AddMenuIcon className={styles.addOrderButtonIcon} aria-hidden='true' />
                 주문 직접 추가
               </Button>
 

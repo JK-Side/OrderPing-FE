@@ -102,6 +102,11 @@
   min-width: 120px;
 }
 
+.printButton {
+  display: flex;
+  gap: 8px;
+}
+
 .printButtonIcon {
   width: 18px;
   height: 18px;
@@ -109,6 +114,20 @@
 
 .printButtonIcon path {
   fill: currentColor;
+}
+
+.addOrderButton {
+  display: flex;
+  gap: 8px;
+}
+
+.addOrderButtonIcon {
+  width: 18px;
+  height: 18px;
+}
+
+.addOrderButtonIcon path {
+  fill: $white;
 }
 
 .actionButtons {
