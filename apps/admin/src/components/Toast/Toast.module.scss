@@ -4,7 +4,8 @@
   position: fixed;
   top: 20px;
   right: 0px;
-  width: 450px;
+  width: fit-content;
+  max-width: min(450px, calc(100vw - 24px));
   z-index: 1200;
   display: flex;
   flex-direction: column;
@@ -29,7 +30,8 @@
   grid-template-columns: 24px 1fr 24px;
   align-items: center;
   column-gap: 8px;
-  width: 450px;
+  width: fit-content;
+  max-width: 100%;
 
   padding: 24px 16px 24px 36px;
   background: $background;
@@ -132,6 +134,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  margin-left: 8px;
   border-radius: 6px;
   background: transparent;
   cursor: pointer;
@@ -216,7 +219,6 @@
 
 @media (max-width: 480px) {
   .viewport {
-    width: 375px;
     top: 12px;
     right: 12px;
   }
