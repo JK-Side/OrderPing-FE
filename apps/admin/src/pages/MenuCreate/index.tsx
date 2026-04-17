@@ -51,7 +51,7 @@ export default function MenuCreate() {
   const menuPrice = useWatch({ control, name: 'price' });
   const menuStock = useWatch({ control, name: 'stock' });
   const categoryId = useWatch({ control, name: 'categoryId' });
-  const isTableFee = useWatch({ control, name: 'isTableFee' });
+  // const isTableFee = useWatch({ control, name: 'isTableFee' });
 
   const isPriceFormatError = errors.price?.message === MESSAGES.MENU.NUMBER_ONLY;
   const isStockFormatError = errors.stock?.message === MESSAGES.MENU.NUMBER_ONLY;
@@ -216,8 +216,7 @@ export default function MenuCreate() {
               </Input>
             </div>
 
-            <div className={styles.categoryRow}>
-              <div className={styles.category}>
+            <div className={styles.category}>
               <div className={styles.categoryLabel}>
                 카테고리 <span className={styles.required}>*</span>
               </div>
@@ -261,27 +260,6 @@ export default function MenuCreate() {
                 </button>
               </div>
               {errors.categoryId?.message && <span className={styles.categoryError}>{errors.categoryId.message}</span>}
-            </div>
-
-              <div className={styles.toggleField}>
-              <div className={styles.toggleLabel}>테이블비 메뉴</div>
-              <label className={styles.toggleControl}>
-                <input
-                  type='checkbox'
-                  className={styles.toggleInput}
-                  {...register('isTableFee')}
-                />
-                <span
-                  className={`${styles.toggleTrack} ${isTableFee ? styles.toggleTrackActive : ''}`}
-                  aria-hidden='true'
-                >
-                  <span className={`${styles.toggleThumb} ${isTableFee ? styles.toggleThumbActive : ''}`} />
-                </span>
-                <span className={styles.toggleText}>
-                  {isTableFee ? '운영자 전용 메뉴 (고객 미노출)' : '일반 메뉴 (고객 노출)'}
-                </span>
-              </label>
-              </div>
             </div>
 
             <Input

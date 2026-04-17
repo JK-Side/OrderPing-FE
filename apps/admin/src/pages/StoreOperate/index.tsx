@@ -70,14 +70,6 @@ export default function StoreOperate() {
             </div>
           </div>
           <div className={styles.summaryActions}>
-            <Button
-              className={styles.actionButton}
-              size='md'
-              onClick={() => id && navigate(`/store/${id}/menu/create`)}
-            >
-              <AddMenuIcon className={styles.actionIcon} aria-hidden='true' />
-              메뉴 추가
-            </Button>
             {storeId ? (
               <StoreSettingsModal
                 storeId={storeId}
@@ -87,6 +79,14 @@ export default function StoreOperate() {
               />
             ) : null}
             {storeId && <TableFeeCreateModal storeId={storeId} />}
+            <Button
+              className={styles.actionButton}
+              size='md'
+              onClick={() => id && navigate(`/store/${id}/menu/create`)}
+            >
+              <AddMenuIcon className={styles.actionIcon} aria-hidden='true' />
+              메뉴 추가
+            </Button>
           </div>
         </div>
 

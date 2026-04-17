@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { postCreatedMenu } from '@/api/menu';
+import PlusIcon from '@/assets/icons/plus.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle, ModalTrigger } from '@/components/Modal';
@@ -106,6 +107,7 @@ export default function TableFeeCreateModal({ storeId }: TableFeeCreateModalProp
     <Modal open={open} onOpenChange={handleOpenChange}>
       <ModalTrigger asChild>
         <Button className={styles.triggerButton} size='md'>
+          <PlusIcon />
           테이블비 추가
         </Button>
       </ModalTrigger>
