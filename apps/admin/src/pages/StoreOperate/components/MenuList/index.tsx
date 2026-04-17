@@ -18,7 +18,12 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
 
   return (
     <section className={styles.section}>
-      <h3 className={styles.sectionTitle}>{title}</h3>
+      <div>
+        <h3 className={styles.sectionTitle}>{title}</h3>
+
+        <div className={styles.section__divider} />
+      </div>
+
       <div className={styles.menuGrid}>
         {menus.map((menu) => (
           <article key={menu.id} className={styles.menuCard}>

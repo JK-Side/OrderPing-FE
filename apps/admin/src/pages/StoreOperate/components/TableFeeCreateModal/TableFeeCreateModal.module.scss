@@ -1,0 +1,29 @@
+@use '@order-ping/shared/styles/colors' as *;
+
+.triggerButton {
+  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+
+  & > svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.triggerButton path {
+  width: 18px;
+  height: 18px;
+  fill: $white;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer {
+  justify-content: flex-end;
+  gap: 12px;
+}
