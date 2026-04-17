@@ -1,9 +1,15 @@
 import { useUserInfo } from '@/utils/hooks/useUserInfo';
 import EmptyMain from './EmptyMain';
 import ReadyMain from './ReadyMain';
+import WaitingMain from './WaitingMain';
 
 export default function AuthedHome() {
-  const { data: userInfo } = useUserInfo();
+  const { data: userInfo, isPending } = useUserInfo();
+
+  if (isPending) {
+    return <WaitingMain />;
+  }
+
   const hasShop = (userInfo?.stores?.length ?? 0) > 0;
 
   return (
@@ -11,7 +17,7 @@ export default function AuthedHome() {
       {hasShop ? (
         <ReadyMain userName={userInfo?.userName} store={userInfo?.stores?.[0]} />
       ) : (
-        <EmptyMain />
+        <EmptyMain userName={userInfo?.userName} />
       )}
     </>
   );
