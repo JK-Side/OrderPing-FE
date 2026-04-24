@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { useSearchParams } from 'react-router-dom';
+import { useToast } from '@/components/Toast/useToast';
 import { useCreateStore } from '@/pages/StoreCreate/hooks/useCreateStore';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
 import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
@@ -13,7 +14,33 @@ import StoreInfo from './StoreInfo';
 const STEP_MIN = 1;
 const STEP_MAX = 3;
 
+const resolveCreateStoreErrorMessage = (error: unknown) => {
+  const status = (error as { status?: number })?.status;
+
+  if (status === 409) {
+    if (error instanceof Error) {
+      try {
+        const parsed = JSON.parse(error.message) as { message?: string };
+        if (typeof parsed.message === 'string' && parsed.message.trim().length > 0) {
+          return parsed.message;
+        }
+      } catch {
+        return '이미 주점을 등록한 사용자입니다.';
+      }
+    }
+
+    return '이미 주점을 등록한 사용자입니다.';
+  }
+
+  if (status === 401) {
+    return '로그인이 필요한 기능입니다.';
+  }
+
+  return '주점 생성에 실패했습니다.';
+};
+
 export default function StoreCreate() {
+  const { toast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const stepParam = Number(searchParams.get('step'));
   const isStepParamValid = Number.isInteger(stepParam) && stepParam >= STEP_MIN && stepParam <= STEP_MAX;
@@ -137,13 +164,17 @@ export default function StoreCreate() {
         });
         updateStep(3);
       } catch (error) {
+        toast({
+          message: resolveCreateStoreErrorMessage(error),
+          variant: 'error',
+        });
         console.error('Failed to create store', error);
       } finally {
         accountSubmitLockRef.current = false;
         setIsAccountSubmitting(false);
       }
     },
-    [createStore, storeImageFile, updateStep, uploadStoreImage],
+    [createStore, storeImageFile, toast, updateStep, uploadStoreImage],
   );
 
   const isStep1Completed = step > 1;
