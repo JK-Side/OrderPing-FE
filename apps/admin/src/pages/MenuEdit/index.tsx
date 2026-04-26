@@ -317,70 +317,50 @@ export default function MenuEdit() {
               </Input>
             </div>
 
-            <div className={styles.categoryRow}>
-              <div className={styles.category}>
-                <div className={styles.categoryLabel}>
-                  카테고리 <span className={styles.required}>*</span>
-                </div>
-                <input
-                  type='hidden'
-                  {...register('categoryId', {
-                    valueAsNumber: true,
-                    required: '카테고리를 선택해 주세요.',
-                  })}
-                />
-                <div className={styles.categoryButtons}>
-                  <button
-                    type='button'
-                    className={`${styles.categoryButton} ${
-                      categoryId === CATEGORY_MAIN ? styles.categoryButtonActive : ''
-                    }`}
-                    onClick={() =>
-                      setValue('categoryId', CATEGORY_MAIN, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      })
-                    }
-                  >
-                    메인 메뉴
-                  </button>
-                  <button
-                    type='button'
-                    className={`${styles.categoryButton} ${
-                      categoryId === CATEGORY_SIDE ? styles.categoryButtonActive : ''
-                    }`}
-                    onClick={() =>
-                      setValue('categoryId', CATEGORY_SIDE, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true,
-                      })
-                    }
-                  >
-                    사이드 메뉴
-                  </button>
-                </div>
-                {errors.categoryId?.message && (
-                  <span className={styles.categoryError}>{errors.categoryId.message}</span>
-                )}
+            <div className={styles.category}>
+              <div className={styles.categoryLabel}>
+                카테고리 <span className={styles.required}>*</span>
               </div>
-
-              <div className={styles.toggleField}>
-                <div className={styles.toggleLabel}>테이블비 메뉴</div>
-                <label className={styles.toggleControl}>
-                  <input type='checkbox' className={styles.toggleInput} {...register('isTableFee')} />
-                  <span
-                    className={`${styles.toggleTrack} ${isTableFee ? styles.toggleTrackActive : ''}`}
-                    aria-hidden='true'
-                  >
-                    <span className={`${styles.toggleThumb} ${isTableFee ? styles.toggleThumbActive : ''}`} />
-                  </span>
-                  <span className={styles.toggleText}>
-                    {isTableFee ? '운영자 전용 메뉴 (고객 미노출)' : '일반 메뉴 (고객 노출)'}
-                  </span>
-                </label>
+              <input
+                type='hidden'
+                {...register('categoryId', {
+                  valueAsNumber: true,
+                  required: '카테고리를 선택해 주세요.',
+                })}
+              />
+              <div className={styles.categoryButtons}>
+                <button
+                  type='button'
+                  className={`${styles.categoryButton} ${
+                    categoryId === CATEGORY_MAIN ? styles.categoryButtonActive : ''
+                  }`}
+                  onClick={() =>
+                    setValue('categoryId', CATEGORY_MAIN, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  메인 메뉴
+                </button>
+                <button
+                  type='button'
+                  className={`${styles.categoryButton} ${
+                    categoryId === CATEGORY_SIDE ? styles.categoryButtonActive : ''
+                  }`}
+                  onClick={() =>
+                    setValue('categoryId', CATEGORY_SIDE, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  사이드 메뉴
+                </button>
               </div>
+              {errors.categoryId?.message && <span className={styles.categoryError}>{errors.categoryId.message}</span>}
             </div>
 
             <Input
