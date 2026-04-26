@@ -1,7 +1,12 @@
 @use '@order-ping/shared/styles/colors' as *;
 
+$orders-table-min-width: 720px;
+$orders-table-mobile-min-width: 600px;
+
 .storeStatistics {
   padding: 46px 80px 96px;
+  width: 100%;
+  min-width: 0;
 }
 
 .filterBar {
@@ -186,6 +191,9 @@
   border-radius: 12px;
   background: $white;
   min-height: 300px;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .tableHead {
@@ -202,6 +210,7 @@
   grid-template-columns:
     minmax(80px, 0.9fr) minmax(80px, 0.9fr) minmax(100px, 1.1fr) minmax(260px, 3fr) minmax(100px, 1.1fr)
     minmax(100px, 1.1fr);
+  min-width: $orders-table-min-width;
 }
 
 .tableHeadMenus {
@@ -210,7 +219,7 @@
 
 .tableBody {
   padding: 4px 28px 28px;
-  overflow-x: auto;
+  overflow-x: visible;
 }
 
 .orderRow {
@@ -224,8 +233,8 @@
   color: $black;
   font-size: 16px;
   line-height: 1.45;
-  min-width: 0;
   align-items: center;
+  min-width: $orders-table-min-width;
 }
 
 .tableHeadOrders > span {
@@ -341,6 +350,22 @@
     min-width: 0;
     height: 44px;
     font-size: 16px;
+  }
+
+  .tableHead {
+    gap: 8px;
+    padding: 14px 16px 10px;
+  }
+
+  .tableHeadOrders,
+  .orderRow {
+    grid-template-columns: 68px 56px 84px minmax(150px, 1fr) 84px 84px;
+    gap: 8px;
+    min-width: $orders-table-mobile-min-width;
+  }
+
+  .tableBody {
+    padding: 4px 16px 24px;
   }
 
   .menuChartPanel {
