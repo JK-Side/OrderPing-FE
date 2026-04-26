@@ -24,33 +24,35 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
         <div className={styles.section__divider} />
       </div>
 
-      <div className={styles.menuGrid}>
-        {menus.map((menu) => (
-          <article key={menu.id} className={styles.menuCard}>
-            <div className={styles.menuImageWrap}>
-              <div className={styles.menuStockBadge}>재고 {menu.stock}</div>
-              {menu.isSoldOut && (
-                <div className={styles.menuSoldOut}>
-                  SOLD <br />
-                  OUT
-                </div>
-              )}
-              <img className={styles.menuImage} src={menu.imageUrl || MenuDefault} alt={menu.name} />
-              <button
-                type='button'
-                className={styles.menuAction}
-                aria-label={`${menu.name} 설정`}
-                onClick={() => navigate(`/store/${menu.storeId}/menu/${menu.id}/edit`)}
-              >
-                <SettingIcon className={styles.menuActionIcon} aria-hidden='true' />
-              </button>
-            </div>
-            <div className={styles.menuInfo}>
-              <div className={styles.menuName}>{menu.name}</div>
-              <div className={styles.menuPrice}>{formatPrice(menu.price)}</div>
-            </div>
-          </article>
-        ))}
+      <div className={styles.menuGridScroller}>
+        <div className={styles.menuGrid}>
+          {menus.map((menu) => (
+            <article key={menu.id} className={styles.menuCard}>
+              <div className={styles.menuImageWrap}>
+                <div className={styles.menuStockBadge}>재고 {menu.stock}</div>
+                {menu.isSoldOut && (
+                  <div className={styles.menuSoldOut}>
+                    SOLD <br />
+                    OUT
+                  </div>
+                )}
+                <img className={styles.menuImage} src={menu.imageUrl || MenuDefault} alt={menu.name} />
+                <button
+                  type='button'
+                  className={styles.menuAction}
+                  aria-label={`${menu.name} 설정`}
+                  onClick={() => navigate(`/store/${menu.storeId}/menu/${menu.id}/edit`)}
+                >
+                  <SettingIcon className={styles.menuActionIcon} aria-hidden='true' />
+                </button>
+              </div>
+              <div className={styles.menuInfo}>
+                <div className={styles.menuName}>{menu.name}</div>
+                <div className={styles.menuPrice}>{formatPrice(menu.price)}</div>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

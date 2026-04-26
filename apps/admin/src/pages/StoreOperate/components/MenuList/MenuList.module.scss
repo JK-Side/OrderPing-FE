@@ -2,12 +2,15 @@
 
 .menuList {
   width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 40px;
 }
 
 .section {
+  width: 100%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -27,18 +30,37 @@
   color: $gray-90;
 }
 
-.menuGrid {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 50px;
+.menuGridScroller {
+  width: 100%;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   padding-bottom: 8px;
-  scrollbar-width: none;
 }
 
-.menuGrid::-webkit-scrollbar {
-  display: none;
+.menuGrid {
+  width: max-content;
+  min-width: 100%;
+  display: flex;
+  gap: 50px;
+}
+
+.menuGridScroller::-webkit-scrollbar {
+  height: 10px;
+}
+
+.menuGridScroller::-webkit-scrollbar-track {
+  background-color: $gray-10;
+  border-radius: 999px;
+}
+
+.menuGridScroller::-webkit-scrollbar-thumb {
+  background-color: $gray-20;
+  border-radius: 999px;
+}
+
+.menuGridScroller::-webkit-scrollbar-thumb:hover {
+  background-color: $gray-30;
 }
 
 .menuSoldOut {
@@ -63,7 +85,6 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  width: 250px;
   flex: 0 0 250px;
 }
 
