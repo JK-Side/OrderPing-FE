@@ -6,7 +6,7 @@ import StoreDefault from '@/assets/imgs/store_default.svg?url';
 import Button from '@/components/Button';
 import MenuList from '@/pages/StoreOperate/components/MenuList';
 import StoreSettingsModal from '@/pages/StoreOperate/components/StoreSettingsModal';
-import TableFeeCreateModal from '@/pages/StoreOperate/components/TableFeeCreateModal';
+// import TableFeeCreateModal from '@/pages/StoreOperate/components/TableFeeCreateModal';
 import { useMenusByCategory } from '@/pages/StoreOperate/hooks/useMenus';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import styles from './StoreOperate.module.scss';
@@ -78,7 +78,7 @@ export default function StoreOperate() {
                 storeImageUrl={storeImageUrl}
               />
             ) : null}
-            {storeId && <TableFeeCreateModal storeId={storeId} />}
+            {/* {storeId && <TableFeeCreateModal storeId={storeId} />} */}
             <Button
               className={styles.actionButton}
               size='md'
