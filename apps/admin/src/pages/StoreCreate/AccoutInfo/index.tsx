@@ -1,4 +1,5 @@
 // import { useState } from 'react';
+import type { ChangeEvent } from 'react';
 import { Controller, FieldErrors, type Control, type UseFormRegister } from 'react-hook-form';
 // import InfoIcon from '@/assets/icons/info-circle.svg?react';
 // import QrIcon from '@/assets/icons/qr-code.svg?react';
@@ -10,6 +11,7 @@ import { Input } from '@/components/Input';
 // import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useBanks } from '@/pages/StoreCreate/hooks/useBanks';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
+import { normalizeAccountNumber } from '@/utils/normalizeAccountNumber';
 import styles from './AccoutInfo.module.scss';
 
 interface AccoutInfoProps {
@@ -37,6 +39,14 @@ export default function AccoutInfo({
   // const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const bankOptions = banks?.map((b) => ({ value: b.code, label: b.name })) ?? [];
+  const accountNumberField = register('accountNumber', {
+    required: '계좌번호를 입력해 주세요.',
+    maxLength: { value: 20, message: '계좌번호은 최대 20자입니다.' },
+  });
+  const handleAccountNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.target.value = normalizeAccountNumber(event.target.value);
+    void accountNumberField.onChange(event);
+  };
   // const qrCodeImageField = register('qrCodeImage');
   // const { onChange: handleQrCodeImageChange, ref: qrCodeImageRef, ...qrCodeImageFieldProps } = qrCodeImageField;
 
@@ -94,14 +104,8 @@ export default function AccoutInfo({
             <Input.Text
               placeholder='계좌번호를 숫자만 입력해 주세요. (최대 20글자)'
               inputMode='numeric'
-              {...register('accountNumber', {
-                required: '계좌번호를 입력해 주세요.',
-                maxLength: { value: 20, message: '계좌번호은 최대 20자입니다.' },
-                onChange: (e) => {
-                  const value = e.target.value;
-                  e.target.value = value.replace(/[^0-9]/g, '');
-                },
-              })}
+              {...accountNumberField}
+              onChange={handleAccountNumberChange}
             />
           </Input>
 

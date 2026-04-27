@@ -1,3 +1,4 @@
+import type { ChangeEvent } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import { useToast } from '@/components/Toast/useToast';
 import { useStoreAccounts } from '@/pages/MyPage/hooks/useStoreAccounts';
 import { useUpdateStoreAccount } from '@/pages/MyPage/hooks/useUpdateStoreAccount';
 import { useBanks } from '@/pages/StoreCreate/hooks/useBanks';
+import { normalizeAccountNumber } from '@/utils/normalizeAccountNumber';
 import styles from './InfoEditModal.module.scss';
 
 interface AccountSettingsModalProps {
@@ -45,9 +47,17 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
     defaultValues: {
       bankCode: store.account?.bankCode ?? '',
       accountHolder: store.account?.accountHolder ?? '',
-      accountNumber: store.account?.accountNumber ?? '',
+      accountNumber: normalizeAccountNumber(store.account?.accountNumber ?? ''),
     },
   });
+  const accountNumberField = register('accountNumber', {
+    required: '계좌번호를 입력해 주세요.',
+    maxLength: { value: 20, message: '계좌번호는 최대 20자입니다.' },
+  });
+  const handleAccountNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.target.value = normalizeAccountNumber(event.target.value);
+    void accountNumberField.onChange(event);
+  };
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -56,7 +66,7 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
       reset({
         bankCode: store.account?.bankCode ?? '',
         accountHolder: store.account?.accountHolder ?? '',
-        accountNumber: store.account?.accountNumber ?? '',
+        accountNumber: normalizeAccountNumber(store.account?.accountNumber ?? ''),
       });
     }
   };
@@ -77,7 +87,7 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
         body: {
           bankCode: data.bankCode,
           accountHolder: data.accountHolder.trim(),
-          accountNumber: data.accountNumber.trim(),
+          accountNumber: normalizeAccountNumber(data.accountNumber),
         },
       });
 
@@ -187,14 +197,8 @@ export default function AccountSettingsModal({ store, className }: AccountSettin
                 <Input.Text
                   placeholder='계좌번호를 입력해 주세요. (최대 20글자)'
                   inputMode='numeric'
-                  {...register('accountNumber', {
-                    required: '계좌번호를 입력해 주세요.',
-                    maxLength: { value: 20, message: '계좌번호는 최대 20자입니다.' },
-                    onChange: (e) => {
-                      const value = e.target.value;
-                      e.target.value = value.replace(/[^0-9]/g, '');
-                    },
-                  })}
+                  {...accountNumberField}
+                  onChange={handleAccountNumberChange}
                 />
               </Input>
             </div>

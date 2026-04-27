@@ -6,6 +6,7 @@ import { useToast } from '@/components/Toast/useToast';
 import { useCreateStore } from '@/pages/StoreCreate/hooks/useCreateStore';
 import { StoreCreateForm } from '@/pages/StoreCreate/types.ts';
 import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
+import { normalizeAccountNumber } from '@/utils/normalizeAccountNumber';
 import AccoutInfo from './AccoutInfo';
 import StoreCreateComplete from './Complete';
 import styles from './StoreCreate.module.scss';
@@ -160,7 +161,7 @@ export default function StoreCreate() {
           imageUrl,
           bankCode: data.bankCode ?? '',
           accountHolder: data.accountHolder ?? '',
-          accountNumber: data.accountNumber ?? '',
+          accountNumber: normalizeAccountNumber(data.accountNumber ?? ''),
         });
         updateStep(3);
       } catch (error) {
@@ -184,12 +185,13 @@ export default function StoreCreate() {
   const bankCodeValue = watch('bankCode') ?? '';
   const accountHolderValue = watch('accountHolder') ?? '';
   const accountNumberValue = watch('accountNumber') ?? '';
+  const normalizedAccountNumberValue = normalizeAccountNumber(accountNumberValue);
   const hasStoreName = storeNameValue.trim().length > 0 && storeNameValue.length <= 10;
   const hasStoreDescription = storeDescriptionValue.trim().length > 0 && storeDescriptionValue.length <= 100;
   const isStoreInfoValid = hasStoreName && hasStoreDescription;
   const hasBankCode = bankCodeValue.trim().length > 0;
   const hasAccountHolder = accountHolderValue.trim().length > 0 && accountHolderValue.length <= 6;
-  const hasAccountNumber = /^[0-9]+$/.test(accountNumberValue) && accountNumberValue.length <= 20;
+  const hasAccountNumber = /^[0-9]+$/.test(normalizedAccountNumberValue) && normalizedAccountNumberValue.length <= 20;
   const isAccountInfoValid = hasBankCode && hasAccountHolder && hasAccountNumber;
 
   return (
