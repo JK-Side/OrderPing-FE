@@ -10,6 +10,7 @@ interface MenuListProps {
 
 const CATEGORY_MAIN = 1;
 const CATEGORY_SIDE = 2;
+const CATEGORY_TABLE_FEE = 3;
 
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
@@ -61,11 +62,13 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
 export default function MenuList({ menus }: MenuListProps) {
   const mainMenus = menus.filter((menu) => menu.categoryId === CATEGORY_MAIN);
   const sideMenus = menus.filter((menu) => menu.categoryId === CATEGORY_SIDE);
+  const tableFeeMenus = menus.filter((menu) => menu.categoryId === CATEGORY_TABLE_FEE);
 
   return (
     <div className={styles.menuList}>
       {mainMenus.length > 0 && <MenuSection title='메인 메뉴' menus={mainMenus} />}
       {sideMenus.length > 0 && <MenuSection title='사이드 메뉴' menus={sideMenus} />}
+      {tableFeeMenus.length > 0 && <MenuSection title='테이블비' menus={tableFeeMenus} />}
     </div>
   );
 }

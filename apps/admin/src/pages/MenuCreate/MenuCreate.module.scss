@@ -137,6 +137,13 @@
     outline: 2px solid $primary-20;
     outline-offset: 2px;
   }
+
+  &:disabled {
+    border-color: $gray-30;
+    background-color: $gray-10;
+    color: $gray-50;
+    cursor: not-allowed;
+  }
 }
 
 .categoryButtonActive {

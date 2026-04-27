@@ -6,12 +6,15 @@ import Button from '@/components/Button';
 import { Input } from '@/components/Input';
 import { useToast } from '@/components/Toast/useToast';
 import { useCreateMenu } from '@/pages/MenuCreate/hooks/useCreateMenu';
+import { useMenusByCategory } from '@/pages/StoreOperate/hooks/useMenus';
 import { MESSAGES, REGEX } from '@/static/validation';
 import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
 import styles from './MenuCreate.module.scss';
 
 const CATEGORY_MAIN = 1;
 const CATEGORY_SIDE = 2;
+const CATEGORY_TABLE_FEE = 3;
+const TABLE_FEE_LIMIT_MESSAGE = '테이블비 메뉴는 주점당 하나만 등록할 수 있어요.';
 
 export interface MenuCreateForm {
   name: string;
@@ -30,6 +33,7 @@ export default function MenuCreate() {
   const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { mutateAsync: createMenu } = useCreateMenu();
+  const { data: tableFeeMenus = [] } = useMenusByCategory(storeId, CATEGORY_TABLE_FEE);
   const { toast } = useToast();
   const { upload } = usePresignedUploader();
   const {
@@ -65,8 +69,18 @@ export default function MenuCreate() {
   const isNameValid = typeof menuName === 'string' && menuName.trim().length > 0;
   const isCategoryValid = typeof categoryId === 'number' && categoryId > 0;
   const hasErrors = Object.keys(errors).length > 0;
+  const isTableFeeCategory = categoryId === CATEGORY_TABLE_FEE;
+  const hasTableFeeMenu = tableFeeMenus.length > 0;
+  const isTableFeeLimitExceeded = isTableFeeCategory && hasTableFeeMenu;
 
-  const canSubmit = !!storeId && isNameValid && isPriceValid && isStockValid && isCategoryValid && !hasErrors;
+  const canSubmit =
+    !!storeId &&
+    isNameValid &&
+    isPriceValid &&
+    isStockValid &&
+    isCategoryValid &&
+    !hasErrors &&
+    !isTableFeeLimitExceeded;
 
   const handleCancel = () => {
     if (id) {
@@ -104,6 +118,14 @@ export default function MenuCreate() {
   const handleSubmitMenu = useCallback<SubmitHandler<MenuCreateForm>>(
     async (data) => {
       if (!storeId) return;
+      if (data.categoryId === CATEGORY_TABLE_FEE && hasTableFeeMenu) {
+        toast({
+          message: TABLE_FEE_LIMIT_MESSAGE,
+          variant: 'error',
+        });
+        return;
+      }
+
       try {
         const imageUrl = await uploadMenuImage(data.menuImage);
         await createMenu({
@@ -114,7 +136,7 @@ export default function MenuCreate() {
           description: data.description ?? '',
           imageUrl,
           stock: Number(data.stock),
-          isTableFee: data.isTableFee,
+          isTableFee: data.categoryId === CATEGORY_TABLE_FEE,
         });
         toast({
           message: '메뉴 추가가 완료되었습니다.',
@@ -122,14 +144,15 @@ export default function MenuCreate() {
         });
         navigate(`/store/operate/${storeId}`);
       } catch (error) {
+        const status = (error as { status?: number })?.status;
         toast({
-          message: '메뉴 추가에 실패했습니다.',
+          message: status === 409 ? TABLE_FEE_LIMIT_MESSAGE : '메뉴 추가에 실패했습니다.',
           variant: 'error',
         });
         console.error('Failed to create menu', error);
       }
     },
-    [createMenu, navigate, storeId, toast, uploadMenuImage],
+    [createMenu, hasTableFeeMenu, navigate, storeId, toast, uploadMenuImage],
   );
 
   return (
@@ -258,8 +281,25 @@ export default function MenuCreate() {
                 >
                   사이드 메뉴
                 </button>
+                <button
+                  type='button'
+                  className={`${styles.categoryButton} ${
+                    categoryId === CATEGORY_TABLE_FEE ? styles.categoryButtonActive : ''
+                  }`}
+                  disabled={hasTableFeeMenu}
+                  onClick={() =>
+                    setValue('categoryId', CATEGORY_TABLE_FEE, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  테이블비
+                </button>
               </div>
               {errors.categoryId?.message && <span className={styles.categoryError}>{errors.categoryId.message}</span>}
+              {isTableFeeLimitExceeded && <span className={styles.categoryError}>{TABLE_FEE_LIMIT_MESSAGE}</span>}
             </div>
 
             <Input

@@ -13,6 +13,7 @@ import styles from './StoreOperate.module.scss';
 
 const CATEGORY_MAIN = 1;
 const CATEGORY_SIDE = 2;
+const CATEGORY_TABLE_FEE = 3;
 
 export default function StoreOperate() {
   const navigate = useNavigate();
@@ -25,9 +26,10 @@ export default function StoreOperate() {
   const storeDescription = storeDetail?.description ?? '주점 소개를 입력해 주세요.';
   const { data: mainMenus = [], isError: isMainMenuError } = useMenusByCategory(storeId, CATEGORY_MAIN);
   const { data: sideMenus = [], isError: isSideMenuError } = useMenusByCategory(storeId, CATEGORY_SIDE);
-  const menuItems = [...mainMenus, ...sideMenus];
+  const { data: tableFeeMenus = [], isError: isTableFeeMenuError } = useMenusByCategory(storeId, CATEGORY_TABLE_FEE);
+  const menuItems = [...mainMenus, ...sideMenus, ...tableFeeMenus];
   const hasMenus = menuItems.length > 0;
-  const hasMenuError = isMainMenuError || isSideMenuError;
+  const hasMenuError = isMainMenuError || isSideMenuError || isTableFeeMenuError;
   const storeImage = storeImageUrl || StoreDefault;
   const summaryTextRef = useRef<HTMLDivElement>(null);
   const [imageSize, setImageSize] = useState(84);

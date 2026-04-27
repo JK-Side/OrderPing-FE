@@ -9,12 +9,15 @@ import { useToast } from '@/components/Toast/useToast';
 import { useDeleteMenu } from '@/pages/MenuEdit/hooks/useDeleteMenu';
 import { useMenuById } from '@/pages/MenuEdit/hooks/useMenuById';
 import { useUpdateMenu } from '@/pages/MenuEdit/hooks/useUpdateMenu';
+import { useMenusByCategory } from '@/pages/StoreOperate/hooks/useMenus';
 import { MESSAGES, REGEX } from '@/static/validation';
 import { usePresignedUploader } from '@/utils/hooks/usePresignedUploader';
 import styles from './MenuEdit.module.scss';
 
 const CATEGORY_MAIN = 1;
 const CATEGORY_SIDE = 2;
+const CATEGORY_TABLE_FEE = 3;
+const TABLE_FEE_LIMIT_MESSAGE = '테이블비 메뉴는 주점당 하나만 등록할 수 있어요.';
 
 export interface MenuEditForm {
   name: string;
@@ -36,6 +39,7 @@ export default function MenuEdit() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { data: menuDetail, isError: isMenuError } = useMenuById(resolvedMenuId);
+  const { data: tableFeeMenus = [] } = useMenusByCategory(storeId, CATEGORY_TABLE_FEE);
   const { mutateAsync: updateMenu } = useUpdateMenu();
   const { mutateAsync: deleteMenu, isPending: isDeleting } = useDeleteMenu();
   const { toast } = useToast();
@@ -56,7 +60,7 @@ export default function MenuEdit() {
     },
   });
 
-  const menuDetailIsTableFee = menuDetail?.isTableFee ?? false;
+  const menuDetailIsTableFee = menuDetail?.categoryId === CATEGORY_TABLE_FEE || (menuDetail?.isTableFee ?? false);
 
   useEffect(() => {
     if (!menuDetail) return;
@@ -74,7 +78,6 @@ export default function MenuEdit() {
   const menuPrice = useWatch({ control, name: 'price' });
   const menuStock = useWatch({ control, name: 'stock' });
   const categoryId = useWatch({ control, name: 'categoryId' });
-  const isTableFee = useWatch({ control, name: 'isTableFee' });
   const menuDescription = useWatch({ control, name: 'description' });
   const menuImage = useWatch({ control, name: 'menuImage' });
 
@@ -90,6 +93,9 @@ export default function MenuEdit() {
   const isNameValid = typeof menuName === 'string' && menuName.trim().length > 0;
   const isCategoryValid = typeof categoryId === 'number' && categoryId > 0;
   const hasErrors = Object.keys(errors).length > 0;
+  const otherTableFeeMenu = tableFeeMenus.find((menu) => menu.id !== resolvedMenuId);
+  const isTableFeeCategory = categoryId === CATEGORY_TABLE_FEE;
+  const isTableFeeLimitExceeded = isTableFeeCategory && !!otherTableFeeMenu;
   const canSubmit =
     !!storeId &&
     !!resolvedMenuId &&
@@ -98,14 +104,15 @@ export default function MenuEdit() {
     isPriceValid &&
     isStockValid &&
     isCategoryValid &&
-    !hasErrors;
+    !hasErrors &&
+    !isTableFeeLimitExceeded;
   const isFormChanged =
     !!menuDetail &&
     (menuName?.trim() !== menuDetail.name.trim() ||
       Number(menuPrice) !== menuDetail.price ||
       Number(menuStock) !== menuDetail.stock ||
       categoryId !== menuDetail.categoryId ||
-      !!isTableFee !== !!menuDetailIsTableFee ||
+      isTableFeeCategory !== menuDetailIsTableFee ||
       (menuDescription ?? '').trim() !== (menuDetail.description ?? '').trim() ||
       !!menuImage?.length);
 
@@ -179,6 +186,14 @@ export default function MenuEdit() {
   const handleSubmitMenu = useCallback<SubmitHandler<MenuEditForm>>(
     async (data) => {
       if (!storeId || !resolvedMenuId || !menuDetail) return;
+      if (data.categoryId === CATEGORY_TABLE_FEE && otherTableFeeMenu) {
+        toast({
+          message: TABLE_FEE_LIMIT_MESSAGE,
+          variant: 'error',
+        });
+        return;
+      }
+
       try {
         const imageUrl = await uploadMenuImage(data.menuImage);
         await updateMenu({
@@ -192,7 +207,7 @@ export default function MenuEdit() {
             initialStock: menuDetail.initialStock,
             stock: Number(data.stock),
             isSoldOut: Number(data.stock) === 0,
-            isTableFee: data.isTableFee,
+            isTableFee: data.categoryId === CATEGORY_TABLE_FEE,
           },
         });
         toast({
@@ -209,7 +224,9 @@ export default function MenuEdit() {
               ? '본인 매장이 아닙니다.'
               : status === 404
                 ? '메뉴를 찾을 수 없습니다.'
-                : '메뉴 수정에 실패했습니다.';
+                : status === 409
+                  ? TABLE_FEE_LIMIT_MESSAGE
+                  : '메뉴 수정에 실패했습니다.';
 
         toast({
           message: errorMessage,
@@ -218,7 +235,7 @@ export default function MenuEdit() {
         console.error('Failed to update menu', error);
       }
     },
-    [storeId, resolvedMenuId, menuDetail, uploadMenuImage, updateMenu, navigate, toast],
+    [storeId, resolvedMenuId, menuDetail, otherTableFeeMenu, uploadMenuImage, updateMenu, navigate, toast],
   );
 
   const previewImage = previewUrl ?? menuDetail?.imageUrl;
@@ -359,8 +376,25 @@ export default function MenuEdit() {
                 >
                   사이드 메뉴
                 </button>
+                <button
+                  type='button'
+                  className={`${styles.categoryButton} ${
+                    categoryId === CATEGORY_TABLE_FEE ? styles.categoryButtonActive : ''
+                  }`}
+                  disabled={!!otherTableFeeMenu && categoryId !== CATEGORY_TABLE_FEE}
+                  onClick={() =>
+                    setValue('categoryId', CATEGORY_TABLE_FEE, {
+                      shouldDirty: true,
+                      shouldTouch: true,
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  테이블비
+                </button>
               </div>
               {errors.categoryId?.message && <span className={styles.categoryError}>{errors.categoryId.message}</span>}
+              {isTableFeeLimitExceeded && <span className={styles.categoryError}>{TABLE_FEE_LIMIT_MESSAGE}</span>}
             </div>
 
             <Input
