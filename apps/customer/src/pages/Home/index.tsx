@@ -87,6 +87,8 @@ export default function HomePage() {
   const mainSectionRef = useRef<HTMLElement | null>(null);
   const sideSectionRef = useRef<HTMLElement | null>(null);
   const tabContainerRef = useRef<HTMLDivElement | null>(null);
+  const scrollTargetTabRef = useRef<TabKey | null>(null);
+  const scrollTargetClearTimerRef = useRef<number | null>(null);
 
   const navigate = useNavigate();
   const { totalPrice, totalQuantity, setActiveTable } = useCart();
@@ -164,10 +166,24 @@ export default function HomePage() {
   }, [setActiveTable, tableNum]);
 
   useEffect(() => {
-    if (!hasTableFeeSection && activeTab === 'tableFee') {
+    return () => {
+      if (scrollTargetClearTimerRef.current !== null) {
+        window.clearTimeout(scrollTargetClearTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading && categories.length > 0 && !hasTableFeeSection && activeTab === 'tableFee') {
       setActiveTab('main');
     }
-  }, [activeTab, hasTableFeeSection]);
+  }, [activeTab, categories.length, hasTableFeeSection, isLoading]);
+
+  useEffect(() => {
+    if (hasTableFeeSection) {
+      setActiveTab('tableFee');
+    }
+  }, [hasTableFeeSection]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -198,7 +214,17 @@ export default function HomePage() {
           if (!entry.isIntersecting) return;
           const tab = entry.target.getAttribute('data-tab');
           if (tab === 'tableFee' || tab === 'main' || tab === 'side') {
+            const scrollTargetTab = scrollTargetTabRef.current;
+            if (scrollTargetTab && tab !== scrollTargetTab) {
+              return;
+            }
+
             setActiveTab(tab);
+            scrollTargetTabRef.current = null;
+            if (scrollTargetClearTimerRef.current !== null) {
+              window.clearTimeout(scrollTargetClearTimerRef.current);
+              scrollTargetClearTimerRef.current = null;
+            }
           }
         });
       },
@@ -230,6 +256,15 @@ export default function HomePage() {
     if (tab === 'side' && !hasSideSection) return;
 
     setActiveTab(tab);
+    scrollTargetTabRef.current = tab;
+    if (scrollTargetClearTimerRef.current !== null) {
+      window.clearTimeout(scrollTargetClearTimerRef.current);
+    }
+    scrollTargetClearTimerRef.current = window.setTimeout(() => {
+      scrollTargetTabRef.current = null;
+      scrollTargetClearTimerRef.current = null;
+    }, 900);
+
     const target =
       tab === 'tableFee'
         ? tableFeeSectionRef.current
