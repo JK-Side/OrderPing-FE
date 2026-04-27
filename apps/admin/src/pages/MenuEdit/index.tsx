@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import PlusIcon from '@/assets/icons/plus.svg?react';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
-import { Modal, ModalBody, ModalContent, ModalFooter } from '@/components/Modal';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import { useDeleteMenu } from '@/pages/MenuEdit/hooks/useDeleteMenu';
 import { useMenuById } from '@/pages/MenuEdit/hooks/useMenuById';
@@ -17,7 +17,11 @@ import styles from './MenuEdit.module.scss';
 const CATEGORY_MAIN = 1;
 const CATEGORY_SIDE = 2;
 const CATEGORY_TABLE_FEE = 3;
+
 const TABLE_FEE_LIMIT_MESSAGE = '테이블비 메뉴는 주점당 하나만 등록할 수 있어요.';
+const TABLE_FEE_NAME = '인원수';
+const TABLE_FEE_STOCK = '1000';
+const TABLE_FEE_DESCRIPTION = '함께온 인원수 만큼 수량을 선택해 주세요';
 
 export interface MenuEditForm {
   name: string;
@@ -38,6 +42,7 @@ export default function MenuEdit() {
   const resolvedMenuId = Number.isFinite(parsedMenuId) ? parsedMenuId : undefined;
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isTableFeeConfirmOpen, setIsTableFeeConfirmOpen] = useState(false);
   const { data: menuDetail, isError: isMenuError } = useMenuById(resolvedMenuId);
   const { data: tableFeeMenus = [] } = useMenusByCategory(storeId, CATEGORY_TABLE_FEE);
   const { mutateAsync: updateMenu } = useUpdateMenu();
@@ -64,13 +69,15 @@ export default function MenuEdit() {
 
   useEffect(() => {
     if (!menuDetail) return;
+    const isTableFee = menuDetail.categoryId === CATEGORY_TABLE_FEE || menuDetail.isTableFee;
+
     reset({
-      name: menuDetail.name,
+      name: isTableFee ? TABLE_FEE_NAME : menuDetail.name,
       price: String(menuDetail.price),
-      stock: String(menuDetail.stock),
+      stock: isTableFee ? TABLE_FEE_STOCK : String(menuDetail.stock),
       categoryId: menuDetail.categoryId,
       isTableFee: menuDetailIsTableFee,
-      description: menuDetail.description ?? '',
+      description: isTableFee ? TABLE_FEE_DESCRIPTION : (menuDetail.description ?? ''),
     });
   }, [menuDetail, menuDetailIsTableFee, reset]);
 
@@ -96,6 +103,14 @@ export default function MenuEdit() {
   const otherTableFeeMenu = tableFeeMenus.find((menu) => menu.id !== resolvedMenuId);
   const isTableFeeCategory = categoryId === CATEGORY_TABLE_FEE;
   const isTableFeeLimitExceeded = isTableFeeCategory && !!otherTableFeeMenu;
+  const hasTableFeeResetTarget =
+    !menuDetailIsTableFee &&
+    ((menuName ?? '').trim().length > 0 ||
+      (menuStock ?? '').trim().length > 0 ||
+      (menuDescription ?? '').trim().length > 0 ||
+      !!menuImage?.length ||
+      !!previewUrl ||
+      !!menuDetail?.imageUrl);
   const canSubmit =
     !!storeId &&
     !!resolvedMenuId &&
@@ -110,10 +125,11 @@ export default function MenuEdit() {
     !!menuDetail &&
     (menuName?.trim() !== menuDetail.name.trim() ||
       Number(menuPrice) !== menuDetail.price ||
-      Number(menuStock) !== menuDetail.stock ||
+      Number(menuStock) !== (isTableFeeCategory ? Number(TABLE_FEE_STOCK) : menuDetail.stock) ||
       categoryId !== menuDetail.categoryId ||
       isTableFeeCategory !== menuDetailIsTableFee ||
-      (menuDescription ?? '').trim() !== (menuDetail.description ?? '').trim() ||
+      (menuDescription ?? '').trim() !==
+        (isTableFeeCategory ? TABLE_FEE_DESCRIPTION : (menuDetail.description ?? '').trim()) ||
       !!menuImage?.length);
 
   const handleCancel = () => {
@@ -158,6 +174,60 @@ export default function MenuEdit() {
     }
   };
 
+  const setMenuCategory = (nextCategoryId: number) => {
+    setValue('categoryId', nextCategoryId, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue('isTableFee', nextCategoryId === CATEGORY_TABLE_FEE, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+  };
+
+  const applyTableFeeCategory = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    setPreviewUrl(null);
+    setMenuCategory(CATEGORY_TABLE_FEE);
+    setValue('name', TABLE_FEE_NAME, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue('stock', TABLE_FEE_STOCK, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue('description', TABLE_FEE_DESCRIPTION, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setValue('menuImage', undefined, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    setIsTableFeeConfirmOpen(false);
+  };
+
+  const handleTableFeeCategoryClick = () => {
+    if (otherTableFeeMenu || isTableFeeCategory) return;
+
+    if (hasTableFeeResetTarget) {
+      setIsTableFeeConfirmOpen(true);
+      return;
+    }
+
+    applyTableFeeCategory();
+  };
+
   useEffect(() => {
     return () => {
       if (previewUrl) {
@@ -186,7 +256,9 @@ export default function MenuEdit() {
   const handleSubmitMenu = useCallback<SubmitHandler<MenuEditForm>>(
     async (data) => {
       if (!storeId || !resolvedMenuId || !menuDetail) return;
-      if (data.categoryId === CATEGORY_TABLE_FEE && otherTableFeeMenu) {
+      const isTableFee = data.categoryId === CATEGORY_TABLE_FEE;
+
+      if (isTableFee && otherTableFeeMenu) {
         toast({
           message: TABLE_FEE_LIMIT_MESSAGE,
           variant: 'error',
@@ -195,19 +267,19 @@ export default function MenuEdit() {
       }
 
       try {
-        const imageUrl = await uploadMenuImage(data.menuImage);
+        const imageUrl = isTableFee ? '' : await uploadMenuImage(data.menuImage);
         await updateMenu({
           menuId: resolvedMenuId,
           body: {
             categoryId: data.categoryId,
-            name: data.name,
+            name: isTableFee ? TABLE_FEE_NAME : data.name,
             price: Number(data.price),
-            description: data.description ?? '',
+            description: isTableFee ? TABLE_FEE_DESCRIPTION : (data.description ?? ''),
             imageUrl,
-            initialStock: menuDetail.initialStock,
-            stock: Number(data.stock),
-            isSoldOut: Number(data.stock) === 0,
-            isTableFee: data.categoryId === CATEGORY_TABLE_FEE,
+            initialStock: isTableFee ? Number(TABLE_FEE_STOCK) : menuDetail.initialStock,
+            stock: isTableFee ? Number(TABLE_FEE_STOCK) : Number(data.stock),
+            isSoldOut: isTableFee ? false : Number(data.stock) === 0,
+            isTableFee,
           },
         });
         toast({
@@ -238,7 +310,7 @@ export default function MenuEdit() {
     [storeId, resolvedMenuId, menuDetail, otherTableFeeMenu, uploadMenuImage, updateMenu, navigate, toast],
   );
 
-  const previewImage = previewUrl ?? menuDetail?.imageUrl;
+  const previewImage = isTableFeeCategory ? null : (previewUrl ?? menuDetail?.imageUrl);
 
   return (
     <section className={styles.menuEdit}>
@@ -267,6 +339,7 @@ export default function MenuEdit() {
                 type='file'
                 accept='image/*'
                 hidden
+                disabled={isTableFeeCategory}
                 {...register('menuImage', {
                   onChange: (event) => {
                     const file = (event.target as HTMLInputElement).files?.[0] ?? null;
@@ -296,6 +369,7 @@ export default function MenuEdit() {
             >
               <Input.Text
                 placeholder='내용을 입력해 주세요.'
+                disabled={isTableFeeCategory}
                 {...register('name', {
                   required: '메뉴명을 입력해 주세요.',
                   maxLength: { value: 20, message: '메뉴명은 최대 20자입니다.' },
@@ -323,6 +397,7 @@ export default function MenuEdit() {
                   type='text'
                   inputMode='numeric'
                   placeholder='수량을 입력해 주세요.'
+                  disabled={isTableFeeCategory}
                   {...register('stock', {
                     required: MESSAGES.MENU.STOCK_REQUIRED,
                     pattern: {
@@ -351,13 +426,7 @@ export default function MenuEdit() {
                   className={`${styles.categoryButton} ${
                     categoryId === CATEGORY_MAIN ? styles.categoryButtonActive : ''
                   }`}
-                  onClick={() =>
-                    setValue('categoryId', CATEGORY_MAIN, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
+                  onClick={() => setMenuCategory(CATEGORY_MAIN)}
                 >
                   메인 메뉴
                 </button>
@@ -366,13 +435,7 @@ export default function MenuEdit() {
                   className={`${styles.categoryButton} ${
                     categoryId === CATEGORY_SIDE ? styles.categoryButtonActive : ''
                   }`}
-                  onClick={() =>
-                    setValue('categoryId', CATEGORY_SIDE, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
+                  onClick={() => setMenuCategory(CATEGORY_SIDE)}
                 >
                   사이드 메뉴
                 </button>
@@ -382,13 +445,7 @@ export default function MenuEdit() {
                     categoryId === CATEGORY_TABLE_FEE ? styles.categoryButtonActive : ''
                   }`}
                   disabled={!!otherTableFeeMenu && categoryId !== CATEGORY_TABLE_FEE}
-                  onClick={() =>
-                    setValue('categoryId', CATEGORY_TABLE_FEE, {
-                      shouldDirty: true,
-                      shouldTouch: true,
-                      shouldValidate: true,
-                    })
-                  }
+                  onClick={handleTableFeeCategoryClick}
                 >
                   테이블비
                 </button>
@@ -404,6 +461,7 @@ export default function MenuEdit() {
             >
               <Input.TextArea
                 placeholder={'예시) 우리 주점 최고의 안주,\n둘이 먹다 죽어도 몰라요.\n극강의 매운맛에 도전해 보세요!'}
+                disabled={isTableFeeCategory}
                 {...register('description', {
                   maxLength: { value: 30, message: '메뉴 설명은 최대 30자입니다.' },
                 })}
@@ -452,6 +510,26 @@ export default function MenuEdit() {
               loadingText='삭제 중...'
             >
               삭제
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal open={isTableFeeConfirmOpen} onOpenChange={setIsTableFeeConfirmOpen}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>경고</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            <p className={styles.confirmMessage}>테이블비 카테고리로 변경시</p>
+            <p className={styles.confirmMessage}>기존에 입력된 정보는 모두 삭제됩니다.</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button type='button' variant='ghost' fullWidth onClick={() => setIsTableFeeConfirmOpen(false)}>
+              취소
+            </Button>
+            <Button type='button' variant='danger' fullWidth onClick={applyTableFeeCategory}>
+              변경
             </Button>
           </ModalFooter>
         </ModalContent>
