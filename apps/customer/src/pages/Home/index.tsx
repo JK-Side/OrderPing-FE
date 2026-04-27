@@ -16,6 +16,7 @@ const CATEGORY_MAIN = 1;
 const CATEGORY_SIDE = 2;
 const CATEGORY_TABLE_FEE = 3;
 const HEADER_HEIGHT_PX = 74;
+const SCROLL_TARGET_LOCK_MS = 900;
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -263,7 +264,7 @@ export default function HomePage() {
     scrollTargetClearTimerRef.current = window.setTimeout(() => {
       scrollTargetTabRef.current = null;
       scrollTargetClearTimerRef.current = null;
-    }, 900);
+    }, SCROLL_TARGET_LOCK_MS);
 
     const target =
       tab === 'tableFee'
