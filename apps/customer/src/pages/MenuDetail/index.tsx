@@ -135,7 +135,10 @@ export default function MenuDetailPage() {
               />
             ) : (
               <div className={styles.menuDetail__imageFallback}>
-                <MenuDefaultImage aria-hidden='true' />
+                <MenuDefaultImage
+                  aria-hidden='true'
+                  preserveAspectRatio='xMidYMid slice'
+                />
               </div>
             )}
           </section>
