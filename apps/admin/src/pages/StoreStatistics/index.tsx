@@ -298,8 +298,10 @@ export default function StoreStatistics() {
           <div className={styles.summaryValue}>{formatCurrency(statistics?.couponRevenue ?? 0)}</div>
         </article>
         <article className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>주문 수</div>
-          <div className={styles.summaryValue}>{(statistics?.orderCount ?? 0).toLocaleString('ko-KR')}건</div>
+          <div className={styles.summaryLabel}>테이블비</div>
+          <div className={styles.summaryValue}>{formatCurrency(statistics?.tableFeeRevenue ?? 0)}</div>
+          {/* <div className={styles.summaryLabel}>주문 수</div>
+          <div className={styles.summaryValue}>{(statistics?.orderCount ?? 0).toLocaleString('ko-KR')}건</div> */}
         </article>
       </div>
 
