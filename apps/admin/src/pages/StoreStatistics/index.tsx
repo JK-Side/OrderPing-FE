@@ -50,6 +50,8 @@ const parseDateString = (value?: string) => {
 
 const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 
+const formatPeopleCount = (value: number) => `${value.toLocaleString('ko-KR')}명`;
+
 const formatOrderNumber = (value: number) => String(value).padStart(4, '0');
 
 const formatOrderedAt = (value: string, isSingleDay: boolean) => {
@@ -157,14 +159,14 @@ export default function StoreStatistics() {
         const soldQuantity = resolveSoldQuantity(menu);
 
         return {
-        menuId: menu.menuId,
-        menuName: menu.menuName,
-        stock,
-        soldQuantity,
-        maxValue: Math.max(stock, soldQuantity),
-        stockRatio: stock / menuChartMaxValue,
-        soldRatio: soldQuantity / menuChartMaxValue,
-      };
+          menuId: menu.menuId,
+          menuName: menu.menuName,
+          stock,
+          soldQuantity,
+          maxValue: Math.max(stock, soldQuantity),
+          stockRatio: stock / menuChartMaxValue,
+          soldRatio: soldQuantity / menuChartMaxValue,
+        };
       }),
     [menuChartMaxValue, menuRows],
   );
@@ -298,8 +300,8 @@ export default function StoreStatistics() {
           <div className={styles.summaryValue}>{formatCurrency(statistics?.couponRevenue ?? 0)}</div>
         </article>
         <article className={styles.summaryCard}>
-          <div className={styles.summaryLabel}>테이블비</div>
-          <div className={styles.summaryValue}>{formatCurrency(statistics?.tableFeeRevenue ?? 0)}</div>
+          <div className={styles.summaryLabel}>방문 인원</div>
+          <div className={styles.summaryValue}>{formatPeopleCount(statistics?.tableFeeQuantity ?? 0)}</div>
           {/* <div className={styles.summaryLabel}>주문 수</div>
           <div className={styles.summaryValue}>{(statistics?.orderCount ?? 0).toLocaleString('ko-KR')}건</div> */}
         </article>
@@ -372,5 +374,3 @@ export default function StoreStatistics() {
     </section>
   );
 }
-
-
