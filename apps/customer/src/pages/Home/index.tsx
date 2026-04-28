@@ -4,6 +4,7 @@ import BottomActionBar from '../../components/BottomActionBar';
 import PageHeader from '../../components/PageHeader';
 import { useCart } from '../../stores/cart';
 import DEFAULTIMG from '../../assets/imgs/store_default.svg?react';
+import MenuDefaultImage from '../../assets/imgs/menu_default.svg?react';
 import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -65,7 +66,9 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
           className={styles.home__menuImage}
         />
       ) : (
-        <div className={styles.home__menuImageFallback}>이미지가 없어요</div>
+        <div className={styles.home__menuImageFallback}>
+          <MenuDefaultImage aria-hidden='true' />
+        </div>
       )}
     </article>
   );
