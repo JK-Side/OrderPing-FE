@@ -2,12 +2,12 @@ export type OrderStatus = 'PENDING' | 'COOKING' | 'COMPLETE';
 
 // POST /api/customer/orders
 export interface CreateCustomerOrderRequest {
-  tableId: number;
   tableNum: number;
   storeId: number;
   depositorName: string;
   couponAmount: number;
   menus: OrderMenu[];
+  idempotencyKey: string;
 }
 
 interface OrderMenu {

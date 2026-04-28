@@ -1,14 +1,12 @@
 ﻿import { Input } from '@order-ping/shared/components/Input';
-import {
-  getPaymentTossDeeplink,
-  postCreatedCustomerOrder,
-} from '../../api/customer';
+import { getPaymentTossDeeplink } from '../../api/customer';
 import BottomActionBar from '../../components/BottomActionBar';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
 import {
   buildCartPath,
   buildOrderPaymentWaitPath,
+  createOrderIdempotencyKey,
   parsePositiveInt,
   savePendingOrderDraft,
 } from '../../utils/orderFlow';
@@ -23,8 +21,7 @@ const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 export default function OrderConfirmPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { clearCart, setActiveTable, items, totalQuantity, totalPrice } =
-    useCart();
+  const { setActiveTable, items, totalQuantity, totalPrice } = useCart();
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
@@ -33,7 +30,7 @@ export default function OrderConfirmPage() {
     [searchParams],
   );
   const hasTableContext = storeId !== null && tableNum !== null;
-  const { data, isLoading } = useStoreOrder(storeId, tableNum);
+  const { data, isLoading, refetch } = useStoreOrder(storeId, tableNum);
   const [depositorName, setDepositorName] = useState('');
   const [couponAmountInput, setCouponAmountInput] = useState('');
   const [isPreparingPayment, setIsPreparingPayment] = useState(false);
@@ -105,30 +102,80 @@ export default function OrderConfirmPage() {
 
     try {
       setIsPreparingPayment(true);
+      const { data: latestData } = await refetch();
+      const latestOrderData = latestData ?? data;
+
+      if (!latestOrderData) {
+        toast({
+          message: '주문 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.',
+          variant: 'info',
+          duration: 3000,
+        });
+        return;
+      }
+
+      const latestMenuById = new Map(
+        latestOrderData.categories.flatMap((category) =>
+          category.menus.map((menu) => [menu.id, menu] as const),
+        ),
+      );
+      const normalizedItems = [];
+
+      for (const item of items) {
+        const latestMenu = latestMenuById.get(item.menuId);
+
+        if (
+          !latestMenu ||
+          latestMenu.isSoldOut ||
+          latestMenu.stock < item.quantity
+        ) {
+          toast({
+            message: '재고가 부족하여 주문할 수 없어요. 수량을 조절해 주세요.',
+            variant: 'warning',
+            duration: 3000,
+          });
+          return;
+        }
+
+        normalizedItems.push({
+          menuId: item.menuId,
+          name: item.name,
+          price: item.price,
+          imageUrl: item.imageUrl,
+          quantity: item.quantity,
+        });
+      }
+
+      const normalizedTotalPrice = normalizedItems.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      );
       const normalizedCouponAmount =
         couponAmountInput.trim() === '' ? 0 : appliedCouponAmount;
-      const createdOrder = await postCreatedCustomerOrder({
-        tableId: data.tableId,
-        tableNum: data.tableNum,
-        storeId: data.storeId,
-        depositorName: depositorName.trim(),
-        couponAmount: normalizedCouponAmount, // 빈 문자열일 때 확실히 0으로 보냄
-        menus: items.map((item) => ({
-          menuId: item.menuId,
-          quantity: item.quantity,
-        })),
-      });
 
-      const normalizedPaymentAmount = Math.max(createdOrder.cashAmount, 0);
+      if (normalizedCouponAmount > normalizedTotalPrice) {
+        toast({
+          message: '주문 금액을 초과하는 쿠폰은 사용할 수 없어요.',
+          variant: 'warning',
+          duration: 3000,
+        });
+        return;
+      }
+
+      const normalizedPaymentAmount = Math.max(
+        normalizedTotalPrice - normalizedCouponAmount,
+        0,
+      );
 
       const baseDraft = {
-        orderId: createdOrder.id,
-        storeId: data.storeId,
-        tableId: data.tableId,
-        tableNum: data.tableNum,
+        orderId: null,
+        storeId: latestOrderData.storeId,
+        tableId: latestOrderData.tableId,
+        tableNum: latestOrderData.tableNum,
+        idempotencyKey: createOrderIdempotencyKey(),
         depositorName: depositorName.trim(),
-        couponAmount: createdOrder.couponAmount, // 프론트 입력값 정리본(요청 보낸 값)이기에 실제랑 동일하게
-        totalPrice,
+        couponAmount: normalizedCouponAmount,
+        totalPrice: normalizedTotalPrice,
         paymentAmount: normalizedPaymentAmount,
         tossDeeplink: '',
         account: {
@@ -137,16 +184,15 @@ export default function OrderConfirmPage() {
           accountHolder: '',
           accountNumber: '',
         },
-        items,
+        items: normalizedItems,
         createdAt: new Date().toISOString(),
       };
 
       savePendingOrderDraft(baseDraft);
-      clearCart();
 
       try {
         const paymentInfo = await getPaymentTossDeeplink({
-          storeId: data.storeId,
+          storeId: latestOrderData.storeId,
           amount: normalizedPaymentAmount,
         });
 
@@ -172,9 +218,9 @@ export default function OrderConfirmPage() {
       const status = (error as { status?: number } | null)?.status;
       toast({
         message:
-          status === 409
-            ? '재고가 부족하여 주문할 수 없어요. 수량을 조절해 주세요.'
-            : '주문 생성에 실패했어요. 다시 시도해 주세요.',
+          status === 404
+            ? '입금 계좌 정보를 찾을 수 없어요. 다시 시도해 주세요.'
+            : '결제 준비에 실패했어요. 다시 시도해 주세요.',
         variant: 'error',
         duration: 3000,
       });
@@ -282,9 +328,9 @@ export default function OrderConfirmPage() {
                 <div>{formatPrice(paymentAmount)}</div>
               </div>
 
-              <div className={styles.orderConfirm__info}>
+              {/* <div className={styles.orderConfirm__info}>
                 최초 주문 시에는 테이블비가 포함되어 있을 수도 있어요.
-              </div>
+              </div> */}
             </section>
           </div>
         ) : null}
