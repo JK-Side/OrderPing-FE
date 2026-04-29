@@ -19,7 +19,7 @@ const CATEGORY_TABLE_FEE = 3;
 const TABLE_FEE_LIMIT_MESSAGE = '테이블비 메뉴는 주점당 하나만 등록할 수 있어요.';
 const TABLE_FEE_NAME = '인원수';
 const TABLE_FEE_STOCK = '1000';
-const TABLE_FEE_DESCRIPTION = '함께온 인원수 만큼 수량을 선택해 주세요';
+const TABLE_FEE_DESCRIPTION = '첫 주문 시 테이블 이용 인원수만큼 선택해 주세요.';
 
 export interface MenuCreateForm {
   name: string;
