@@ -150,6 +150,13 @@ export default function HomePage() {
   const hasNotFoundError =
     (error as { status?: number } | null)?.status === 404;
   const hasTableContext = storeId !== null && tableNum !== null;
+  const visibleActiveTab =
+    !isLoading &&
+    categories.length > 0 &&
+    !hasTableFeeSection &&
+    activeTab === 'tableFee'
+      ? 'main'
+      : activeTab;
 
   const headerStyle = useMemo(() => {
     const colorChannel = mixChannel(255, 17, headerProgress);
@@ -176,18 +183,6 @@ export default function HomePage() {
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (!isLoading && categories.length > 0 && !hasTableFeeSection && activeTab === 'tableFee') {
-      setActiveTab('main');
-    }
-  }, [activeTab, categories.length, hasTableFeeSection, isLoading]);
-
-  useEffect(() => {
-    if (hasTableFeeSection) {
-      setActiveTab('tableFee');
-    }
-  }, [hasTableFeeSection]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -364,7 +359,7 @@ export default function HomePage() {
               <button
                 type='button'
                 className={`${styles.home__tabButton} ${
-                  activeTab === 'tableFee'
+                  visibleActiveTab === 'tableFee'
                     ? styles['home__tabButton--active']
                     : ''
                 }`}
@@ -376,7 +371,9 @@ export default function HomePage() {
             <button
               type='button'
               className={`${styles.home__tabButton} ${
-                activeTab === 'main' ? styles['home__tabButton--active'] : ''
+                visibleActiveTab === 'main'
+                  ? styles['home__tabButton--active']
+                  : ''
               }`}
               onClick={() => scrollToTabSection('main')}
             >
@@ -386,7 +383,9 @@ export default function HomePage() {
               <button
                 type='button'
                 className={`${styles.home__tabButton} ${
-                  activeTab === 'side' ? styles['home__tabButton--active'] : ''
+                  visibleActiveTab === 'side'
+                    ? styles['home__tabButton--active']
+                    : ''
                 }`}
                 onClick={() => scrollToTabSection('side')}
               >
