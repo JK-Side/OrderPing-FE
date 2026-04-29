@@ -116,6 +116,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  margin-bottom: 12px;
 }
 
 .categoryLabel {
@@ -149,6 +150,13 @@
     outline: 2px solid $primary-20;
     outline-offset: 2px;
   }
+
+  &:disabled {
+    border-color: $gray-30;
+    background-color: $gray-10;
+    color: $gray-50;
+    cursor: not-allowed;
+  }
 }
 
 .categoryButtonActive {
@@ -159,6 +167,13 @@
 .categoryError {
   font-size: 12px;
   color: $red-50;
+}
+
+.confirmMessage {
+  margin: 0;
+  text-align: center;
+  font-size: 16px;
+  color: $black;
 }
 
 .toggleField {

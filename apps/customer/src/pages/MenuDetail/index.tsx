@@ -4,6 +4,7 @@ import PageHeader from '../../components/PageHeader';
 import QuantityControl from '../../components/QuantityControl';
 import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
+import MenuDefaultImage from '../../assets/imgs/menu_default.svg?react';
 import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
@@ -134,7 +135,10 @@ export default function MenuDetailPage() {
               />
             ) : (
               <div className={styles.menuDetail__imageFallback}>
-                이미지가 없어요
+                <MenuDefaultImage
+                  aria-hidden='true'
+                  preserveAspectRatio='xMidYMid slice'
+                />
               </div>
             )}
           </section>

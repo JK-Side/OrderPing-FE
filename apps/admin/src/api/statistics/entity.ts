@@ -24,6 +24,8 @@ export interface StatisticsResponse {
   totalRevenue: number;
   transferRevenue: number;
   couponRevenue: number;
+  tableFeeQuantity: number;
+  tableFeeRevenue: number;
   orderCount: number;
   orders: StatisticsOrder[];
 }

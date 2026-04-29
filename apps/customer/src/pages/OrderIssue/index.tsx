@@ -51,7 +51,7 @@ export default function OrderIssuePage() {
         <p className={styles.orderIssue__description}>
           결제는 완료되었지만 재고 문제로 주문 접수에 실패했어요.
           <br />
-          주점장에서 환불을 도와드릴 수 있도록 화면을 보여 주세요.
+          주점에서 환불을 도와드릴 수 있도록 화면을 보여 주세요.
         </p>
 
         {draft ? (

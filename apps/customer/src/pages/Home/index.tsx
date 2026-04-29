@@ -4,15 +4,20 @@ import BottomActionBar from '../../components/BottomActionBar';
 import PageHeader from '../../components/PageHeader';
 import { useCart } from '../../stores/cart';
 import DEFAULTIMG from '../../assets/imgs/store_default.svg?react';
+import MenuDefaultImage from '../../assets/imgs/menu_default.svg?react';
 import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useStoreOrder } from './hooks/useStoreOrder';
 import styles from './Home.module.scss';
 
-type TabKey = 'main' | 'side';
+type TabKey = 'tableFee' | 'main' | 'side';
 
+const CATEGORY_MAIN = 1;
+const CATEGORY_SIDE = 2;
+const CATEGORY_TABLE_FEE = 3;
 const HEADER_HEIGHT_PX = 74;
+const SCROLL_TARGET_LOCK_MS = 900;
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -61,17 +66,16 @@ function MenuCard({ menu, onClick }: MenuCardProps) {
           className={styles.home__menuImage}
         />
       ) : (
-        <div className={styles.home__menuImageFallback}>이미지가 없어요</div>
+        <div className={styles.home__menuImageFallback}>
+          <MenuDefaultImage aria-hidden='true' />
+        </div>
       )}
     </article>
   );
 }
 
-const isTableFeeMenu = (menu: CustomerStoreOrderMenu) =>
-  menu.isTableFee ?? false;
-
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('main');
+  const [activeTab, setActiveTab] = useState<TabKey>('tableFee');
   const [isTabSticky, setIsTabSticky] = useState(false);
   const [headerProgress, setHeaderProgress] = useState(0);
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
@@ -83,9 +87,12 @@ export default function HomePage() {
   );
 
   const heroSectionRef = useRef<HTMLElement | null>(null);
+  const tableFeeSectionRef = useRef<HTMLElement | null>(null);
   const mainSectionRef = useRef<HTMLElement | null>(null);
   const sideSectionRef = useRef<HTMLElement | null>(null);
   const tabContainerRef = useRef<HTMLDivElement | null>(null);
+  const scrollTargetTabRef = useRef<TabKey | null>(null);
+  const scrollTargetClearTimerRef = useRef<number | null>(null);
 
   const navigate = useNavigate();
   const { totalPrice, totalQuantity, setActiveTable } = useCart();
@@ -93,11 +100,19 @@ export default function HomePage() {
   const { data, isLoading, error } = useStoreOrder(storeId, tableNum);
   const categories = useMemo(() => data?.categories ?? [], [data]);
 
+  const tableFeeCategory = useMemo(
+    () =>
+      categories.find((category) => category.id === CATEGORY_TABLE_FEE) ?? null,
+    [categories],
+  );
+
   const mainCategory = useMemo(() => {
     if (categories.length === 0) return null;
     return (
+      categories.find((category) => category.id === CATEGORY_MAIN) ??
       categories.find((category) => /main/i.test(category.name)) ??
-      categories[0]
+      categories.find((category) => category.id !== CATEGORY_TABLE_FEE) ??
+      null
     );
   }, [categories]);
 
@@ -106,28 +121,42 @@ export default function HomePage() {
     return (
       categories.find(
         (category) =>
-          category.id !== mainCategory.id && /side/i.test(category.name),
+          category.id === CATEGORY_SIDE && category.id !== mainCategory.id,
       ) ??
-      categories.find((category) => category.id !== mainCategory.id) ??
+      categories.find(
+        (category) =>
+          category.id !== mainCategory.id &&
+          category.id !== CATEGORY_TABLE_FEE &&
+          /side/i.test(category.name),
+      ) ??
+      categories.find(
+        (category) =>
+          category.id !== mainCategory.id &&
+          category.id !== CATEGORY_TABLE_FEE,
+      ) ??
       null
     );
   }, [categories, mainCategory]);
 
-  const mainMenus = useMemo(
-    () => (mainCategory?.menus ?? []).filter((menu) => !isTableFeeMenu(menu)),
-    [mainCategory],
-  );
-  const sideMenus = useMemo(
-    () => (sideCategory?.menus ?? []).filter((menu) => !isTableFeeMenu(menu)),
-    [sideCategory],
-  );
+  const tableFeeMenus = tableFeeCategory?.menus ?? [];
+  const mainMenus = mainCategory?.menus ?? [];
+  const sideMenus = sideCategory?.menus ?? [];
 
+  const tableFeeSectionLabel = tableFeeCategory?.name ?? '테이블비';
   const mainSectionLabel = mainCategory?.name ?? '메인 메뉴';
   const sideSectionLabel = sideCategory?.name ?? '사이드 메뉴';
+  const hasTableFeeSection = tableFeeCategory !== null;
   const hasSideSection = sideCategory !== null;
   const hasNotFoundError =
     (error as { status?: number } | null)?.status === 404;
   const hasTableContext = storeId !== null && tableNum !== null;
+  const visibleActiveTab =
+    !isLoading &&
+    categories.length > 0 &&
+    !hasTableFeeSection &&
+    activeTab === 'tableFee'
+      ? 'main'
+      : activeTab;
 
   const headerStyle = useMemo(() => {
     const colorChannel = mixChannel(255, 17, headerProgress);
@@ -146,6 +175,14 @@ export default function HomePage() {
   useEffect(() => {
     setActiveTable(tableNum);
   }, [setActiveTable, tableNum]);
+
+  useEffect(() => {
+    return () => {
+      if (scrollTargetClearTimerRef.current !== null) {
+        window.clearTimeout(scrollTargetClearTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -175,8 +212,18 @@ export default function HomePage() {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) return;
           const tab = entry.target.getAttribute('data-tab');
-          if (tab === 'main' || tab === 'side') {
+          if (tab === 'tableFee' || tab === 'main' || tab === 'side') {
+            const scrollTargetTab = scrollTargetTabRef.current;
+            if (scrollTargetTab && tab !== scrollTargetTab) {
+              return;
+            }
+
             setActiveTab(tab);
+            scrollTargetTabRef.current = null;
+            if (scrollTargetClearTimerRef.current !== null) {
+              window.clearTimeout(scrollTargetClearTimerRef.current);
+              scrollTargetClearTimerRef.current = null;
+            }
           }
         });
       },
@@ -186,20 +233,43 @@ export default function HomePage() {
       },
     );
 
+    if (tableFeeSectionRef.current && hasTableFeeSection) {
+      observer.observe(tableFeeSectionRef.current);
+    }
     if (mainSectionRef.current) observer.observe(mainSectionRef.current);
     if (sideSectionRef.current && hasSideSection) {
       observer.observe(sideSectionRef.current);
     }
 
     return () => observer.disconnect();
-  }, [hasSideSection, mainMenus.length, sideMenus.length]);
+  }, [
+    hasTableFeeSection,
+    hasSideSection,
+    tableFeeMenus.length,
+    mainMenus.length,
+    sideMenus.length,
+  ]);
 
   const scrollToTabSection = (tab: TabKey) => {
+    if (tab === 'tableFee' && !hasTableFeeSection) return;
     if (tab === 'side' && !hasSideSection) return;
 
     setActiveTab(tab);
+    scrollTargetTabRef.current = tab;
+    if (scrollTargetClearTimerRef.current !== null) {
+      window.clearTimeout(scrollTargetClearTimerRef.current);
+    }
+    scrollTargetClearTimerRef.current = window.setTimeout(() => {
+      scrollTargetTabRef.current = null;
+      scrollTargetClearTimerRef.current = null;
+    }, SCROLL_TARGET_LOCK_MS);
+
     const target =
-      tab === 'main' ? mainSectionRef.current : sideSectionRef.current;
+      tab === 'tableFee'
+        ? tableFeeSectionRef.current
+        : tab === 'main'
+          ? mainSectionRef.current
+          : sideSectionRef.current;
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -285,10 +355,25 @@ export default function HomePage() {
       >
         <div className={styles.home__tabHeader}>
           <div className={styles.home__tabList}>
+            {hasTableFeeSection ? (
+              <button
+                type='button'
+                className={`${styles.home__tabButton} ${
+                  visibleActiveTab === 'tableFee'
+                    ? styles['home__tabButton--active']
+                    : ''
+                }`}
+                onClick={() => scrollToTabSection('tableFee')}
+              >
+                테이블비
+              </button>
+            ) : null}
             <button
               type='button'
               className={`${styles.home__tabButton} ${
-                activeTab === 'main' ? styles['home__tabButton--active'] : ''
+                visibleActiveTab === 'main'
+                  ? styles['home__tabButton--active']
+                  : ''
               }`}
               onClick={() => scrollToTabSection('main')}
             >
@@ -298,7 +383,9 @@ export default function HomePage() {
               <button
                 type='button'
                 className={`${styles.home__tabButton} ${
-                  activeTab === 'side' ? styles['home__tabButton--active'] : ''
+                  visibleActiveTab === 'side'
+                    ? styles['home__tabButton--active']
+                    : ''
                 }`}
                 onClick={() => scrollToTabSection('side')}
               >
@@ -326,6 +413,37 @@ export default function HomePage() {
 
       {hasTableContext && !isLoading && !error ? (
         <>
+          {hasTableFeeSection ? (
+            <section
+              ref={tableFeeSectionRef}
+              data-tab='tableFee'
+              className={styles.home__menuSection}
+            >
+              <div className={styles.home__sectionTitle}>
+                {tableFeeSectionLabel}
+              </div>
+              {tableFeeMenus.length > 0 ? (
+                <div className={styles.home__menuList}>
+                  {tableFeeMenus.map((menu) => (
+                    <MenuCard
+                      key={menu.id}
+                      menu={menu}
+                      onClick={handleMenuCardClick}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.home__emptyMessage}>
+                  테이블비 메뉴가 없어요.
+                </p>
+              )}
+            </section>
+          ) : null}
+
+          {hasTableFeeSection ? (
+            <div className={styles.home__sectionDivider} />
+          ) : null}
+
           <section
             ref={mainSectionRef}
             data-tab='main'

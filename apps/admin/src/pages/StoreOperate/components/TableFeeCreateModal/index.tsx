@@ -1,3 +1,4 @@
+/*
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
@@ -158,3 +159,4 @@ export default function TableFeeCreateModal({ storeId }: TableFeeCreateModalProp
     </Modal>
   );
 }
+*/

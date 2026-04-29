@@ -1,4 +1,9 @@
-import { getPaymentTossDeeplink } from '../../api/customer';
+import {
+  getCustomerOrdersByTableId,
+  getPaymentTossDeeplink,
+  postCreatedCustomerOrder,
+} from '../../api/customer';
+import type { CustomerOrderLookupResponse } from '../../api/customer/entity';
 import CoinIcon from '../../assets/imgs/3d-coin-icon.png?url';
 import BottomActionBar from '../../components/BottomActionBar';
 import PageHeader from '../../components/PageHeader';
@@ -6,6 +11,7 @@ import { useToast } from '../../components/Toast/useToast';
 import { useCart } from '../../stores/cart';
 import {
   buildCartPath,
+  buildOrderIssuePath,
   buildOrderPaymentAccountPath,
   buildOrderStatusPath,
   buildStoreHomePath,
@@ -14,6 +20,7 @@ import {
   openTossWithStoreFallback,
   parsePositiveInt,
   savePendingOrderDraft,
+  type PendingOrderDraft,
 } from '../../utils/orderFlow';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -21,10 +28,83 @@ import styles from './PaymentWait.module.scss';
 
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
+const hasSameMenus = (
+  order: CustomerOrderLookupResponse,
+  draft: PendingOrderDraft,
+) => {
+  const orderMenuQuantities = new Map<number, number>();
+  const draftMenuQuantities = new Map<number, number>();
+
+  order.menus
+    .filter((menu) => !menu.isService)
+    .forEach((menu) => {
+      orderMenuQuantities.set(
+        menu.menuId,
+        (orderMenuQuantities.get(menu.menuId) ?? 0) + menu.quantity,
+      );
+    });
+
+  draft.items.forEach((item) => {
+    draftMenuQuantities.set(
+      item.menuId,
+      (draftMenuQuantities.get(item.menuId) ?? 0) + item.quantity,
+    );
+  });
+
+  if (orderMenuQuantities.size !== draftMenuQuantities.size) {
+    return false;
+  }
+
+  for (const [menuId, quantity] of draftMenuQuantities) {
+    if (orderMenuQuantities.get(menuId) !== quantity) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+const isMatchingCreatedOrder = (
+  order: CustomerOrderLookupResponse,
+  draft: PendingOrderDraft,
+) => {
+  const draftCreatedAt = new Date(draft.createdAt).getTime();
+  const orderCreatedAt = new Date(order.createdAt).getTime();
+
+  if (
+    Number.isFinite(draftCreatedAt) &&
+    Number.isFinite(orderCreatedAt) &&
+    orderCreatedAt < draftCreatedAt - 5_000
+  ) {
+    return false;
+  }
+
+  return (
+    order.tableId === draft.tableId &&
+    order.storeId === draft.storeId &&
+    order.tableNum === draft.tableNum &&
+    order.depositorName === draft.depositorName &&
+    order.couponAmount === draft.couponAmount &&
+    order.cashAmount === draft.paymentAmount &&
+    hasSameMenus(order, draft)
+  );
+};
+
+const findCreatedOrderFromDraft = async (draft: PendingOrderDraft) => {
+  const orders = await getCustomerOrdersByTableId(draft.storeId, draft.tableNum);
+
+  return [...orders]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    )
+    .find((order) => isMatchingCreatedOrder(order, draft));
+};
+
 export default function PaymentWaitPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { setActiveTable } = useCart();
+  const { clearCart, setActiveTable } = useCart();
   const { storeId: storeIdParam } = useParams<{ storeId?: string }>();
   const [searchParams] = useSearchParams();
   const storeId = useMemo(() => parsePositiveInt(storeIdParam), [storeIdParam]);
@@ -122,17 +202,103 @@ export default function PaymentWaitPage() {
     });
   }, [draft, openToss, toast]);
 
-  const handleCompletePayment = () => {
+  const handleCompletePayment = async () => {
     if (!draft || isMovingNext) return;
 
-    setIsMovingNext(true);
-    clearPendingOrderDraft();
-    navigate(
-      buildOrderStatusPath(draft.storeId, draft.tableNum, draft.orderId),
-      {
-        replace: true,
-      },
-    );
+    try {
+      setIsMovingNext(true);
+      if (draft.orderId !== null) {
+        clearPendingOrderDraft();
+        clearCart();
+        navigate(
+          buildOrderStatusPath(draft.storeId, draft.tableNum, draft.orderId),
+          {
+            replace: true,
+          },
+        );
+        return;
+      }
+
+      const existingOrder = await findCreatedOrderFromDraft(draft).catch(
+        () => null,
+      );
+
+      if (existingOrder) {
+        clearPendingOrderDraft();
+        clearCart();
+        navigate(
+          buildOrderStatusPath(
+            existingOrder.storeId,
+            existingOrder.tableNum,
+            existingOrder.id,
+          ),
+          {
+            replace: true,
+          },
+        );
+        return;
+      }
+
+      const createdOrder = await postCreatedCustomerOrder({
+        tableNum: draft.tableNum,
+        storeId: draft.storeId,
+        depositorName: draft.depositorName,
+        couponAmount: draft.couponAmount,
+        idempotencyKey: draft.idempotencyKey,
+        menus: draft.items.map((item) => ({
+          menuId: item.menuId,
+          quantity: item.quantity,
+        })),
+      });
+
+      clearPendingOrderDraft();
+      clearCart();
+      navigate(
+        buildOrderStatusPath(
+          createdOrder.storeId,
+          createdOrder.tableNum,
+          createdOrder.id,
+        ),
+        {
+          replace: true,
+        },
+      );
+    } catch (error) {
+      const status = (error as { status?: number } | null)?.status;
+      if (status === 409) {
+        navigate(buildOrderIssuePath(draft.storeId, draft.tableNum), {
+          replace: true,
+        });
+        return;
+      }
+
+      const createdOrder = await findCreatedOrderFromDraft(draft).catch(
+        () => null,
+      );
+
+      if (createdOrder) {
+        clearPendingOrderDraft();
+        clearCart();
+        navigate(
+          buildOrderStatusPath(
+            createdOrder.storeId,
+            createdOrder.tableNum,
+            createdOrder.id,
+          ),
+          {
+            replace: true,
+          },
+        );
+        return;
+      }
+
+      toast({
+        message: '주문 접수에 실패했어요. 다시 시도해 주세요.',
+        variant: 'error',
+        duration: 3000,
+      });
+      setIsMovingNext(false);
+    }
   };
 
   if (
@@ -187,9 +353,9 @@ export default function PaymentWaitPage() {
           type='button'
           className={styles.paymentWait__submitButton}
           disabled={isMovingNext}
-          onClick={handleCompletePayment}
+          onClick={() => void handleCompletePayment()}
         >
-          {isMovingNext ? '다음 화면으로 이동 중...' : '결제 완료'}
+          {isMovingNext ? '주문 접수 중...' : '결제 완료'}
         </button>
       </BottomActionBar>
     </main>

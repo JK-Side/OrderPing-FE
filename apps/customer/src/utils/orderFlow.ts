@@ -8,10 +8,11 @@ const ORDER_DRAFT_STORAGE_KEY = 'order-ping:customer-order-draft:v1';
 type MobilePlatform = 'android' | 'ios' | 'other';
 
 export interface PendingOrderDraft {
-  orderId: number;
+  orderId: number | null;
   storeId: number;
   tableId: number;
   tableNum: number;
+  idempotencyKey: string;
   depositorName: string;
   couponAmount: number;
   totalPrice: number;
@@ -25,6 +26,14 @@ export interface PendingOrderDraft {
 export const parsePositiveInt = (value: string | null | undefined) => {
   const parsed = Number(value);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+};
+
+export const createOrderIdempotencyKey = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
 };
 
 export const buildStoreHomePath = (storeId: number, tableNum: number) =>
@@ -78,10 +87,12 @@ const isValidDraft = (value: unknown): value is PendingOrderDraft => {
 
   const draft = value as PendingOrderDraft;
   return (
-    typeof draft.orderId === 'number' &&
+    (typeof draft.orderId === 'number' || draft.orderId === null) &&
     typeof draft.storeId === 'number' &&
     typeof draft.tableId === 'number' &&
     typeof draft.tableNum === 'number' &&
+    typeof draft.idempotencyKey === 'string' &&
+    draft.idempotencyKey.length > 0 &&
     typeof draft.depositorName === 'string' &&
     typeof draft.couponAmount === 'number' &&
     typeof draft.totalPrice === 'number' &&
