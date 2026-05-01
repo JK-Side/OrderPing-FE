@@ -116,6 +116,14 @@
   fill: currentColor;
 }
 
+.deleteConfirmMessage {
+  margin: 0;
+  color: $gray-70;
+  font-size: 16px;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .actionButtons {
   display: flex;
   align-items: center;

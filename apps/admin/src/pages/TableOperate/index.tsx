@@ -7,6 +7,7 @@ import CloseIcon from '@/assets/icons/close.svg?react';
 import DownloadIcon from '@/assets/icons/download.svg?react';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import Button from '@/components/Button';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
@@ -71,6 +72,7 @@ export default function TableOperate() {
   const [serviceTableId, setServiceTableId] = useState<number | null>(null);
   const [isServiceOpen, setIsServiceOpen] = useState(false);
   const [isDirectOrderOpen, setIsDirectOrderOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [directOrderReturnTableId, setDirectOrderReturnTableId] = useState<number | null>(null);
   const [isDismissed, setIsDismissed] = useState(() => {
     return window.localStorage.getItem(TABLE_GUIDE_BANNER_DISMISSED_KEY) === 'true';
@@ -184,6 +186,7 @@ export default function TableOperate() {
       });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
+      setIsDeleteConfirmOpen(false);
       toast({
         message: '테이블 삭제가 완료되었습니다.',
         variant: 'info',
@@ -293,7 +296,7 @@ export default function TableOperate() {
                   type='button'
                   variant='danger'
                   size='md'
-                  onClick={handleDeleteTables}
+                  onClick={() => setIsDeleteConfirmOpen(true)}
                   disabled={isDeleting}
                   isLoading={isDeleting}
                 >
@@ -407,6 +410,34 @@ export default function TableOperate() {
       />
 
       <TableServiceModal open={isServiceOpen} onOpenChange={handleServiceOpenChange} table={serviceTable} />
+
+      <Modal open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>테이블 삭제</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            <p className={styles.deleteConfirmMessage}>
+              한 번 삭제된 테이블은 되돌릴 수 없습니다. <br /> 계속하시겠습니까?
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button type='button' variant='ghost' size='md' fullWidth onClick={() => setIsDeleteConfirmOpen(false)}>
+              테이블 삭제
+            </Button>
+            <Button
+              type='button'
+              variant='danger'
+              size='md'
+              fullWidth
+              onClick={handleDeleteTables}
+              isLoading={isDeleting}
+            >
+              이전
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       <TableDirectOrderModal
         open={isDirectOrderOpen}
