@@ -203,7 +203,7 @@ export default function TableOperate() {
               ? '자신의 주점의 테이블만 삭제 가능합니다.'
               : status === 404
                 ? '주점을 찾을 수 없습니다.'
-                : '주점 삭제에 실패했습니다.';
+                : '테이블 삭제에 실패했습니다.';
 
       toast({
         message,
@@ -422,17 +422,17 @@ export default function TableOperate() {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button type='button' variant='ghost' size='md' fullWidth onClick={() => setIsDeleteConfirmOpen(false)}>
-              테이블 삭제
-            </Button>
             <Button
               type='button'
-              variant='danger'
+              variant='ghost'
               size='md'
               fullWidth
               onClick={handleDeleteTables}
               isLoading={isDeleting}
             >
+              테이블 삭제
+            </Button>
+            <Button type='button' variant='danger' size='md' fullWidth onClick={() => setIsDeleteConfirmOpen(false)}>
               이전
             </Button>
           </ModalFooter>
