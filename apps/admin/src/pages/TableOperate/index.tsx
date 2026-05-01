@@ -72,6 +72,7 @@ export default function TableOperate() {
   const [serviceTableId, setServiceTableId] = useState<number | null>(null);
   const [isServiceOpen, setIsServiceOpen] = useState(false);
   const [isDirectOrderOpen, setIsDirectOrderOpen] = useState(false);
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [directOrderReturnTableId, setDirectOrderReturnTableId] = useState<number | null>(null);
   const [isDismissed, setIsDismissed] = useState(() => {
@@ -130,6 +131,7 @@ export default function TableOperate() {
       });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
+      setIsClearConfirmOpen(false);
       toast({
         message: '테이블 비우기가 완료되었습니다.',
         variant: 'info',
@@ -308,7 +310,7 @@ export default function TableOperate() {
                 <Button
                   className={styles.clearButton}
                   size='md'
-                  onClick={handleClearTables}
+                  onClick={() => setIsClearConfirmOpen(true)}
                   disabled={selectedTableIds.length === 0 || isClearing}
                   isLoading={isClearing}
                 >
@@ -411,6 +413,38 @@ export default function TableOperate() {
 
       <TableServiceModal open={isServiceOpen} onOpenChange={handleServiceOpenChange} table={serviceTable} />
 
+      <Modal open={isClearConfirmOpen} onOpenChange={setIsClearConfirmOpen}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>테이블 비우기</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            <p className={styles.clearConfirmMessage}>
+              해당 테이블의 현재 주문 내역이 모두 삭제됩니다.
+              <br />
+              단, 완료된 판매 이력은 주문 통계에 반영되므로
+              <br />
+              매출 집계에는 영향을 주지 않습니다.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              type='button'
+              variant='ghost'
+              size='md'
+              fullWidth
+              onClick={handleClearTables}
+              isLoading={isClearing}
+            >
+              테이블 비우기
+            </Button>
+            <Button type='button' variant='danger' size='md' fullWidth onClick={() => setIsClearConfirmOpen(false)}>
+              취소
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       <Modal open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <ModalContent>
           <ModalHeader>
@@ -433,7 +467,7 @@ export default function TableOperate() {
               테이블 삭제
             </Button>
             <Button type='button' variant='danger' size='md' fullWidth onClick={() => setIsDeleteConfirmOpen(false)}>
-              이전
+              취소
             </Button>
           </ModalFooter>
         </ModalContent>
