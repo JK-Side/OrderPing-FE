@@ -77,7 +77,7 @@ export default function OrderConfirmPage() {
       toast({
         message: '매장 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.',
         variant: 'info',
-        duration: 3000,
+        duration: 1500,
       });
       return;
     }
@@ -95,7 +95,7 @@ export default function OrderConfirmPage() {
       toast({
         message: '최종 결제 금액은 0원보다 커야 해요.',
         variant: 'warning',
-        duration: 3000,
+        duration: 1500,
       });
       return;
     }
@@ -109,7 +109,7 @@ export default function OrderConfirmPage() {
         toast({
           message: '주문 정보를 불러오는 중이에요. 잠시 후 다시 시도해 주세요.',
           variant: 'info',
-          duration: 3000,
+          duration: 1500,
         });
         return;
       }
@@ -132,7 +132,7 @@ export default function OrderConfirmPage() {
           toast({
             message: '재고가 부족하여 주문할 수 없어요. 수량을 조절해 주세요.',
             variant: 'warning',
-            duration: 3000,
+            duration: 1500,
           });
           return;
         }
@@ -157,7 +157,7 @@ export default function OrderConfirmPage() {
         toast({
           message: '주문 금액을 초과하는 쿠폰은 사용할 수 없어요.',
           variant: 'warning',
-          duration: 3000,
+          duration: 1500,
         });
         return;
       }
@@ -209,7 +209,7 @@ export default function OrderConfirmPage() {
               ? '입금 계좌 정보를 찾을 수 없어요. 다음 화면에서 다시 시도해 주세요.'
               : '토스 결제 링크를 불러오지 못했어요. 다음 화면에서 다시 시도해 주세요.',
           variant: 'error',
-          duration: 3000,
+          duration: 1500,
         });
       }
 
@@ -222,7 +222,7 @@ export default function OrderConfirmPage() {
             ? '입금 계좌 정보를 찾을 수 없어요. 다시 시도해 주세요.'
             : '결제 준비에 실패했어요. 다시 시도해 주세요.',
         variant: 'error',
-        duration: 3000,
+        duration: 1500,
       });
     } finally {
       setIsPreparingPayment(false);

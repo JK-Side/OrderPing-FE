@@ -81,7 +81,7 @@ export default function MenuDetailPage() {
     toast({
       message: '장바구니에 메뉴를 추가했어요.',
       variant: 'success',
-      duration: 3000,
+      duration: 1500,
     });
 
     navigate(hasTableContext ? `/stores/${storeId}?tableNum=${tableNum}` : '/');
