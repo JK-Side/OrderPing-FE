@@ -98,9 +98,8 @@ export default function TableOperate() {
     if (!storeId || selectedTableIds.length === 0 || isClearing) return;
 
     const selectedTables = tables.filter((table) => selectedTableIds.includes(table.id));
-    const eligibleTables = selectedTables.filter((table) => table.status !== 'CLOSED');
-    if (eligibleTables.length === 0) return;
-    const hasOrderTables = eligibleTables.some(hasIncompleteOrderOnTable);
+    if (selectedTables.length === 0) return;
+    const hasOrderTables = selectedTables.some(hasIncompleteOrderOnTable);
 
     if (hasOrderTables) {
       toast({
@@ -110,10 +109,22 @@ export default function TableOperate() {
       return;
     }
 
+    const hasAlreadyEmptyTables = selectedTables.some(
+      (table) => table.status === 'CLOSED' || !hasOrdersForTable(table),
+    );
+
+    if (hasAlreadyEmptyTables) {
+      toast({
+        message: '이미 빈 테이블은 다시 비울 수 없습니다.',
+        variant: 'error',
+      });
+      return;
+    }
+
     try {
       await clearTables({
         storeId,
-        tableNums: eligibleTables.map((table) => table.tableNum),
+        tableNums: selectedTables.map((table) => table.tableNum),
       });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
@@ -406,4 +417,3 @@ export default function TableOperate() {
     </section>
   );
 }
-
