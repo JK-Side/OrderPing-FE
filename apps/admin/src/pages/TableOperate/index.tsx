@@ -7,6 +7,7 @@ import CloseIcon from '@/assets/icons/close.svg?react';
 import DownloadIcon from '@/assets/icons/download.svg?react';
 import InfoIcon from '@/assets/icons/info-circle.svg?react';
 import Button from '@/components/Button';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalTitle } from '@/components/Modal';
 import { useToast } from '@/components/Toast/useToast';
 import OrderCard from '@/pages/TableOperate/components/OrderCard';
 import TableCreateModal from '@/pages/TableOperate/components/TableCreateModal';
@@ -71,6 +72,8 @@ export default function TableOperate() {
   const [serviceTableId, setServiceTableId] = useState<number | null>(null);
   const [isServiceOpen, setIsServiceOpen] = useState(false);
   const [isDirectOrderOpen, setIsDirectOrderOpen] = useState(false);
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [directOrderReturnTableId, setDirectOrderReturnTableId] = useState<number | null>(null);
   const [isDismissed, setIsDismissed] = useState(() => {
     return window.localStorage.getItem(TABLE_GUIDE_BANNER_DISMISSED_KEY) === 'true';
@@ -98,9 +101,8 @@ export default function TableOperate() {
     if (!storeId || selectedTableIds.length === 0 || isClearing) return;
 
     const selectedTables = tables.filter((table) => selectedTableIds.includes(table.id));
-    const eligibleTables = selectedTables.filter((table) => table.status !== 'CLOSED');
-    if (eligibleTables.length === 0) return;
-    const hasOrderTables = eligibleTables.some(hasIncompleteOrderOnTable);
+    if (selectedTables.length === 0) return;
+    const hasOrderTables = selectedTables.some(hasIncompleteOrderOnTable);
 
     if (hasOrderTables) {
       toast({
@@ -110,13 +112,26 @@ export default function TableOperate() {
       return;
     }
 
+    const hasAlreadyEmptyTables = selectedTables.some(
+      (table) => table.status === 'CLOSED' || !hasOrdersForTable(table),
+    );
+
+    if (hasAlreadyEmptyTables) {
+      toast({
+        message: '이미 빈 테이블은 다시 비울 수 없습니다.',
+        variant: 'error',
+      });
+      return;
+    }
+
     try {
       await clearTables({
         storeId,
-        tableNums: eligibleTables.map((table) => table.tableNum),
+        tableNums: selectedTables.map((table) => table.tableNum),
       });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
+      setIsClearConfirmOpen(false);
       toast({
         message: '테이블 비우기가 완료되었습니다.',
         variant: 'info',
@@ -173,6 +188,7 @@ export default function TableOperate() {
       });
       await queryClient.invalidateQueries({ queryKey: ['tables', storeId] });
       setSelectedTableIds([]);
+      setIsDeleteConfirmOpen(false);
       toast({
         message: '테이블 삭제가 완료되었습니다.',
         variant: 'info',
@@ -189,7 +205,7 @@ export default function TableOperate() {
               ? '자신의 주점의 테이블만 삭제 가능합니다.'
               : status === 404
                 ? '주점을 찾을 수 없습니다.'
-                : '주점 삭제에 실패했습니다.';
+                : '테이블 삭제에 실패했습니다.';
 
       toast({
         message,
@@ -282,7 +298,7 @@ export default function TableOperate() {
                   type='button'
                   variant='danger'
                   size='md'
-                  onClick={handleDeleteTables}
+                  onClick={() => setIsDeleteConfirmOpen(true)}
                   disabled={isDeleting}
                   isLoading={isDeleting}
                 >
@@ -294,7 +310,7 @@ export default function TableOperate() {
                 <Button
                   className={styles.clearButton}
                   size='md'
-                  onClick={handleClearTables}
+                  onClick={() => setIsClearConfirmOpen(true)}
                   disabled={selectedTableIds.length === 0 || isClearing}
                   isLoading={isClearing}
                 >
@@ -397,6 +413,66 @@ export default function TableOperate() {
 
       <TableServiceModal open={isServiceOpen} onOpenChange={handleServiceOpenChange} table={serviceTable} />
 
+      <Modal open={isClearConfirmOpen} onOpenChange={setIsClearConfirmOpen}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>테이블 비우기</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            <p className={styles.clearConfirmMessage}>
+              해당 테이블의 현재 주문 내역이 모두 삭제됩니다.
+              <br />
+              단, 완료된 판매 이력은 주문 통계에 반영되므로
+              <br />
+              매출 집계에는 영향을 주지 않습니다.
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              type='button'
+              variant='ghost'
+              size='md'
+              fullWidth
+              onClick={handleClearTables}
+              isLoading={isClearing}
+            >
+              테이블 비우기
+            </Button>
+            <Button type='button' variant='danger' size='md' fullWidth onClick={() => setIsClearConfirmOpen(false)}>
+              취소
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <ModalContent>
+          <ModalHeader>
+            <ModalTitle>테이블 삭제</ModalTitle>
+          </ModalHeader>
+          <ModalBody>
+            <p className={styles.deleteConfirmMessage}>
+              한 번 삭제된 테이블은 되돌릴 수 없습니다. <br /> 계속하시겠습니까?
+            </p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              type='button'
+              variant='ghost'
+              size='md'
+              fullWidth
+              onClick={handleDeleteTables}
+              isLoading={isDeleting}
+            >
+              테이블 삭제
+            </Button>
+            <Button type='button' variant='danger' size='md' fullWidth onClick={() => setIsDeleteConfirmOpen(false)}>
+              취소
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
       <TableDirectOrderModal
         open={isDirectOrderOpen}
         onOpenChange={handleDirectOrderOpenChange}
@@ -406,4 +482,3 @@ export default function TableOperate() {
     </section>
   );
 }
-

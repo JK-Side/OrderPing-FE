@@ -1,9 +1,20 @@
 ﻿import * as ToastPrimitive from '@radix-ui/react-toast';
 import clsx from 'clsx';
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 
 import CheckIcon from '@/assets/icons/check.svg?react';
-import { ToastContext, type ToastOptions, type ToastVariant } from './toast-context';
+import {
+  ToastContext,
+  type ToastOptions,
+  type ToastVariant,
+} from './toast-context';
 import styles from './Toast.module.scss';
 
 interface ToastItem extends ToastOptions {
@@ -13,7 +24,7 @@ interface ToastItem extends ToastOptions {
 }
 
 const TOAST_REMOVE_DELAY = 150;
-const DEFAULT_TOAST_DURATION = 3000;
+const DEFAULT_TOAST_DURATION = 1500;
 
 const createToastId = () =>
   globalThis.crypto?.randomUUID?.() ??
@@ -21,7 +32,9 @@ const createToastId = () =>
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
-  const removeTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const removeTimeouts = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  );
 
   const scheduleRemove = useCallback((id: string) => {
     const existing = removeTimeouts.current.get(id);
@@ -78,7 +91,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ToastPrimitive.Provider swipeDirection='right' duration={DEFAULT_TOAST_DURATION}>
+    <ToastPrimitive.Provider
+      swipeDirection='right'
+      duration={DEFAULT_TOAST_DURATION}
+    >
       <ToastContext.Provider value={value}>
         {children}
         {toasts.map((toastItem) => {
@@ -87,7 +103,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           return (
             <ToastPrimitive.Root
               key={toastItem.id}
-              className={clsx(styles.toast, styles[`toast--${toastItem.variant}`])}
+              className={clsx(
+                styles.toast,
+                styles[`toast--${toastItem.variant}`],
+              )}
               open={toastItem.open}
               duration={duration}
               onOpenChange={(open) => {

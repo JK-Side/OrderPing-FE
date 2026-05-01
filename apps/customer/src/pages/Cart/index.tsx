@@ -55,7 +55,7 @@ export default function CartPage() {
       toast({
         message: '테이블 정보를 확인할 수 없어요.',
         variant: 'warning',
-        duration: 3000,
+        duration: 1500,
       });
       return;
     }

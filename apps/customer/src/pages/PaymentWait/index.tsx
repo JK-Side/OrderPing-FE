@@ -134,7 +134,7 @@ export default function PaymentWaitPage() {
       toast({
         message: '결제 정보를 다시 준비해 주세요.',
         variant: 'warning',
-        duration: 3000,
+        duration: 1500,
       });
       navigate(hasTableContext ? buildCartPath(storeId, tableNum) : '/cart', {
         replace: true,
@@ -180,7 +180,7 @@ export default function PaymentWaitPage() {
       toast({
         message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
         variant: 'info',
-        duration: 3000,
+        duration: 1500,
       });
     });
   }, [ensureTossDeeplink, toast]);
@@ -197,7 +197,7 @@ export default function PaymentWaitPage() {
             ? '입금 계좌 정보를 찾을 수 없어요. 다시 시도해 주세요.'
             : '토스 앱을 열지 못했어요. 다시 시도해 주세요.',
         variant: 'error',
-        duration: 3000,
+        duration: 1500,
       });
     });
   }, [draft, openToss, toast]);
@@ -295,7 +295,7 @@ export default function PaymentWaitPage() {
       toast({
         message: '주문 접수에 실패했어요. 다시 시도해 주세요.',
         variant: 'error',
-        duration: 3000,
+        duration: 1500,
       });
       setIsMovingNext(false);
     }
