@@ -41,6 +41,56 @@
   flex-shrink: 0;
 }
 
+.toolbarControls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.printModeToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid $gray-20;
+  border-radius: 10px;
+  background: $white;
+}
+
+.printModeButton {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: $gray-60;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    color: $black;
+    background: $gray-10;
+  }
+
+  &:focus-visible {
+    outline: 3px solid $primary-20;
+    outline-offset: 2px;
+  }
+}
+
+.printModeButtonActive {
+  background: $primary-50;
+  color: $white;
+
+  &:hover {
+    background: $primary-60;
+    color: $white;
+  }
+}
+
 .stateCard,
 .sheet {
   background-color: $white;
@@ -124,7 +174,7 @@
   padding: 16px 4px 8px;
   border-radius: 22px;
   border: 1px solid $gray-20;
-  background: $background;
+  background: $white;
   break-inside: avoid;
   page-break-inside: avoid;
 }
@@ -144,6 +194,100 @@
   object-fit: contain;
 }
 
+.guideGrid {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+}
+
+.guideCard {
+  display: grid;
+  grid-template-columns: minmax(190px, 200px) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 32px;
+  min-height: 300px;
+  padding: 16px 12px;
+  border: 2px solid $gray-20;
+  border-radius: 36px;
+}
+
+.guideCard .cardLabel {
+  font-size: 22px;
+}
+
+.guideQrPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  background: $white;
+}
+
+.guideQrImage {
+  width: 100%;
+  max-width: 190px;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.guideContent {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+
+.guideTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: $black;
+}
+
+.guideSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guideStep {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+  font-size: 18px;
+  color: $black;
+
+  strong {
+    font-weight: 800;
+  }
+
+  &__number {
+    color: $primary-50;
+    font-weight: 700;
+    text-align: center;
+    font-size: 18px;
+  }
+
+  &__text {
+    font-size: 18px;
+  }
+}
+
+.guideSource {
+  color: $gray-50;
+}
+
+.guideLogo {
+  display: block;
+  width: 130px;
+  height: auto;
+}
+
 @media (max-width: 900px) {
   .page {
     padding: 40px 20px 80px;
@@ -151,6 +295,20 @@
 
   .toolbar {
     flex-direction: column;
+  }
+
+  .toolbarControls {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .printModeToggle {
+    width: 100%;
+  }
+
+  .printModeButton {
+    flex: 1;
   }
 
   .actions {
@@ -172,6 +330,38 @@
 
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .guideGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .guideCard {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 24px 20px;
+  }
+
+  .guideContent {
+    gap: 18px;
+  }
+
+  .guideTitle {
+    font-size: 26px;
+  }
+
+  .guideSteps {
+    gap: 14px;
+  }
+
+  .guideStep {
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 12px;
+    font-size: 20px;
+  }
+
+  .guideLogo {
+    width: 180px;
   }
 }
 
@@ -198,13 +388,26 @@
   }
 
   .sheetHeader {
-    margin-bottom: 20px;
-    padding-bottom: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+  }
+
+  .sheetTitle {
+    font-size: 24px;
+  }
+
+  .sheetMeta {
+    font-size: 12px;
   }
 
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
+  }
+
+  .guideGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5mm;
   }
 
   .card {
@@ -220,5 +423,58 @@
 
   .qrImage {
     max-width: 150px;
+  }
+
+  .guideCard {
+    grid-template-columns: minmax(50mm, 53mm) minmax(0, 1fr);
+    gap: 8mm;
+    min-height: 79mm;
+    padding: 2.5mm 3mm;
+    border: 0.5mm solid $gray-20;
+    border-radius: 9mm;
+    background: $white;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .guideCard .cardLabel {
+    font-size: 16pt;
+  }
+
+  .guideQrPanel {
+    gap: 0;
+  }
+
+  .guideQrImage {
+    max-width: 50mm;
+  }
+
+  .guideContent {
+    gap: 6mm;
+  }
+
+  .guideTitle {
+    font-size: 15pt;
+    line-height: 1.2;
+  }
+
+  .guideSteps {
+    gap: 5mm;
+  }
+
+  .guideStep {
+    grid-template-columns: 8mm minmax(0, 1fr);
+    gap: 2mm;
+    font-size: 13.5pt;
+    line-height: normal;
+  }
+
+  .guideStep__number,
+  .guideStep__text {
+    font-size: 13.5pt;
+  }
+
+  .guideLogo {
+    width: 34mm;
   }
 }
