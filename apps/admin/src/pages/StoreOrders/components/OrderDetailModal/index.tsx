@@ -76,13 +76,14 @@ export default function OrderDetailModal({
   const actionConfig = STATUS_ACTION_CONFIG[order.status];
   const handlePrevClick = actionConfig.prevAction === 'reject' ? onReject : onPrev;
   const isPrevAction = actionConfig.prevAction === 'prev';
+  const orderNumber = 'storeOrderNumber' in order ? order.storeOrderNumber : order.id;
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent className={styles.modalContent}>
         <ModalHeader>
           <div className={styles.headerContent}>
-            <span className={styles.orderBadge}>주문번호 {order.id}</span>
+            <span className={styles.orderBadge}>주문번호 {orderNumber}</span>
             <ModalTitle className={styles.tableTitle}>{formatTableLabel(order.tableNum)}</ModalTitle>
           </div>
         </ModalHeader>

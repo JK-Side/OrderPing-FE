@@ -42,6 +42,7 @@ export interface OrderMenuItem {
 
 export interface OrderDetailResponse extends OrderResponse {
   menus: OrderMenuItem[];
+  storeOrderNumber: number;
 }
 
 export interface OrderLookupResponse {
