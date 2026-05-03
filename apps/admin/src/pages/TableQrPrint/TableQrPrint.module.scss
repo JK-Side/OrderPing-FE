@@ -197,9 +197,11 @@
 .guideGrid {
   grid-template-columns: minmax(0, 1fr);
   gap: 24px;
+  justify-items: start;
 }
 
 .guideCard {
+  width: 72%;
   display: grid;
   grid-template-columns: minmax(190px, 200px) minmax(0, 1fr);
   align-items: stretch;
@@ -337,6 +339,7 @@
   }
 
   .guideCard {
+    width: 100%;
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     padding: 24px 20px;
