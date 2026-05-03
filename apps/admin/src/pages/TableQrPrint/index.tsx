@@ -35,22 +35,17 @@ export default function TableQrPrint() {
         </div>
 
         <div className={styles.toolbarControls}>
-          <div className={styles.printModeToggle} role='group' aria-label='설명 문구 포함 여부'>
+          <div className={styles.guideSwitchControl}>
+            <span className={styles.guideSwitchLabel}>안내문구 포함</span>
             <button
               type='button'
-              className={`${styles.printModeButton} ${printMode === 'compact' ? styles.printModeButtonActive : ''}`}
-              aria-pressed={printMode === 'compact'}
-              onClick={() => setPrintMode('compact')}
+              role='switch'
+              aria-label='안내문구 포함'
+              aria-checked={printMode === 'guide'}
+              className={`${styles.guideSwitch} ${printMode === 'guide' ? styles.guideSwitchActive : ''}`}
+              onClick={() => setPrintMode((currentMode) => (currentMode === 'guide' ? 'compact' : 'guide'))}
             >
-              설명 문구 미포함
-            </button>
-            <button
-              type='button'
-              className={`${styles.printModeButton} ${printMode === 'guide' ? styles.printModeButtonActive : ''}`}
-              aria-pressed={printMode === 'guide'}
-              onClick={() => setPrintMode('guide')}
-            >
-              설명 문구 포함
+              <span className={styles.guideSwitchThumb} />
             </button>
           </div>
 

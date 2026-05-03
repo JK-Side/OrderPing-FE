@@ -48,32 +48,31 @@
   flex-shrink: 0;
 }
 
-.printModeToggle {
-  display: inline-flex;
+.guideSwitchControl {
+  height: 40px;
+  display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid $gray-20;
-  border-radius: 10px;
-  background: $white;
+  gap: 10px;
 }
 
-.printModeButton {
-  height: 32px;
-  padding: 0 12px;
-  border: none;
-  border-radius: 7px;
-  background: transparent;
-  color: $gray-60;
-  font-size: 14px;
-  font-weight: 700;
+.guideSwitchLabel {
+  font-size: 16px;
+  font-weight: 500;
+  color: $black;
   white-space: nowrap;
-  cursor: pointer;
+}
 
-  &:hover {
-    color: $black;
-    background: $gray-10;
-  }
+.guideSwitch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: $gray-30;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 
   &:focus-visible {
     outline: 3px solid $primary-20;
@@ -81,14 +80,28 @@
   }
 }
 
-.printModeButtonActive {
+.guideSwitchActive {
   background: $primary-50;
-  color: $white;
 
   &:hover {
     background: $primary-60;
-    color: $white;
   }
+}
+
+.guideSwitchThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: $white;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.24);
+  transition: transform 0.15s ease;
+}
+
+.guideSwitchActive .guideSwitchThumb {
+  transform: translateX(20px);
 }
 
 .stateCard,
@@ -305,12 +318,8 @@
     align-items: stretch;
   }
 
-  .printModeToggle {
-    width: 100%;
-  }
-
-  .printModeButton {
-    flex: 1;
+  .guideSwitchControl {
+    justify-content: space-between;
   }
 
   .actions {
