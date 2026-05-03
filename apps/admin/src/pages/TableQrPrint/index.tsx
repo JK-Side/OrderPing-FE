@@ -1,15 +1,19 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import WarningIcon from '@/assets/icons/warning-circle.svg?react';
+import OrderPingLogo from '@/assets/logo/ORDERPING_LOGO_LINE.png';
 import Button from '@/components/Button';
 import { useStoreById } from '@/pages/StoreOperate/hooks/useStore';
 import { useTableQrList } from './hooks/useTableQrList';
 import styles from './TableQrPrint.module.scss';
 
+type PrintMode = 'compact' | 'guide';
+
 const formatTableLabel = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 
 export default function TableQrPrint() {
   const navigate = useNavigate();
+  const [printMode, setPrintMode] = useState<PrintMode>('compact');
   const { id } = useParams();
   const parsedId = id ? Number(id) : undefined;
   const storeId = Number.isFinite(parsedId) ? parsedId : undefined;
@@ -30,13 +34,29 @@ export default function TableQrPrint() {
           <p className={styles.description}>출력 전 미리보기를 확인하고 PDF로 저장할 수 있습니다.</p>
         </div>
 
-        <div className={styles.actions}>
-          <Button type='button' variant='secondary' size='md' onClick={() => navigate(-1)}>
-            돌아가기
-          </Button>
-          <Button type='button' size='md' onClick={() => window.print()} disabled={isPending || isError}>
-            인쇄하기
-          </Button>
+        <div className={styles.toolbarControls}>
+          <div className={styles.guideSwitchControl}>
+            <span className={styles.guideSwitchLabel}>안내문구 포함</span>
+            <button
+              type='button'
+              role='switch'
+              aria-label='안내문구 포함'
+              aria-checked={printMode === 'guide'}
+              className={`${styles.guideSwitch} ${printMode === 'guide' ? styles.guideSwitchActive : ''}`}
+              onClick={() => setPrintMode((currentMode) => (currentMode === 'guide' ? 'compact' : 'guide'))}
+            >
+              <span className={styles.guideSwitchThumb} />
+            </button>
+          </div>
+
+          <div className={styles.actions}>
+            <Button type='button' variant='secondary' size='md' onClick={() => navigate(-1)}>
+              돌아가기
+            </Button>
+            <Button type='button' size='md' onClick={() => window.print()} disabled={isPending || isError}>
+              인쇄하기
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -60,11 +80,55 @@ export default function TableQrPrint() {
             <p className={styles.sheetMeta}>테이블 QR 코드 {tables.length}개</p>
           </div>
 
-          <div className={styles.grid}>
+          <div className={`${styles.grid} ${printMode === 'guide' ? styles.guideGrid : ''}`}>
             {tables.map((table) => (
-              <article key={table.tableNum} className={styles.card}>
-                <div className={styles.cardLabel}>{formatTableLabel(table.tableNum)}</div>
-                <img className={styles.qrImage} src={table.qrImageUrl} alt={`${formatTableLabel(table.tableNum)} QR`} />
+              <article
+                key={table.tableNum}
+                className={`${styles.card} ${printMode === 'guide' ? styles.guideCard : ''}`}
+              >
+                {printMode === 'guide' ? (
+                  <>
+                    <div className={styles.guideQrPanel}>
+                      <div className={styles.cardLabel}>{formatTableLabel(table.tableNum)}</div>
+                      <img
+                        className={styles.guideQrImage}
+                        src={table.qrImageUrl}
+                        alt={`${formatTableLabel(table.tableNum)} QR`}
+                      />
+                    </div>
+
+                    <div className={styles.guideContent}>
+                      <h3 className={styles.guideTitle}>QR오더 이용 방법</h3>
+                      <ol className={styles.guideSteps}>
+                        <li className={styles.guideStep}>
+                          <span className={styles.guideStep__number}>1</span>
+                          <span className={styles.guideStep__text}>원하는 메뉴를 장바구니에 담아주세요</span>
+                        </li>
+                        <li className={styles.guideStep}>
+                          <span className={styles.guideStep__number}>2</span>
+                          <span className={styles.guideStep__text}>
+                            결제 후 반드시 <strong>결제 완료 버튼</strong>을 눌러주세요
+                          </span>
+                        </li>
+                        <li className={styles.guideStep}>
+                          <span className={styles.guideStep__number}>3</span>
+                          <span className={styles.guideStep__text}>주문 내역에서 주문 상태를 확인할 수 있어요</span>
+                        </li>
+                      </ol>
+                      {/* <div className={styles.guideSource}>@order-ping</div> */}
+                      <img className={styles.guideLogo} src={OrderPingLogo} alt='ORDER PING' />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className={styles.cardLabel}>{formatTableLabel(table.tableNum)}</div>
+                    <img
+                      className={styles.qrImage}
+                      src={table.qrImageUrl}
+                      alt={`${formatTableLabel(table.tableNum)} QR`}
+                    />
+                  </>
+                )}
               </article>
             ))}
           </div>
