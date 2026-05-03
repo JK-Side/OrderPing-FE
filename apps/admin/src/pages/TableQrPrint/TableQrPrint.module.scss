@@ -407,7 +407,8 @@
 
   .guideGrid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 5mm;
+    gap: 4mm;
+    justify-items: center;
   }
 
   .card {
@@ -426,19 +427,20 @@
   }
 
   .guideCard {
-    grid-template-columns: minmax(50mm, 53mm) minmax(0, 1fr);
-    gap: 8mm;
-    min-height: 79mm;
-    padding: 2.5mm 3mm;
-    border: 0.5mm solid $gray-20;
-    border-radius: 9mm;
+    width: 72%;
+    grid-template-columns: minmax(34mm, 36mm) minmax(0, 1fr);
+    gap: 5mm;
+    min-height: 53mm;
+    padding: 2mm 2.5mm;
+    border: 0.35mm solid $gray-20;
+    border-radius: 6mm;
     background: $white;
     break-inside: avoid;
     page-break-inside: avoid;
   }
 
   .guideCard .cardLabel {
-    font-size: 16pt;
+    font-size: 11pt;
   }
 
   .guideQrPanel {
@@ -446,35 +448,35 @@
   }
 
   .guideQrImage {
-    max-width: 50mm;
+    max-width: 34mm;
   }
 
   .guideContent {
-    gap: 6mm;
+    gap: 3.5mm;
   }
 
   .guideTitle {
-    font-size: 15pt;
+    font-size: 10.5pt;
     line-height: 1.2;
   }
 
   .guideSteps {
-    gap: 5mm;
+    gap: 2.8mm;
   }
 
   .guideStep {
-    grid-template-columns: 8mm minmax(0, 1fr);
-    gap: 2mm;
-    font-size: 13.5pt;
-    line-height: normal;
+    grid-template-columns: 5mm minmax(0, 1fr);
+    gap: 1.5mm;
+    font-size: 9.5pt;
+    line-height: 1.2;
   }
 
   .guideStep__number,
   .guideStep__text {
-    font-size: 13.5pt;
+    font-size: 9.5pt;
   }
 
   .guideLogo {
-    width: 34mm;
+    width: 23mm;
   }
 }
