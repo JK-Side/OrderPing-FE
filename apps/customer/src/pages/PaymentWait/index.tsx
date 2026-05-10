@@ -348,6 +348,9 @@ export default function PaymentWaitPage() {
           {formatPrice(draft.paymentAmount)}
         </div>
         <div className={styles.paymentWait__helper}>
+          <div className={styles.paymentWait__helperText}>
+            토스 앱이 없거나 실행되지 않나요?
+          </div>
           <button
             type='button'
             className={styles.paymentWait__linkButton}
@@ -355,7 +358,7 @@ export default function PaymentWaitPage() {
               navigate(buildOrderPaymentAccountPath(storeId, tableNum))
             }
           >
-            토스앱이 열리지 않나요?
+            토스 다시 열기 또는 계좌이체
           </button>
         </div>
       </section>
