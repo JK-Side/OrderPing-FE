@@ -18,6 +18,7 @@ export interface PendingOrderDraft {
   totalPrice: number;
   paymentAmount: number;
   tossDeeplink: string;
+  tossAutoOpenAttemptedAt?: string;
   account: CustomerPaymentDeeplinkAccount;
   items: CartItem[];
   createdAt: string;
@@ -98,6 +99,8 @@ const isValidDraft = (value: unknown): value is PendingOrderDraft => {
     typeof draft.totalPrice === 'number' &&
     typeof draft.paymentAmount === 'number' &&
     typeof draft.tossDeeplink === 'string' &&
+    (draft.tossAutoOpenAttemptedAt === undefined ||
+      typeof draft.tossAutoOpenAttemptedAt === 'string') &&
     draft.account !== null &&
     typeof draft.account === 'object' &&
     typeof draft.account.bankName === 'string' &&
@@ -112,6 +115,19 @@ const isValidDraft = (value: unknown): value is PendingOrderDraft => {
 export const savePendingOrderDraft = (draft: PendingOrderDraft) => {
   if (typeof window === 'undefined') return;
   window.sessionStorage.setItem(ORDER_DRAFT_STORAGE_KEY, JSON.stringify(draft));
+};
+
+export const hasTossAutoOpenAttempted = (draft: PendingOrderDraft) =>
+  Boolean(draft.tossAutoOpenAttemptedAt);
+
+export const markTossAutoOpenAttempted = (draft: PendingOrderDraft) => {
+  const nextDraft = {
+    ...draft,
+    tossAutoOpenAttemptedAt: new Date().toISOString(),
+  };
+
+  savePendingOrderDraft(nextDraft);
+  return nextDraft;
 };
 
 export const loadPendingOrderDraft = () => {
