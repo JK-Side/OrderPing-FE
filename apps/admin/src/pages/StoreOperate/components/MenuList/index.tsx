@@ -30,7 +30,9 @@ function MenuSection({ title, menus }: { title: string; menus: MenuResponse[] })
           {menus.map((menu) => (
             <article key={menu.id} className={styles.menuCard}>
               <div className={styles.menuImageWrap}>
-                <div className={styles.menuStockBadge}>재고 {menu.stock}</div>
+                {menu.categoryId !== CATEGORY_TABLE_FEE && (
+                  <div className={styles.menuStockBadge}>재고 {menu.stock}</div>
+                )}
                 {menu.isSoldOut && (
                   <div className={styles.menuSoldOut}>
                     SOLD <br />
