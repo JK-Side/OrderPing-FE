@@ -45,6 +45,10 @@ export default function CartPage() {
   );
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, []);
+
+  useEffect(() => {
     setActiveTable(tableNum);
   }, [setActiveTable, tableNum]);
 
