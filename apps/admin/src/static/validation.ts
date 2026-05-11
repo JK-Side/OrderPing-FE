@@ -7,5 +7,6 @@ export const MESSAGES = {
     PRICE_REQUIRED: '메뉴 가격을 입력해 주세요.',
     STOCK_REQUIRED: '재고 수량을 입력해 주세요.',
     NUMBER_ONLY: '숫자만 입력해 주세요.',
+    STOCK_MIN_ONE: '재고는 1개 이상 입력해 주세요.',
   },
 };
