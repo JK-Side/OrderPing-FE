@@ -21,7 +21,13 @@ const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 
 const formatTableLabel = (tableNum: number) => `테이블 ${String(tableNum).padStart(2, '0')}`;
 
-export default function TableOrderModal({ open, onOpenChange, onServiceAdd, onDirectOrderAdd, table }: TableOrderModalProps) {
+export default function TableOrderModal({
+  open,
+  onOpenChange,
+  onServiceAdd,
+  onDirectOrderAdd,
+  table,
+}: TableOrderModalProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const { mutateAsync: updateTableMemo, isPending: isSavingMemo } = useUpdateTableMemo();
@@ -181,11 +187,11 @@ export default function TableOrderModal({ open, onOpenChange, onServiceAdd, onDi
             <div className={styles['payment-group']}>
               <div className={styles.payment}>
                 <span>입금 금액</span>
-                <span className={styles.payment__text}>{formatCurrency(table.totalOrderAmount ?? 0)}</span>
+                <span className={styles.payment__text}>{formatCurrency(table.cashAmount ?? 0)}</span>
               </div>
               <div className={styles.payment}>
                 <span>쿠폰 금액</span>
-                <span className={styles.payment__text}>{formatCurrency(table.totalOrderAmount ?? 0)}</span>
+                <span className={styles.payment__text}>{formatCurrency(table.couponAmount ?? 0)}</span>
               </div>
             </div>
           </div>

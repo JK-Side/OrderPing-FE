@@ -23,6 +23,8 @@ export interface TableResponse {
   orderMenus?: TableOrderMenu[];
   serviceMenus?: TableOrderMenu[];
   totalOrderAmount?: number;
+  couponAmount: number;
+  cashAmount: number;
   orderStatus?: TableOrderStatus | null;
 }
 
