@@ -66,6 +66,16 @@
   color: $gray-80;
 }
 
+.loginLink {
+  color: $primary-50;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
 @media (max-width: 900px) {
   .guestHome {
     padding: 56px 24px 80px;

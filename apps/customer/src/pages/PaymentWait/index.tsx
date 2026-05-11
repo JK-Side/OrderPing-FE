@@ -179,12 +179,15 @@ export default function PaymentWaitPage() {
     const latestDraft = await ensureTossDeeplink();
     const markedDraft = markTossAutoOpenAttempted(latestDraft);
 
-    await openTossWithStoreFallback(markedDraft.tossDeeplink, () => {
-      toast({
-        message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
-        variant: 'info',
-        duration: 1500,
-      });
+    await openTossWithStoreFallback(markedDraft.tossDeeplink, {
+      allowStoreFallback: false,
+      onUnsupportedDevice: () => {
+        toast({
+          message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
+          variant: 'info',
+          duration: 1500,
+        });
+      },
     });
   }, [ensureTossDeeplink, toast]);
 

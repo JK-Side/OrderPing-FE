@@ -1,6 +1,8 @@
 import LockIcon from '@/assets/icons/lock.svg?react';
 import styles from './GuestHome.module.scss';
 
+const LOGIN_URL = import.meta.env.VITE_KAKAO_LOGIN || '/';
+
 export default function GuestHome() {
   return (
     <section className={styles.guestHome}>
@@ -24,7 +26,12 @@ export default function GuestHome() {
           <div className={styles.lockBox}>
             <LockIcon width={32} height={32} fill='#8e8e93' />
           </div>
-          <p className={styles.lockText}>로그인 후 주점을 생성해 보세요!</p>
+          <p className={styles.lockText}>
+            <a className={styles.loginLink} href={LOGIN_URL}>
+              로그인
+            </a>{' '}
+            후 주점을 생성해 보세요!
+          </p>
         </div>
       </div>
     </section>
