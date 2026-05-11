@@ -211,7 +211,7 @@ export default function StoreSettingsModal({
                     ) : (
                       <>
                         <UploadIcon className={styles.uploadIcon} aria-hidden='true' />
-                        <span>드래그 하여 이미지 삽입</span>
+                        <span>클릭하여 이미지 삽입</span>
                       </>
                     )}
                   </label>

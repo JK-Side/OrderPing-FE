@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
+import { Controller, useForm, useWatch, type SubmitHandler } from 'react-hook-form';
 import type { TableResponse } from '@/api/table/entity';
 import Button from '@/components/Button';
 import { Input } from '@/components/Input';
@@ -28,7 +28,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: menus = [], isLoading } = useAvailableMenus(table?.storeId);
+  const { data: menus = [], isLoading, refetch: refetchMenus } = useAvailableMenus(table?.storeId);
   const { mutateAsync: createServiceOrder, isPending } = useCreateServiceOrder();
   const isOrderableTable = table?.status === 'OCCUPIED' || table?.status === 'EMPTY';
 
@@ -37,6 +37,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
     register,
     handleSubmit,
     reset,
+    trigger,
     formState: { errors, isValid, isSubmitting },
   } = useForm<ServiceAddForm>({
     mode: 'onChange',
@@ -51,11 +52,16 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
       menus.map((menu) => ({
         value: String(menu.id),
         label: menu.name,
-        disabled: menu.isSoldOut,
+        disabled: menu.isSoldOut || menu.stock <= 0,
       })),
     [menus],
   );
 
+  const selectedMenuId = useWatch({ control, name: 'menuId' });
+  const selectedMenu = useMemo(
+    () => menus.find((menu) => menu.id === Number(selectedMenuId)),
+    [menus, selectedMenuId],
+  );
   const hasSelectableMenu = menuOptions.some((option) => !option.disabled);
   const selectPlaceholder = isLoading
     ? '메뉴를 불러오는 중입니다.'
@@ -104,7 +110,26 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
       return;
     }
 
+    if (selectedMenu.isSoldOut || selectedMenu.stock <= 0 || quantity > selectedMenu.stock) {
+      toast({
+        message: `재고가 부족하여 서비스를 추가할 수 없어요. 재고 ${Math.max(selectedMenu.stock, 0)}개 이하로 입력해 주세요.`,
+        variant: 'warning',
+      });
+      return;
+    }
+
     try {
+      const latestMenus = (await refetchMenus()).data ?? [];
+      const latestMenu = latestMenus.find((menu) => menu.id === menuId);
+
+      if (!latestMenu || latestMenu.isSoldOut || latestMenu.stock <= 0 || quantity > latestMenu.stock) {
+        toast({
+          message: '재고가 부족하여 서비스를 추가할 수 없어요. 수량을 조절해 주세요.',
+          variant: 'warning',
+        });
+        return;
+      }
+
       await createServiceOrder({
         storeId: table.storeId,
         tableNum: table.tableNum,
@@ -118,6 +143,7 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
 
       await queryClient.invalidateQueries({ queryKey: ['tables', table.storeId] });
       await queryClient.invalidateQueries({ queryKey: ['orders', table.storeId] });
+      await queryClient.invalidateQueries({ queryKey: ['menus', table.storeId, 'available'] });
 
       toast({
         message: '서비스 메뉴가 추가되었습니다.',
@@ -125,9 +151,12 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
       });
       handleModalOpenChange(false);
     } catch (error) {
+      const status = (error as { status?: number })?.status;
       toast({
-        message: '서비스 추가에 실패했습니다.',
-        description: error instanceof Error ? error.message : undefined,
+        message:
+          status === 409
+            ? '재고가 부족하여 서비스를 추가할 수 없어요. 수량을 조절해 주세요.'
+            : '서비스 추가에 실패했습니다.',
         variant: 'error',
       });
       console.error('Failed to create service order', error);
@@ -159,7 +188,10 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
                     <Input.InputSelect
                       name={field.name}
                       value={field.value ?? ''}
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        void trigger('quantity');
+                      }}
                       options={menuOptions}
                       placeholder={selectPlaceholder}
                       disabled={isLoading || !hasSelectableMenu || !isOrderableTable}
@@ -185,6 +217,11 @@ export default function TableServiceModal({ open, onOpenChange, table }: TableSe
                     pattern: {
                       value: REGEX.NUMBER_ONLY,
                       message: '숫자만 입력해 주세요.',
+                    },
+                    validate: (value) => {
+                      const quantity = Number(value);
+                      if (!selectedMenu || !Number.isFinite(quantity) || quantity <= 0) return true;
+                      return quantity <= selectedMenu.stock || `재고 ${Math.max(selectedMenu.stock, 0)}개 이하로 입력해 주세요.`;
                     },
                   })}
                 />

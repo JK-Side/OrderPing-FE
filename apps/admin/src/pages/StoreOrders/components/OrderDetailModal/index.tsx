@@ -10,16 +10,18 @@ interface OrderDetailModalProps {
   menus: OrderMenuItem[];
   onReject?: () => void;
   onPrev?: () => void;
+  onCancel?: () => void;
   onAccept?: () => void;
   isAccepting?: boolean;
   isReverting?: boolean;
+  isCanceling?: boolean;
   isAcceptDisabled?: boolean;
 }
 
 type StatusActionConfig = {
   prevLabel: string;
   prevVariant: 'danger' | 'secondary';
-  prevAction: 'reject' | 'prev';
+  prevAction: 'reject' | 'prev' | 'cancel';
   nextLabel?: string;
 };
 
@@ -66,16 +68,27 @@ export default function OrderDetailModal({
   menus,
   onReject,
   onPrev,
+  onCancel,
   onAccept,
   isAccepting = false,
   isReverting = false,
+  isCanceling = false,
   isAcceptDisabled = false,
 }: OrderDetailModalProps) {
   if (!order) return null;
 
-  const actionConfig = STATUS_ACTION_CONFIG[order.status];
-  const handlePrevClick = actionConfig.prevAction === 'reject' ? onReject : onPrev;
+  const isServiceOrder = order.depositorName === '서비스';
+  const actionConfig: StatusActionConfig = isServiceOrder
+    ? {
+        prevLabel: '취소',
+        prevVariant: 'secondary',
+        prevAction: 'cancel',
+      }
+    : STATUS_ACTION_CONFIG[order.status];
+  const handlePrevClick =
+    actionConfig.prevAction === 'reject' ? onReject : actionConfig.prevAction === 'cancel' ? onCancel : onPrev;
   const isPrevAction = actionConfig.prevAction === 'prev';
+  const isCancelAction = actionConfig.prevAction === 'cancel';
   const orderNumber = 'storeOrderNumber' in order ? order.storeOrderNumber : order.id;
 
   return (
@@ -149,8 +162,8 @@ export default function OrderDetailModal({
               variant={actionConfig.prevVariant}
               className={styles.footerButton}
               onClick={handlePrevClick}
-              isLoading={isPrevAction && isReverting}
-              disabled={isPrevAction && isReverting}
+              isLoading={(isPrevAction && isReverting) || (isCancelAction && isCanceling)}
+              disabled={(isPrevAction && isReverting) || (isCancelAction && (isCanceling || !onCancel))}
             >
               {actionConfig.prevLabel}
             </Button>

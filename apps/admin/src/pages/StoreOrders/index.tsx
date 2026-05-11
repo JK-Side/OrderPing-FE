@@ -222,6 +222,38 @@ export default function StoreOrders() {
     }
   };
 
+  const handleCancelServiceFromDetail = async () => {
+    const targetOrder = orderDetail ?? selectedOrder;
+    if (!targetOrder || targetOrder.depositorName !== '서비스') return;
+    if (cancelingOrderId === targetOrder.id) return;
+
+    try {
+      setCancelingOrderId(targetOrder.id);
+      await deleteOrder(targetOrder.id);
+
+      if (storeId) {
+        queryClient.setQueryData<OrderLookupResponse[]>(['orders', storeId], (prev) =>
+          prev ? prev.filter((item) => item.id !== targetOrder.id) : prev,
+        );
+      }
+
+      toast({
+        message: '주문이 취소되었습니다.',
+        variant: 'success',
+      });
+      handleDetailOpenChange(false);
+    } catch (error) {
+      toast({
+        message: '주문 취소에 실패했습니다.',
+        description: error instanceof Error ? error.message : undefined,
+        variant: 'error',
+      });
+      console.error('주문 취소에 실패했습니다.', error);
+    } finally {
+      setCancelingOrderId((prev) => (prev === targetOrder.id ? null : prev));
+    }
+  };
+
   const resolveNextStatus = (status: OrderStatus) => {
     if (status === 'PENDING') return 'COOKING';
     if (status === 'COOKING') return 'COMPLETE';
@@ -327,8 +359,10 @@ export default function StoreOrders() {
 
   const selectedOrder = selectedOrderId ? (visibleOrders.find((order) => order.id === selectedOrderId) ?? null) : null;
   const detailOrder = orderDetail ?? selectedOrder;
+  const isDetailServiceOrder = detailOrder?.depositorName === '서비스';
   const isDetailAccepting = detailOrder ? acceptingOrderId === detailOrder.id : false;
-  const isDetailReverting = detailOrder ? revertingOrderId === detailOrder.id : false;
+  const isDetailReverting = detailOrder && !isDetailServiceOrder ? revertingOrderId === detailOrder.id : false;
+  const isDetailCanceling = detailOrder && isDetailServiceOrder ? cancelingOrderId === detailOrder.id : false;
   const isDetailAcceptDisabled =
     !storeId || !detailOrder || detailOrder.status === 'COMPLETE' || detailOrder.depositorName === '서비스';
 
@@ -388,9 +422,11 @@ export default function StoreOrders() {
         menus={orderDetail?.menus ?? []}
         onReject={handleOpenRejectFromDetail}
         onPrev={handlePrevFromDetail}
+        onCancel={isDetailServiceOrder ? handleCancelServiceFromDetail : undefined}
         onAccept={handleAcceptFromDetail}
         isAccepting={isDetailAccepting}
         isReverting={isDetailReverting}
+        isCanceling={isDetailCanceling}
         isAcceptDisabled={isDetailAcceptDisabled}
       />
       <OrderRejectModal

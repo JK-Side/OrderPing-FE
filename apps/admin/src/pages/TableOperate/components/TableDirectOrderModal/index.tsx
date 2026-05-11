@@ -32,7 +32,7 @@ const formatCurrency = (value: number) => `${value.toLocaleString('ko-KR')}원`;
 export default function TableDirectOrderModal({ open, onOpenChange, onCancel, table }: TableDirectOrderModalProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { data: menus = [], isLoading: isMenuLoading } = useAvailableMenus(table?.storeId);
+  const { data: menus = [], isLoading: isMenuLoading, refetch: refetchMenus } = useAvailableMenus(table?.storeId);
   const { mutateAsync: createOrder, isPending } = useCreateOrder();
   const [quantityMap, setQuantityMap] = useState<QuantityMap>({});
 
@@ -97,9 +97,12 @@ export default function TableDirectOrderModal({ open, onOpenChange, onCancel, ta
 
   const handleIncreaseQuantity = (menuId: number) => {
     if (!canCreateOrder) return;
+    const menu = menus.find((item) => item.id === menuId);
+    if (!menu || menu.isSoldOut || menu.stock <= 0) return;
+
     setQuantityMap((prev) => ({
       ...prev,
-      [menuId]: (prev[menuId] ?? 0) + 1,
+      [menuId]: Math.min((prev[menuId] ?? 0) + 1, menu.stock),
     }));
   };
 
@@ -162,12 +165,34 @@ export default function TableDirectOrderModal({ open, onOpenChange, onCancel, ta
     }
 
     try {
+      const latestMenus = (await refetchMenus()).data ?? [];
+      const latestMenuById = new Map(latestMenus.map((menu) => [menu.id, menu]));
+      const latestSelectedMenus: typeof selectedMenus = [];
+
+      for (const selectedMenu of selectedMenus) {
+        const latestMenu = latestMenuById.get(selectedMenu.id);
+
+        if (!latestMenu || latestMenu.isSoldOut || latestMenu.stock < selectedMenu.quantity) {
+          toast({
+            message: '재고가 부족하여 주문을 추가할 수 없어요. 수량을 조절해 주세요.',
+            variant: 'warning',
+          });
+          return;
+        }
+
+        latestSelectedMenus.push({
+          id: latestMenu.id,
+          quantity: selectedMenu.quantity,
+          price: latestMenu.price,
+        });
+      }
+
       await createOrder({
         storeId,
         tableNum: table.tableNum,
         depositorName,
         couponAmount,
-        menus: selectedMenus.map((menu) => ({
+        menus: latestSelectedMenus.map((menu) => ({
           menuId: menu.id,
           quantity: menu.quantity,
         })),
@@ -176,6 +201,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, onCancel, ta
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['tables', storeId] }),
         queryClient.invalidateQueries({ queryKey: ['orders', storeId] }),
+        queryClient.invalidateQueries({ queryKey: ['menus', storeId, 'available'] }),
       ]);
 
       toast({
@@ -195,7 +221,9 @@ export default function TableDirectOrderModal({ open, onOpenChange, onCancel, ta
               ? '본인 매장의 테이블만 주문을 추가할 수 있습니다.'
               : status === 404
                 ? '테이블 또는 메뉴를 찾을 수 없습니다.'
-                : '주문 추가에 실패했습니다.';
+                : status === 409
+                  ? '재고가 부족하여 주문을 추가할 수 없어요. 수량을 조절해 주세요.'
+                  : '주문 추가에 실패했습니다.';
 
       toast({
         message,
@@ -276,7 +304,7 @@ export default function TableDirectOrderModal({ open, onOpenChange, onCancel, ta
                     {menus.map((menu) => {
                       const quantity = quantityMap[menu.id] ?? 0;
                       const isMinusDisabled = quantity <= 0 || !canCreateOrder;
-                      const isPlusDisabled = !canCreateOrder || menu.isSoldOut;
+                      const isPlusDisabled = !canCreateOrder || menu.isSoldOut || menu.stock <= 0 || quantity >= menu.stock;
 
                       return (
                         <article key={menu.id} className={styles.menuCard}>
