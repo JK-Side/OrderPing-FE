@@ -99,6 +99,7 @@ export interface CustomerOrderLookupResponse {
   cashAmount: number;
   createdAt: string;
   menus: CustomerOrderLookupMenu[];
+  storeOrderNumber: number;
 }
 
 export interface CustomerPaymentDeeplinkAccount {
