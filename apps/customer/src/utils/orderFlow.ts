@@ -2,10 +2,19 @@ import type { CustomerPaymentDeeplinkAccount } from '../api/customer/entity';
 import type { CartItem } from '../stores/cart';
 
 const TOSS_ANDROID_STORE_URL = 'https://play.google.com/store/apps/details?id=viva.republica.toss';
-const APP_OPEN_FALLBACK_DELAY_MS = 1200;
+// Previous fallback delay was 1200ms. Samsung Browser can still fire fallback
+// after Toss opens, leaving a Play Store tab behind.
+// const APP_OPEN_FALLBACK_DELAY_MS = 1200;
+const APP_OPEN_FALLBACK_DELAY_MS = 2500;
 const ORDER_DRAFT_STORAGE_KEY = 'order-ping:customer-order-draft:v1';
 
 type MobilePlatform = 'android' | 'ios' | 'other';
+
+interface OpenTossOptions {
+  allowStoreFallback?: boolean;
+  fallbackDelayMs?: number;
+  onUnsupportedDevice?: () => void;
+}
 
 export interface PendingOrderDraft {
   orderId: number | null;
@@ -166,7 +175,7 @@ const getMobilePlatform = (): MobilePlatform => {
 
 export const openTossWithStoreFallback = async (
   tossDeeplink: string,
-  onUnsupportedDevice?: () => void,
+  options: OpenTossOptions = {},
 ) => {
   if (!isExternalPaymentUrl(tossDeeplink)) {
     throw new Error('Invalid toss deeplink');
@@ -178,12 +187,19 @@ export const openTossWithStoreFallback = async (
   }
 
   const platform = getMobilePlatform();
+  const {
+    allowStoreFallback = true,
+    fallbackDelayMs = APP_OPEN_FALLBACK_DELAY_MS,
+    onUnsupportedDevice,
+  } = options;
 
   await new Promise<void>((resolve) => {
     let finished = false;
 
     const cleanup = () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleAppOpenSignal);
+      window.removeEventListener('pagehide', handleAppOpenSignal);
       clearTimeout(fallbackTimer);
     };
 
@@ -194,6 +210,10 @@ export const openTossWithStoreFallback = async (
       resolve();
     };
 
+    const handleAppOpenSignal = () => {
+      finish();
+    };
+
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         finish();
@@ -201,13 +221,19 @@ export const openTossWithStoreFallback = async (
     };
 
     const fallbackTimer = window.setTimeout(() => {
-      if (document.visibilityState === 'hidden') {
+      if (document.visibilityState === 'hidden' || !document.hasFocus()) {
         finish();
         return;
       }
 
       if (platform === 'android') {
-        window.location.href = TOSS_ANDROID_STORE_URL;
+        if (allowStoreFallback) {
+          // Previous Android fallback behavior:
+          // window.location.href = TOSS_ANDROID_STORE_URL;
+          window.location.assign(TOSS_ANDROID_STORE_URL);
+        } else {
+          onUnsupportedDevice?.();
+        }
         finish();
         return;
       }
@@ -220,9 +246,11 @@ export const openTossWithStoreFallback = async (
 
       onUnsupportedDevice?.();
       finish();
-    }, APP_OPEN_FALLBACK_DELAY_MS);
+    }, fallbackDelayMs);
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleAppOpenSignal, { once: true });
+    window.addEventListener('pagehide', handleAppOpenSignal, { once: true });
     window.location.href = tossDeeplink;
   });
 };

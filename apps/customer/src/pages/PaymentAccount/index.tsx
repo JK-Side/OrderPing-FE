@@ -96,12 +96,15 @@ export default function PaymentAccountPage() {
     try {
       setIsOpeningToss(true);
       const latestDraft = await ensurePaymentInfo();
-      await openTossWithStoreFallback(latestDraft.tossDeeplink, () => {
-        toast({
-          message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
-          variant: 'info',
-          duration: 1500,
-        });
+      await openTossWithStoreFallback(latestDraft.tossDeeplink, {
+        allowStoreFallback: true,
+        onUnsupportedDevice: () => {
+          toast({
+            message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
+            variant: 'info',
+            duration: 1500,
+          });
+        },
       });
     } catch (error) {
       const status = (error as { status?: number } | null)?.status;
