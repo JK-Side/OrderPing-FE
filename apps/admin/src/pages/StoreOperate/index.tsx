@@ -66,7 +66,7 @@ export default function StoreOperate() {
             </div>
             <div className={styles.summaryText} ref={summaryTextRef}>
               <div className={styles.summaryTitle}>
-                <span className={styles.storeName}>{storeName}</span> 주점
+                <span className={styles.storeName}>{storeName}</span>
               </div>
               <p className={styles.summaryDescription}>{storeDescription}</p>
             </div>
