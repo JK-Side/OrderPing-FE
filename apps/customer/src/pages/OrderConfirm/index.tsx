@@ -17,6 +17,15 @@ import styles from './OrderConfirm.module.scss';
 import PageHeader from '../../components/PageHeader';
 
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
+const MAX_TOAST_MENU_NAME_LENGTH = 10;
+
+const getToastMenuName = (name: string) => {
+  const characters = Array.from(name);
+
+  return characters.length > MAX_TOAST_MENU_NAME_LENGTH
+    ? `${characters.slice(0, MAX_TOAST_MENU_NAME_LENGTH).join('')}...`
+    : name;
+};
 
 export default function OrderConfirmPage() {
   const navigate = useNavigate();
@@ -123,14 +132,20 @@ export default function OrderConfirmPage() {
 
       for (const item of items) {
         const latestMenu = latestMenuById.get(item.menuId);
+        const toastMenuName = getToastMenuName(item.name);
 
-        if (
-          !latestMenu ||
-          latestMenu.isSoldOut ||
-          latestMenu.stock < item.quantity
-        ) {
+        if (!latestMenu || latestMenu.isSoldOut || latestMenu.stock <= 0) {
           toast({
-            message: '재고가 부족하여 주문할 수 없어요. 수량을 조절해 주세요.',
+            message: `${toastMenuName}은/는 품절되어 주문할 수 없어요.`,
+            variant: 'warning',
+            duration: 1500,
+          });
+          return;
+        }
+
+        if (latestMenu.stock < item.quantity) {
+          toast({
+            message: `${toastMenuName}은(는) 재고가 ${latestMenu.stock}개 남았어요.`,
             variant: 'warning',
             duration: 1500,
           });
