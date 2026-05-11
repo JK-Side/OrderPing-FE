@@ -71,7 +71,8 @@ export default function MenuCreate() {
   const stockMessageState = isStockFormatError ? 'warning' : errors.stock ? 'error' : undefined;
 
   const isPriceValid = typeof menuPrice === 'string' && REGEX.NUMBER_ONLY.test(menuPrice);
-  const isStockValid = typeof menuStock === 'string' && REGEX.NUMBER_ONLY.test(menuStock);
+  const isStockValid =
+    typeof menuStock === 'string' && REGEX.NUMBER_ONLY.test(menuStock) && Number(menuStock) > 0;
 
   const isNameValid = typeof menuName === 'string' && menuName.trim().length > 0;
   const isCategoryValid = typeof categoryId === 'number' && categoryId > 0;
@@ -306,6 +307,7 @@ export default function MenuCreate() {
                       value: REGEX.NUMBER_ONLY,
                       message: MESSAGES.MENU.NUMBER_ONLY,
                     },
+                    validate: (value) => Number(value) > 0 || MESSAGES.MENU.STOCK_MIN_ONE,
                   })}
                 />
               </Input>

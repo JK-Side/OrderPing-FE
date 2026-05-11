@@ -28,9 +28,6 @@ const formatOrderTime = (value: string) => {
   return `${hours}:${minutes}`;
 };
 
-const getPaidAmount = (order: CustomerOrderLookupResponse) =>
-  order.cashAmount > 0 ? order.cashAmount : order.totalPrice;
-
 const getOrderMenuCount = (order: CustomerOrderLookupResponse) =>
   order.menus.reduce((sum, menu) => sum + menu.quantity, 0);
 
@@ -128,7 +125,7 @@ export default function OrderStatusPage() {
           ) : null}
           {currentOrder ? (
             <div className={styles.orderStatus__summary}>
-              {`총 ${getOrderMenuCount(currentOrder)}개 | ${formatPrice(getPaidAmount(currentOrder))}`}
+              {`총 ${getOrderMenuCount(currentOrder)}개 | ${formatPrice(currentOrder.totalPrice)}`}
             </div>
           ) : null}
         </header>
@@ -218,7 +215,7 @@ export default function OrderStatusPage() {
             <article className={styles.orderStatus__orderCard}>
               <div className={styles.orderStatus__orderHeader}>
                 <span className={styles.orderStatus__orderNumber}>
-                  {`주문 번호 ${String(currentOrder.id).padStart(2, '0')}`}
+                  {`주문 번호 ${String(currentOrder.storeOrderNumber).padStart(2, '0')}`}
                 </span>
                 <span className={styles.orderStatus__orderTime}>
                   {formatOrderTime(currentOrder.createdAt)}
@@ -243,7 +240,7 @@ export default function OrderStatusPage() {
               </div>
 
               <div className={styles.orderStatus__orderPrice}>
-                {formatPrice(getPaidAmount(currentOrder))}
+                {formatPrice(currentOrder.totalPrice)}
               </div>
             </article>
           </section>

@@ -1,5 +1,4 @@
 import { getCustomerOrdersByTableId } from '../../api/customer';
-import type { CustomerOrderLookupResponse } from '../../api/customer/entity';
 import BottomActionBar from '../../components/BottomActionBar';
 import OrderStatusBadge from '../../components/OrderStatusBadge';
 import PageHeader from '../../components/PageHeader';
@@ -20,9 +19,6 @@ const formatOrderTime = (value: string) => {
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return `${hours}:${minutes}`;
 };
-
-const getPaidAmount = (order: CustomerOrderLookupResponse) =>
-  order.cashAmount > 0 ? order.cashAmount : order.totalPrice;
 
 export default function OrderHistoryPage() {
   const navigate = useNavigate();
@@ -68,7 +64,7 @@ export default function OrderHistoryPage() {
   );
 
   const totalPaidAmount = useMemo(
-    () => orders.reduce((sum, order) => sum + getPaidAmount(order), 0),
+    () => orders.reduce((sum, order) => sum + order.totalPrice, 0),
     [orders],
   );
 
@@ -131,7 +127,7 @@ export default function OrderHistoryPage() {
                   <div className={styles.orderHistory__orderHeader}>
                     <div className={styles.orderHistory__orderMeta}>
                       <span className={styles.orderHistory__orderNumber}>
-                        {`주문 번호 ${String(order.id).padStart(2, '0')}`}
+                        {`주문 번호 ${String(order.storeOrderNumber).padStart(2, '0')}`}
                       </span>
                       <OrderStatusBadge status={order.orderStatus} />
                     </div>
@@ -158,7 +154,7 @@ export default function OrderHistoryPage() {
                   </div>
 
                   <div className={styles.orderHistory__orderPrice}>
-                    {formatPrice(getPaidAmount(order))}
+                    {formatPrice(order.totalPrice)}
                   </div>
                 </article>
               ))
