@@ -16,7 +16,9 @@ import {
   buildOrderStatusPath,
   buildStoreHomePath,
   clearPendingOrderDraft,
+  hasTossAutoOpenAttempted,
   loadPendingOrderDraft,
+  markTossAutoOpenAttempted,
   openTossWithStoreFallback,
   parsePositiveInt,
   savePendingOrderDraft,
@@ -175,8 +177,9 @@ export default function PaymentWaitPage() {
 
   const openToss = useCallback(async () => {
     const latestDraft = await ensureTossDeeplink();
+    const markedDraft = markTossAutoOpenAttempted(latestDraft);
 
-    await openTossWithStoreFallback(latestDraft.tossDeeplink, () => {
+    await openTossWithStoreFallback(markedDraft.tossDeeplink, () => {
       toast({
         message: '모바일 기기에서 토스 앱으로 결제해 주세요.',
         variant: 'info',
@@ -186,7 +189,16 @@ export default function PaymentWaitPage() {
   }, [ensureTossDeeplink, toast]);
 
   useEffect(() => {
-    if (!draft || hasAutoOpenedRef.current) return;
+    if (
+      !draft ||
+      !hasTableContext ||
+      draft.storeId !== storeId ||
+      draft.tableNum !== tableNum ||
+      hasAutoOpenedRef.current ||
+      hasTossAutoOpenAttempted(draft)
+    ) {
+      return;
+    }
 
     hasAutoOpenedRef.current = true;
     openToss().catch((error) => {
@@ -200,7 +212,7 @@ export default function PaymentWaitPage() {
         duration: 1500,
       });
     });
-  }, [draft, openToss, toast]);
+  }, [draft, hasTableContext, openToss, storeId, tableNum, toast]);
 
   const handleCompletePayment = async () => {
     if (!draft || isMovingNext) return;
@@ -336,6 +348,9 @@ export default function PaymentWaitPage() {
           {formatPrice(draft.paymentAmount)}
         </div>
         <div className={styles.paymentWait__helper}>
+          <div className={styles.paymentWait__helperText}>
+            토스 앱이 없거나 실행되지 않나요?
+          </div>
           <button
             type='button'
             className={styles.paymentWait__linkButton}
@@ -343,7 +358,7 @@ export default function PaymentWaitPage() {
               navigate(buildOrderPaymentAccountPath(storeId, tableNum))
             }
           >
-            토스앱이 열리지 않나요?
+            토스 다시 열기 또는 계좌이체
           </button>
         </div>
       </section>
