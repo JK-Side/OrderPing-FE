@@ -7,7 +7,7 @@ import { useCart } from '../../stores/cart';
 import MenuDefaultImage from '../../assets/imgs/menu_default.svg?react';
 import { buildOrderHistoryPath, parsePositiveInt } from '../../utils/orderFlow';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styles from './MenuDetail.module.scss';
 
@@ -44,6 +44,10 @@ export default function MenuDetailPage() {
 
   const hasNotFoundError =
     (error as { status?: number } | null)?.status === 404;
+
+  useLayoutEffect(() => {
+    window.scrollTo({ top: 0, left: 0 });
+  }, [menuId]);
 
   useEffect(() => {
     setActiveTable(tableNum);

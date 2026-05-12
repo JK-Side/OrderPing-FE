@@ -14,7 +14,6 @@ import {
   buildOrderIssuePath,
   buildOrderPaymentAccountPath,
   buildOrderStatusPath,
-  buildStoreHomePath,
   clearPendingOrderDraft,
   hasTossAutoOpenAttempted,
   loadPendingOrderDraft,
@@ -27,6 +26,8 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styles from './PaymentWait.module.scss';
+
+const PAYMENT_WAIT_GUARD_STATE_KEY = 'orderPingPaymentWaitGuard';
 
 const formatPrice = (price: number) => `${price.toLocaleString('ko-KR')}원`;
 
@@ -118,7 +119,30 @@ export default function PaymentWaitPage() {
   const draft = useMemo(() => loadPendingOrderDraft(), []);
   const hasRedirectedRef = useRef(false);
   const hasAutoOpenedRef = useRef(false);
+  const isNavigationGuardDisabledRef = useRef(false);
   const [isMovingNext, setIsMovingNext] = useState(false);
+  const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+
+  const disableNavigationGuard = useCallback(() => {
+    isNavigationGuardDisabledRef.current = true;
+  }, []);
+
+  const openExitConfirm = useCallback(() => {
+    if (isMovingNext) return;
+    setIsExitConfirmOpen(true);
+  }, [isMovingNext]);
+
+  const handleLeaveToCart = useCallback(() => {
+    disableNavigationGuard();
+    setIsExitConfirmOpen(false);
+
+    if (storeId !== null && tableNum !== null) {
+      navigate(buildCartPath(storeId, tableNum));
+      return;
+    }
+
+    navigate('/cart');
+  }, [disableNavigationGuard, navigate, storeId, tableNum]);
 
   useEffect(() => {
     setActiveTable(tableNum);
@@ -143,6 +167,49 @@ export default function PaymentWaitPage() {
       });
     }
   }, [draft, hasTableContext, navigate, storeId, tableNum, toast]);
+
+  useEffect(() => {
+    if (
+      !hasTableContext ||
+      !draft ||
+      draft.storeId !== storeId ||
+      draft.tableNum !== tableNum
+    ) {
+      return;
+    }
+
+    if (!window.history.state?.[PAYMENT_WAIT_GUARD_STATE_KEY]) {
+      window.history.pushState(
+        {
+          ...(window.history.state ?? {}),
+          [PAYMENT_WAIT_GUARD_STATE_KEY]: true,
+        },
+        '',
+        window.location.href,
+      );
+    }
+
+    const handlePopState = () => {
+      if (isNavigationGuardDisabledRef.current) {
+        return;
+      }
+
+      setIsExitConfirmOpen(true);
+      window.history.pushState(
+        {
+          ...(window.history.state ?? {}),
+          [PAYMENT_WAIT_GUARD_STATE_KEY]: true,
+        },
+        '',
+        window.location.href,
+      );
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [draft, hasTableContext, storeId, tableNum]);
 
   const ensureTossDeeplink = useCallback(async () => {
     if (!draft) {
@@ -223,6 +290,7 @@ export default function PaymentWaitPage() {
     try {
       setIsMovingNext(true);
       if (draft.orderId !== null) {
+        disableNavigationGuard();
         clearPendingOrderDraft();
         clearCart();
         navigate(
@@ -239,6 +307,7 @@ export default function PaymentWaitPage() {
       );
 
       if (existingOrder) {
+        disableNavigationGuard();
         clearPendingOrderDraft();
         clearCart();
         navigate(
@@ -266,6 +335,7 @@ export default function PaymentWaitPage() {
         })),
       });
 
+      disableNavigationGuard();
       clearPendingOrderDraft();
       clearCart();
       navigate(
@@ -281,6 +351,7 @@ export default function PaymentWaitPage() {
     } catch (error) {
       const status = (error as { status?: number } | null)?.status;
       if (status === 409) {
+        disableNavigationGuard();
         navigate(buildOrderIssuePath(draft.storeId, draft.tableNum), {
           replace: true,
         });
@@ -292,6 +363,7 @@ export default function PaymentWaitPage() {
       );
 
       if (createdOrder) {
+        disableNavigationGuard();
         clearPendingOrderDraft();
         clearCart();
         navigate(
@@ -316,6 +388,11 @@ export default function PaymentWaitPage() {
     }
   };
 
+  const handleCompletePaymentFromModal = () => {
+    setIsExitConfirmOpen(false);
+    void handleCompletePayment();
+  };
+
   if (
     !hasTableContext ||
     !draft ||
@@ -327,14 +404,7 @@ export default function PaymentWaitPage() {
 
   return (
     <main className={styles.paymentWait}>
-      <PageHeader
-        title='결제 진행'
-        onBack={() =>
-          navigate(
-            hasTableContext ? buildStoreHomePath(storeId, tableNum) : '/cart',
-          )
-        }
-      />
+      <PageHeader title='결제 진행' onBack={openExitConfirm} />
 
       <section className={styles.paymentWait__content}>
         <img
@@ -345,14 +415,14 @@ export default function PaymentWaitPage() {
         <div className={styles.paymentWait__headline}>
           결제 완료 후
           <br />
-          아래 결제 완료 버튼을 눌러주세요
+          아래 버튼을 눌러주세요
         </div>
         <div className={styles.paymentWait__summary}>
           {formatPrice(draft.paymentAmount)}
         </div>
         <div className={styles.paymentWait__helper}>
           <div className={styles.paymentWait__helperText}>
-            토스 앱이 없거나 실행되지 않나요?
+            토스 앱이 열리지 않거나 실행되지 않나요?
           </div>
           <button
             type='button'
@@ -376,6 +446,49 @@ export default function PaymentWaitPage() {
           {isMovingNext ? '주문 접수 중...' : '결제 완료'}
         </button>
       </BottomActionBar>
+
+      {isExitConfirmOpen ? (
+        <div
+          className={styles.paymentWait__exitOverlay}
+          role='presentation'
+          onClick={() => setIsExitConfirmOpen(false)}
+        >
+          <section
+            className={styles.paymentWait__exitSheet}
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby='payment-wait-exit-title'
+            onClick={(event) => event.stopPropagation()}
+          >
+            <h2
+              id='payment-wait-exit-title'
+              className={styles.paymentWait__exitTitle}
+            >
+              아직 주문이 접수되지 않았어요
+            </h2>
+            <p className={styles.paymentWait__exitDescription}>
+              송금했다면 아래 버튼을 눌러야 매장에 주문이 전달돼요.
+            </p>
+            <div className={styles.paymentWait__exitActions}>
+              <button
+                type='button'
+                className={styles.paymentWait__exitPrimaryButton}
+                disabled={isMovingNext}
+                onClick={handleCompletePaymentFromModal}
+              >
+                {isMovingNext ? '주문 접수 중...' : '결제 완료'}
+              </button>
+              <button
+                type='button'
+                className={styles.paymentWait__exitSecondaryButton}
+                onClick={handleLeaveToCart}
+              >
+                장바구니로 돌아가기
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </main>
   );
 }

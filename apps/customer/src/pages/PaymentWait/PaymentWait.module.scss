@@ -72,6 +72,71 @@
       cursor: not-allowed;
     }
   }
+
+  &__exitOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background-color: rgba($black, 0.44);
+  }
+
+  &__exitSheet {
+    width: min(100%, 560px);
+    padding: 24px 24px calc(24px + env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+    background-color: $white;
+    box-shadow: 0 -12px 32px rgba($black, 0.14);
+  }
+
+  &__exitTitle {
+    color: $black;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  &__exitDescription {
+    margin-top: 8px;
+    color: $gray-70;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  &__exitActions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  &__exitPrimaryButton,
+  &__exitSecondaryButton {
+    width: 100%;
+    min-height: 52px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+    cursor: pointer;
+  }
+
+  &__exitPrimaryButton {
+    color: $white;
+    background-color: $primary-50;
+
+    &:disabled {
+      background-color: $gray-40;
+      cursor: not-allowed;
+    }
+  }
+
+  &__exitSecondaryButton {
+    color: $gray-80;
+    background-color: $gray-10;
+  }
 }
 
 @keyframes floatingCoin {
