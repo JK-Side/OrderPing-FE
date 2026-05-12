@@ -17,7 +17,7 @@ const CATEGORY_SIDE = 2;
 const CATEGORY_TABLE_FEE = 3;
 
 const TABLE_FEE_LIMIT_MESSAGE = '테이블비 메뉴는 주점당 하나만 등록할 수 있어요.';
-const TABLE_FEE_NAME = '인원수';
+const TABLE_FEE_NAME = '인원수만큼 입력해 주세요';
 const TABLE_FEE_STOCK = '1000';
 const TABLE_FEE_DESCRIPTION = '첫 주문 시 테이블 이용 인원수만큼 선택해 주세요.';
 
@@ -71,8 +71,7 @@ export default function MenuCreate() {
   const stockMessageState = isStockFormatError ? 'warning' : errors.stock ? 'error' : undefined;
 
   const isPriceValid = typeof menuPrice === 'string' && REGEX.NUMBER_ONLY.test(menuPrice);
-  const isStockValid =
-    typeof menuStock === 'string' && REGEX.NUMBER_ONLY.test(menuStock) && Number(menuStock) > 0;
+  const isStockValid = typeof menuStock === 'string' && REGEX.NUMBER_ONLY.test(menuStock) && Number(menuStock) > 0;
 
   const isNameValid = typeof menuName === 'string' && menuName.trim().length > 0;
   const isCategoryValid = typeof categoryId === 'number' && categoryId > 0;
