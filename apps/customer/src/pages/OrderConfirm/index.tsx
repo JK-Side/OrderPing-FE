@@ -205,27 +205,29 @@ export default function OrderConfirmPage() {
 
       savePendingOrderDraft(baseDraft);
 
-      try {
-        const paymentInfo = await getPaymentTossDeeplink({
-          storeId: latestOrderData.storeId,
-          amount: normalizedPaymentAmount,
-        });
+      if (normalizedPaymentAmount > 0) {
+        try {
+          const paymentInfo = await getPaymentTossDeeplink({
+            storeId: latestOrderData.storeId,
+            amount: normalizedPaymentAmount,
+          });
 
-        savePendingOrderDraft({
-          ...baseDraft,
-          tossDeeplink: paymentInfo.tossDeeplink,
-          account: paymentInfo.account,
-        });
-      } catch (error) {
-        const status = (error as { status?: number } | null)?.status;
-        toast({
-          message:
-            status === 404
-              ? '입금 계좌 정보를 찾을 수 없어요. 다음 화면에서 다시 시도해 주세요.'
-              : '토스 결제 링크를 불러오지 못했어요. 다음 화면에서 다시 시도해 주세요.',
-          variant: 'error',
-          duration: 1500,
-        });
+          savePendingOrderDraft({
+            ...baseDraft,
+            tossDeeplink: paymentInfo.tossDeeplink,
+            account: paymentInfo.account,
+          });
+        } catch (error) {
+          const status = (error as { status?: number } | null)?.status;
+          toast({
+            message:
+              status === 404
+                ? '입금 계좌 정보를 찾을 수 없어요. 다음 화면에서 다시 시도해 주세요.'
+                : '토스 결제 링크를 불러오지 못했어요. 다음 화면에서 다시 시도해 주세요.',
+            variant: 'error',
+            duration: 1500,
+          });
+        }
       }
 
       navigate(buildOrderPaymentWaitPath(storeId, tableNum));
