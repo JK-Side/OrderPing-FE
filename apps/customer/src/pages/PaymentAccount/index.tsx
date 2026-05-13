@@ -49,12 +49,27 @@ export default function PaymentAccountPage() {
     }
   }, [draft, hasTableContext, navigate, storeId, tableNum]);
 
+  useEffect(() => {
+    if (
+      hasTableContext &&
+      draft &&
+      draft.storeId === storeId &&
+      draft.tableNum === tableNum &&
+      draft.paymentAmount === 0
+    ) {
+      navigate(buildOrderPaymentWaitPath(storeId, tableNum), { replace: true });
+    }
+  }, [draft, hasTableContext, navigate, storeId, tableNum]);
+
   const ensurePaymentInfo = async () => {
     if (!draft) {
       throw new Error('Missing draft');
     }
 
-    if (draft.tossDeeplink && draft.account.accountNumber) {
+    if (
+      draft.paymentAmount === 0 ||
+      (draft.tossDeeplink && draft.account.accountNumber)
+    ) {
       return draft;
     }
 
@@ -93,6 +108,11 @@ export default function PaymentAccountPage() {
   };
 
   const handleOpenToss = async () => {
+    if (draft?.paymentAmount === 0 && hasTableContext) {
+      navigate(buildOrderPaymentWaitPath(storeId, tableNum), { replace: true });
+      return;
+    }
+
     try {
       setIsOpeningToss(true);
       const latestDraft = await ensurePaymentInfo();
@@ -125,7 +145,8 @@ export default function PaymentAccountPage() {
     !hasTableContext ||
     !draft ||
     draft.storeId !== storeId ||
-    draft.tableNum !== tableNum
+    draft.tableNum !== tableNum ||
+    draft.paymentAmount === 0
   ) {
     return <main className={styles.paymentAccount} />;
   }
@@ -146,8 +167,8 @@ export default function PaymentAccountPage() {
             계좌번호를 확인하고 송금해 주세요
           </div>
           <div className={styles.paymentAccount__description}>
-            토스 앱이 바로 열리지 않더라도 아래 계좌 정보로 송금한 뒤, 결제 대기
-            화면에서 결제 완료를 눌러주시면 됩니다.
+            토스 앱이 바로 열리지 않더라도 아래 계좌 정보로 송금한 뒤 결제
+            대기 화면에서 결제 완료를 눌러주시면 됩니다.
           </div>
         </div>
 

@@ -117,6 +117,7 @@ export default function PaymentWaitPage() {
   );
   const hasTableContext = storeId !== null && tableNum !== null;
   const draft = useMemo(() => loadPendingOrderDraft(), []);
+  const isZeroPayment = draft?.paymentAmount === 0;
   const hasRedirectedRef = useRef(false);
   const hasAutoOpenedRef = useRef(false);
   const isNavigationGuardDisabledRef = useRef(false);
@@ -216,7 +217,7 @@ export default function PaymentWaitPage() {
       throw new Error('Missing draft');
     }
 
-    if (draft.tossDeeplink) {
+    if (draft.paymentAmount === 0 || draft.tossDeeplink) {
       return draft;
     }
 
@@ -244,6 +245,8 @@ export default function PaymentWaitPage() {
 
   const openToss = useCallback(async () => {
     const latestDraft = await ensureTossDeeplink();
+    if (latestDraft.paymentAmount === 0) return;
+
     const markedDraft = markTossAutoOpenAttempted(latestDraft);
 
     await openTossWithStoreFallback(markedDraft.tossDeeplink, {
@@ -264,6 +267,7 @@ export default function PaymentWaitPage() {
       !hasTableContext ||
       draft.storeId !== storeId ||
       draft.tableNum !== tableNum ||
+      draft.paymentAmount === 0 ||
       hasAutoOpenedRef.current ||
       hasTossAutoOpenAttempted(draft)
     ) {
@@ -413,27 +417,35 @@ export default function PaymentWaitPage() {
           className={styles.paymentWait__coinIcon}
         />
         <div className={styles.paymentWait__headline}>
-          결제 완료 후
+          {isZeroPayment ? '결제할 금액이 없어요' : '결제 완료 후'}
           <br />
           아래 버튼을 눌러주세요
         </div>
         <div className={styles.paymentWait__summary}>
           {formatPrice(draft.paymentAmount)}
         </div>
-        <div className={styles.paymentWait__helper}>
-          <div className={styles.paymentWait__helperText}>
-            토스 앱이 열리지 않거나 실행되지 않나요?
+        {isZeroPayment ? (
+          <div className={styles.paymentWait__helper}>
+            <div className={styles.paymentWait__helperText}>
+              결제 완료 버튼을 누르면 주문이 매장에 전달돼요.
+            </div>
           </div>
-          <button
-            type='button'
-            className={styles.paymentWait__linkButton}
-            onClick={() =>
-              navigate(buildOrderPaymentAccountPath(storeId, tableNum))
-            }
-          >
-            토스 다시 열기 또는 계좌이체
-          </button>
-        </div>
+        ) : (
+          <div className={styles.paymentWait__helper}>
+            <div className={styles.paymentWait__helperText}>
+              토스 앱이 열리지 않거나 실행되지 않나요?
+            </div>
+            <button
+              type='button'
+              className={styles.paymentWait__linkButton}
+              onClick={() =>
+                navigate(buildOrderPaymentAccountPath(storeId, tableNum))
+              }
+            >
+              토스 다시 열기 또는 계좌이체
+            </button>
+          </div>
+        )}
       </section>
 
       <BottomActionBar>
@@ -467,7 +479,7 @@ export default function PaymentWaitPage() {
               아직 주문이 접수되지 않았어요
             </h2>
             <p className={styles.paymentWait__exitDescription}>
-              송금했다면 아래 버튼을 눌러야 매장에 주문이 전달돼요.
+              아래 결제 완료 버튼을 눌러야 매장에 주문이 전달돼요.
             </p>
             <div className={styles.paymentWait__exitActions}>
               <button
