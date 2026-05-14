@@ -11,6 +11,7 @@ interface FetchOptions<P extends object = Record<string, QueryParamValue>> exten
   headers?: Record<string, string>;
   body?: unknown;
   params?: P;
+  timeoutMs?: number;
 }
 
 export const apiClient = {
@@ -67,7 +68,7 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
   options: FetchOptions<P> = {},
   timeout = 10000,
 ): Promise<T> {
-  const { headers, body, method, params, ...restOptions } = options;
+  const { headers, body, method, params, timeoutMs, ...restOptions } = options;
 
   if (!method) {
     throw new Error('HTTP method is required.');
@@ -80,7 +81,7 @@ async function sendRequest<T = unknown, P extends object = Record<string, QueryP
   }
 
   const abortController = new AbortController();
-  const timeoutId = setTimeout(() => abortController.abort(), timeout);
+  const timeoutId = setTimeout(() => abortController.abort(), timeoutMs ?? timeout);
 
   const isJsonBody = body !== undefined && body !== null && !(body instanceof FormData);
 

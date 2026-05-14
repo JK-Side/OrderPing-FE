@@ -11,6 +11,7 @@ import type {
 export const postCreatedCustomerOrder = async (body: CreateCustomerOrderRequest) => {
   return await apiClient.post<CreateCustomerOrderResponse>('/api/customer/orders', {
     body,
+    timeoutMs: 20000,
   });
 };
 
