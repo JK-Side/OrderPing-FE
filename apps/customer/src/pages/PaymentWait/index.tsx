@@ -119,10 +119,21 @@ export default function PaymentWaitPage() {
   const draft = useMemo(() => loadPendingOrderDraft(), []);
   const isZeroPayment = draft?.paymentAmount === 0;
   const hasRedirectedRef = useRef(false);
-  const hasAutoOpenedRef = useRef(false);
   const isNavigationGuardDisabledRef = useRef(false);
   const [isMovingNext, setIsMovingNext] = useState(false);
   const [isExitConfirmOpen, setIsExitConfirmOpen] = useState(false);
+  const [isPaymentGuideDismissed, setIsPaymentGuideDismissed] =
+    useState(false);
+  const [isPaymentGuideChecked, setIsPaymentGuideChecked] = useState(false);
+  const isPaymentGuideOpen = Boolean(
+    !isPaymentGuideDismissed &&
+      draft &&
+      hasTableContext &&
+      draft.storeId === storeId &&
+      draft.tableNum === tableNum &&
+      draft.paymentAmount > 0 &&
+      !hasTossAutoOpenAttempted(draft),
+  );
 
   const disableNavigationGuard = useCallback(() => {
     isNavigationGuardDisabledRef.current = true;
@@ -261,20 +272,10 @@ export default function PaymentWaitPage() {
     });
   }, [ensureTossDeeplink, toast]);
 
-  useEffect(() => {
-    if (
-      !draft ||
-      !hasTableContext ||
-      draft.storeId !== storeId ||
-      draft.tableNum !== tableNum ||
-      draft.paymentAmount === 0 ||
-      hasAutoOpenedRef.current ||
-      hasTossAutoOpenAttempted(draft)
-    ) {
-      return;
-    }
+  const handleOpenPayment = () => {
+    if (!isPaymentGuideChecked) return;
 
-    hasAutoOpenedRef.current = true;
+    setIsPaymentGuideDismissed(true);
     openToss().catch((error) => {
       const status = (error as { status?: number } | null)?.status;
       toast({
@@ -286,7 +287,7 @@ export default function PaymentWaitPage() {
         duration: 1500,
       });
     });
-  }, [draft, hasTableContext, openToss, storeId, tableNum, toast]);
+  };
 
   const handleCompletePayment = async () => {
     if (!draft || isMovingNext) return;
@@ -459,14 +460,59 @@ export default function PaymentWaitPage() {
         </button>
       </BottomActionBar>
 
+      {isPaymentGuideOpen ? (
+        <div className={styles.paymentWait__sheetOverlay} role='presentation'>
+          <section
+            className={styles.paymentWait__sheet}
+            role='dialog'
+            aria-modal='true'
+            aria-labelledby='payment-wait-guide-title'
+          >
+            <h2
+              id='payment-wait-guide-title'
+              className={styles.paymentWait__sheetTitle}
+            >
+              아직 주문은 접수되지 않았어요
+            </h2>
+            <p className={styles.paymentWait__sheetDescription}>
+              결제 후 이 화면으로 돌아와{' '}
+              <strong className={styles.paymentWait__sheetDescriptionAccent}>
+                결제 완료
+              </strong>{' '}
+              버튼을 눌러야 매장에 주문이 전달돼요.
+            </p>
+            <label className={styles.paymentWait__guideCheck}>
+              <input
+                type='checkbox'
+                checked={isPaymentGuideChecked}
+                onChange={(event) =>
+                  setIsPaymentGuideChecked(event.target.checked)
+                }
+              />
+              <span>확인했어요</span>
+            </label>
+            <div className={styles.paymentWait__sheetActions}>
+              <button
+                type='button'
+                className={styles.paymentWait__sheetPrimaryButton}
+                disabled={!isPaymentGuideChecked}
+                onClick={handleOpenPayment}
+              >
+                결제하러 가기
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
       {isExitConfirmOpen ? (
         <div
-          className={styles.paymentWait__exitOverlay}
+          className={styles.paymentWait__sheetOverlay}
           role='presentation'
           onClick={() => setIsExitConfirmOpen(false)}
         >
           <section
-            className={styles.paymentWait__exitSheet}
+            className={styles.paymentWait__sheet}
             role='dialog'
             aria-modal='true'
             aria-labelledby='payment-wait-exit-title'
@@ -474,17 +520,17 @@ export default function PaymentWaitPage() {
           >
             <h2
               id='payment-wait-exit-title'
-              className={styles.paymentWait__exitTitle}
+              className={styles.paymentWait__sheetTitle}
             >
               아직 주문이 접수되지 않았어요
             </h2>
-            <p className={styles.paymentWait__exitDescription}>
+            <p className={styles.paymentWait__sheetDescription}>
               아래 결제 완료 버튼을 눌러야 매장에 주문이 전달돼요.
             </p>
-            <div className={styles.paymentWait__exitActions}>
+            <div className={styles.paymentWait__sheetActions}>
               <button
                 type='button'
-                className={styles.paymentWait__exitPrimaryButton}
+                className={styles.paymentWait__sheetPrimaryButton}
                 disabled={isMovingNext}
                 onClick={handleCompletePaymentFromModal}
               >
@@ -492,7 +538,7 @@ export default function PaymentWaitPage() {
               </button>
               <button
                 type='button'
-                className={styles.paymentWait__exitSecondaryButton}
+                className={styles.paymentWait__sheetSecondaryButton}
                 onClick={handleLeaveToCart}
               >
                 장바구니로 돌아가기
